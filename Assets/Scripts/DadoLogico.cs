@@ -1,112 +1,183 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
+using System.Collections;
 
 public class DadoLogico : MonoBehaviour
 {
-    public int resultadoActual;
-    private Rigidbody rb;
-    private bool estoyLanzando = false;
-    private float tiempoSinMovimiento = 0f;
-
-    [Header("Referencias de Juego")]
+    [Header("Referencias")]
     public MovimientoFicha jugador;
+    public TextMeshProUGUI textoResultado;
+    public TextMeshProUGUI textoInstruccion;
 
-    [Header("Posicion inicial")]
-    public Vector3 posicionInicial = new Vector3(0f, 4f, 0f);
+    [Header("Posición fija en el tablero (visible desde GameCamera)")]
+    public Vector3 posicionFija = new Vector3(650f, 80f, 250f);
 
-    [Header("Fuerza de lanzamiento")]
-    public float fuerzaHorizontal = 8f;
-    public float fuerzaAbajo = 12f;
-    public float fuerzaRotacion = 20f;
+    [Header("Velocidad de animación")]
+    [Tooltip("Duración total del lanzamiento en segundos")]
+    public float duracionLanzamiento = 1.0f;
+    [Tooltip("Segundos mostrando el resultado antes de pedir confirmación")]
+    public float pausaResultado = 1.5f;
+    [Tooltip("Velocidad máxima de giro en grados/s")]
+    public float velocidadGiro = 900f;
 
-    void Start()
+    public int resultadoActual;
+    private bool lanzando = false;
+    private bool esperandoConfirmacion = false;
+    private Rigidbody rb;
+    private Vector3 ejeRotacion;
+
+    // -------------------------------------------------
+    void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        rb.mass = 1f;
-        Resetear();
+        if (rb != null)
+        {
+            rb.isKinematic = true;
+            rb.useGravity = false;
+        }
     }
 
-    void Resetear()
+    void OnEnable()
     {
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-        transform.position = posicionInicial;
-        transform.rotation = Quaternion.identity;
+        // Cada vez que el dado se activa se reinicia a su posición fija
+        lanzando = false;
+        esperandoConfirmacion = false;
+        ejeRotacion = Vector3.up;
+        StopAllCoroutines();
+        SnapAPosicion();
+
+        if (textoResultado != null)
+            textoResultado.gameObject.SetActive(false);
+        if (textoInstruccion != null)
+        {
+            textoInstruccion.text = "ESPACIO \u2014 Tirar el dado";
+            textoInstruccion.gameObject.SetActive(true);
+        }
     }
 
     void Update()
     {
-        if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame && !estoyLanzando)
-        {
-            Lanzar();
-        }
+        // Mantener posición fija mientras no lanza
+        if (!lanzando && !esperandoConfirmacion)
+            SnapAPosicion();
 
-        if (estoyLanzando && rb.linearVelocity.magnitude < 0.1f && rb.angularVelocity.magnitude < 0.1f)
-        {
-            tiempoSinMovimiento += Time.deltaTime;
-            if (tiempoSinMovimiento > 0.8f)
-            {
-                CheckDiceResult();
-                estoyLanzando = false;
-            }
-        }
+        if (Keyboard.current == null) return;
+
+        if (!lanzando && !esperandoConfirmacion && Keyboard.current.spaceKey.wasPressedThisFrame)
+            Lanzar();
+
+        if (esperandoConfirmacion && Keyboard.current.spaceKey.wasPressedThisFrame)
+            ConfirmarMovimiento();
     }
 
+    void SnapAPosicion()
+    {
+        transform.position = posicionFija;
+    }
+
+    // -------------------------------------------------
     public void Lanzar()
     {
-        Resetear();
-        estoyLanzando = true;
-        tiempoSinMovimiento = 0f;
-        resultadoActual = 0;
-
-        float x = Random.Range(-fuerzaHorizontal, fuerzaHorizontal);
-        float z = Random.Range(-fuerzaHorizontal, fuerzaHorizontal);
-        float y = -fuerzaAbajo;
-
-        rb.linearVelocity = new Vector3(x, y, z);
-
-        rb.angularVelocity = new Vector3(
-            Random.Range(-fuerzaRotacion, fuerzaRotacion),
-            Random.Range(-fuerzaRotacion, fuerzaRotacion),
-            Random.Range(-fuerzaRotacion, fuerzaRotacion)
-        );
+        if (!lanzando)
+            StartCoroutine(AnimarLanzamiento());
     }
 
-    void CheckDiceResult()
+    IEnumerator AnimarLanzamiento()
     {
-        Vector3[] ejesLocales = {
-            transform.up,
-            -transform.up,
-            transform.forward,
-            -transform.forward,
-            transform.right,
-            -transform.right
-        };
-        int[] caras = { 5, 2, 6, 1, 3, 4 };
+        lanzando = true;
 
-        int mejorIndice = 0;
-        float mejorDot = -1f;
+        if (textoResultado != null)   textoResultado.gameObject.SetActive(false);
+        if (textoInstruccion != null) textoInstruccion.gameObject.SetActive(false);
 
-        for (int i = 0; i < ejesLocales.Length; i++)
+        // Resultado elegido al inicio (sin física)
+        resultadoActual = Random.Range(1, 7);
+
+        // Eje de rotación aleatorio diferente cada lanzamiento
+        ejeRotacion = new Vector3(
+            Random.Range(-1f, 1f),
+            Random.Range(-1f, 1f),
+            Random.Range(-1f, 1f)
+        ).normalized;
+
+        // Segunda rotación secundaria para mayor caos visual
+        Vector3 ejeSec = new Vector3(
+            Random.Range(-1f, 1f),
+            Random.Range(-1f, 1f),
+            Random.Range(-1f, 1f)
+        ).normalized;
+
+        float tiempo = 0f;
+        while (tiempo < duracionLanzamiento)
         {
-            float d = Vector3.Dot(ejesLocales[i], Vector3.up);
-            if (d > mejorDot)
-            {
-                mejorDot = d;
-                mejorIndice = i;
-            }
+            tiempo += Time.deltaTime;
+            float t = tiempo / duracionLanzamiento;
+
+            // Giro principal que desacelera, más rotación secundaria constante
+            float vel = velocidadGiro * (1f - t * t);
+            transform.Rotate(ejeRotacion, vel * Time.deltaTime, Space.Self);
+            transform.Rotate(ejeSec, vel * 0.4f * Time.deltaTime, Space.Self);
+
+            // Pequeño salto al inicio de la animación
+            float salto = Mathf.Sin(t * Mathf.PI * 3f) * 10f * (1f - t);
+            transform.position = posicionFija + Vector3.up * salto;
+
+            yield return null;
         }
 
-        resultadoActual = caras[mejorIndice];
-        Debug.Log($"Resultado físico detectado: {resultadoActual}");
+        // Posición y rotación final según resultado
+        transform.position = posicionFija;
+        transform.rotation = RotacionParaResultado(resultadoActual);
+
+        // lanzando permanece true hasta que el jugador confirme con SPACE
+        // para evitar que se pueda tirar de nuevo durante la pausa
+
+        Debug.Log($"Resultado del dado: {resultadoActual}");
+
+        if (textoResultado != null)
+        {
+            textoResultado.text = $"Dado: {resultadoActual}";
+            textoResultado.gameObject.SetActive(true);
+        }
+
+        // Pausa para visualizar el resultado
+        yield return new WaitForSeconds(pausaResultado);
+
+        // Pedir confirmación para mover la ficha
+        lanzando = false;
+        esperandoConfirmacion = true;
+        if (textoInstruccion != null)
+        {
+            textoInstruccion.text = "ESPACIO \u2014 Mover ficha";
+            textoInstruccion.gameObject.SetActive(true);
+        }
+    }
+
+    void ConfirmarMovimiento()
+    {
+        esperandoConfirmacion = false;
+
+        if (textoInstruccion != null)
+            textoInstruccion.gameObject.SetActive(false);
 
         if (jugador != null)
-        {
             jugador.Avanzar(resultadoActual);
-        }
         else
+            Debug.LogWarning("No hay jugador asignado al dado.");
+    }
+
+    // Mapeo original del script: up=5, -up=2, forward=6, -forward=1, right=3, -right=4
+    Quaternion RotacionParaResultado(int resultado)
+    {
+        switch (resultado)
         {
-            Debug.LogWarning("¡Ojo! No has asignado al Jugador en el Inspector del Dado.");
+            case 5: return Quaternion.identity;
+            case 2: return Quaternion.Euler(180, 0, 0);
+            case 6: return Quaternion.Euler(-90, 0, 0);
+            case 1: return Quaternion.Euler(90, 0, 0);
+            case 3: return Quaternion.Euler(0, 0, 90);
+            case 4: return Quaternion.Euler(0, 0, -90);
+            default: return Quaternion.identity;
         }
     }
 }
