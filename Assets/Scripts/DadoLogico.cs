@@ -26,11 +26,13 @@ public class DadoLogico : MonoBehaviour
     private bool esperandoConfirmacion = false;
     private Rigidbody rb;
     private Vector3 ejeRotacion;
+    private CamaraDirectora camaraDirectora;
 
     // -------------------------------------------------
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        camaraDirectora = FindAnyObjectByType<CamaraDirectora>();
         if (rb != null)
         {
             rb.isKinematic = true;
@@ -89,6 +91,9 @@ public class DadoLogico : MonoBehaviour
 
         if (textoResultado != null)   textoResultado.gameObject.SetActive(false);
         if (textoInstruccion != null) textoInstruccion.gameObject.SetActive(false);
+
+        // Enfocar el dado mientras gira
+        if (camaraDirectora != null) camaraDirectora.EnfocarDado();
 
         // Resultado elegido al inicio (sin física)
         resultadoActual = Random.Range(1, 7);

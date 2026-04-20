@@ -9,6 +9,12 @@ public class MovimientoFicha : MonoBehaviour
     public GameManager gm;
 
     private bool enMovimiento = false;
+    private CamaraDirectora camaraDirectora;
+
+    void Awake()
+    {
+        camaraDirectora = FindAnyObjectByType<CamaraDirectora>();
+    }
 
     public void Avanzar(int cantidadPasos)
     {
@@ -29,9 +35,11 @@ public class MovimientoFicha : MonoBehaviour
     {
         enMovimiento = true;
 
-        // Ocultar dado mientras la ficha se mueve
+        // Ocultar dado y enfocar al jugador
         if (gm != null && gm.dado != null)
             gm.dado.gameObject.SetActive(false);
+
+        if (camaraDirectora != null) camaraDirectora.SeguirJugador(transform);
 
         // Validar referencias
         if (ruta == null || ruta.casillas == null || ruta.casillas.Count == 0)
@@ -72,6 +80,8 @@ public class MovimientoFicha : MonoBehaviour
 
         enMovimiento = false;
         Debug.Log($"[MovimientoFicha] {name} llegó a casilla {indiceActual}");
+
+        if (camaraDirectora != null) camaraDirectora.VolverAlTablero();
 
         bool llegóAMeta = indiceActual >= ruta.casillas.Count - 1;
         if (gm != null)
