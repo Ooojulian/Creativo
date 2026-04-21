@@ -11,6 +11,9 @@ public class GameManager : MonoBehaviour
     public GameObject panelHUD;
     public TextMeshProUGUI textoTurno;
 
+    [Header("Cartas UI")]
+    public CartasUIVisual uiCartas;
+
     [Header("Cámaras")]
     public Camera camaraMenu;
     public Camera camaraJuego;
@@ -111,8 +114,20 @@ public class GameManager : MonoBehaviour
             intentos++;
         }
 
+        // Jugador actual
+        MovimientoFicha j = jugadoresActivos[turnoActual];
+
+        // CARTA: PierdeTurno (saltar turno)
+        if (j.pierdeSiguienteTurno)
+        {
+            j.pierdeSiguienteTurno = false;
+            Debug.Log($"[Cartas] Jugador {turnoActual + 1} pierde el turno.");
+            SiguienteTurno();
+            return;
+        }
+
         Debug.Log($"Turno del Jugador {turnoActual + 1}");
-        dado.jugador = jugadoresActivos[turnoActual];
+        dado.jugador = j;
 
         if (!dado.gameObject.activeSelf)
             dado.gameObject.SetActive(true);
@@ -167,6 +182,35 @@ public class GameManager : MonoBehaviour
                 textoFin.text = texto;
             }
         }
+    }
+
+    // =========================
+    // CARTA: INTERCAMBIO
+    // =========================
+    public void IntercambiarConOtroJugador(MovimientoFicha jugador)
+    {
+        // Elegir otro jugador activo (distinto al actual)
+        var candidatos = new List<MovimientoFicha>(jugadoresActivos);
+        candidatos.Remove(jugador);
+        if (candidatos.Count == 0) return;
+
+        MovimientoFicha otro = candidatos[Random.Range(0, candidatos.Count)];
+
+        // Intercambiar índices
+        int a = jugador.indiceActual;
+        int b = otro.indiceActual;
+
+        jugador.indiceActual = b;
+        otro.indiceActual = a;
+
+        // Reposicionar en el tablero
+        if (ruta != null && ruta.casillas != null && ruta.casillas.Count > 0)
+        {
+            jugador.transform.position = ruta.casillas[jugador.indiceActual].position + Vector3.up * 0.5f;
+            otro.transform.position = ruta.casillas[otro.indiceActual].position + Vector3.up * 0.5f;
+        }
+
+        Debug.Log($"[Cartas] Intercambio: {jugador.name} <-> {otro.name}");
     }
 
     public void VolverAlMenu()
