@@ -128,6 +128,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 959169}
+  - component: {fileID: 959170}
   m_Layer: 0
   m_Name: Tile18
   m_TagString: Untagged
@@ -150,6 +151,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &959170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 959168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 1
+  cartaFija: 0
 --- !u!1 &4482364
 GameObject:
   m_ObjectHideFlags: 0
@@ -1217,6 +1232,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 66601165}
+  - component: {fileID: 66601166}
   m_Layer: 0
   m_Name: Tile01
   m_TagString: Untagged
@@ -1239,6 +1255,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &66601166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 66601164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 0
 --- !u!1001 &77288115
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1828,6 +1858,8 @@ GameObject:
   - component: {fileID: 131284076}
   - component: {fileID: 131284075}
   - component: {fileID: 131284074}
+  - component: {fileID: 131284077}
+  - component: {fileID: 131284078}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1847,9 +1879,11 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 385224506}
   - {fileID: 198293690}
   - {fileID: 890495303}
   - {fileID: 1170638331}
+  - {fileID: 1470842465}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1921,6 +1955,34 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &131284077
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 131284072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08ae7420b7febc5478d8a0481ad542f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MenuController
+  panelMenu: {fileID: 198293687}
+  fondoMenu: {fileID: 385224505}
+--- !u!114 &131284078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 131284072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea1a0720baa2e7b4b8123704a67cbce1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MenuNiveles
+  botonJugar: {fileID: 1946007925}
+  contenedorModos: {fileID: 692594631}
 --- !u!1001 &143700976
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2362,8 +2424,11 @@ GameObject:
   - component: {fileID: 195225340}
   - component: {fileID: 195225339}
   - component: {fileID: 195225338}
+  - component: {fileID: 195225341}
+  - component: {fileID: 195225342}
+  - component: {fileID: 195225343}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Boton4Jugadores
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2376,17 +2441,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 195225336}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 859857310}
-  m_Father: {fileID: 198293690}
+  m_Father: {fileID: 692594632}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -66.7}
+  m_AnchoredPosition: {x: 0, y: -100}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &195225338
@@ -2445,6 +2510,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 131284077}
+        m_TargetAssemblyTypeName: MenuController, Assembly-CSharp
+        m_MethodName: IniciarJuego
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 4
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &195225339
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2458,7 +2535,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.27058825, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2483,6 +2560,45 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 195225336}
   m_CullTransparentMesh: 1
+--- !u!114 &195225341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 195225336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3a8bd52dc49db8419b3b07553c05b04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: "Assembly-CSharp::Bot\xF3nMenuFX"
+--- !u!114 &195225342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 195225336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3a8bd52dc49db8419b3b07553c05b04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: "Assembly-CSharp::Bot\xF3nMenuFX"
+--- !u!114 &195225343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 195225336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 1, g: 0.84313726, b: 0, a: 0.5}
+  m_EffectDistance: {x: 3, y: -3}
+  m_UseGraphicAlpha: 1
 --- !u!1 &198293687
 GameObject:
   m_ObjectHideFlags: 0
@@ -2494,6 +2610,7 @@ GameObject:
   - component: {fileID: 198293690}
   - component: {fileID: 198293689}
   - component: {fileID: 198293688}
+  - component: {fileID: 198293691}
   m_Layer: 5
   m_Name: Panel_Menu
   m_TagString: Untagged
@@ -2508,7 +2625,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 198293687}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -2522,8 +2639,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
+  m_Type: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -2551,9 +2668,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 298433037}
-  - {fileID: 1035782858}
-  - {fileID: 195225337}
+  - {fileID: 2120775981}
+  - {fileID: 1614317815}
   m_Father: {fileID: 131284073}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2561,6 +2677,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &198293691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 198293687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea1a0720baa2e7b4b8123704a67cbce1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MenuNiveles
+  botonJugar: {fileID: 1946007925}
+  contenedorModos: {fileID: 692594631}
 --- !u!1001 &208950236
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3270,6 +3400,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 241255089}
+  - component: {fileID: 241255090}
   m_Layer: 0
   m_Name: Tile10
   m_TagString: Untagged
@@ -3292,6 +3423,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &241255090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 241255088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 3
 --- !u!1001 &246898014
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3647,8 +3792,11 @@ GameObject:
   - component: {fileID: 298433040}
   - component: {fileID: 298433039}
   - component: {fileID: 298433038}
+  - component: {fileID: 298433041}
+  - component: {fileID: 298433042}
+  - component: {fileID: 298433043}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Boton2Jugadores
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3661,17 +3809,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 298433036}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 230688875}
-  m_Father: {fileID: 198293690}
+  m_Father: {fileID: 692594632}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 70.9}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &298433038
@@ -3730,6 +3878,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 131284077}
+        m_TargetAssemblyTypeName: MenuController, Assembly-CSharp
+        m_MethodName: IniciarJuego
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 2
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &298433039
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3743,7 +3903,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.11764706, g: 0.5647059, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3768,6 +3928,45 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 298433036}
   m_CullTransparentMesh: 1
+--- !u!114 &298433041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 298433036}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3a8bd52dc49db8419b3b07553c05b04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: "Assembly-CSharp::Bot\xF3nMenuFX"
+--- !u!114 &298433042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 298433036}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3a8bd52dc49db8419b3b07553c05b04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: "Assembly-CSharp::Bot\xF3nMenuFX"
+--- !u!114 &298433043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 298433036}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 0, g: 0.83137256, b: 1, a: 0.5}
+  m_EffectDistance: {x: 3, y: -3}
+  m_UseGraphicAlpha: 1
 --- !u!1001 &300452475
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4382,6 +4581,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 348565418}
+  - component: {fileID: 348565419}
   m_Layer: 0
   m_Name: Tile17
   m_TagString: Untagged
@@ -4404,6 +4604,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &348565419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 348565417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 5
 --- !u!1001 &349331058
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4569,6 +4783,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 362369748}
+  - component: {fileID: 362369749}
   m_Layer: 0
   m_Name: Tile06
   m_TagString: Untagged
@@ -4591,6 +4806,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &362369749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 362369747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 1
 --- !u!1001 &372830420
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4678,6 +4907,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 375772169}
+  - component: {fileID: 375772170}
   m_Layer: 0
   m_Name: Tile12
   m_TagString: Untagged
@@ -4700,6 +4930,95 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &375772170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 375772168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 1
+--- !u!1 &385224505
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 385224506}
+  - component: {fileID: 385224508}
+  - component: {fileID: 385224507}
+  m_Layer: 5
+  m_Name: FondoMenu
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &385224506
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 385224505}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 131284073}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: 18}
+  m_SizeDelta: {x: 700, y: 36}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &385224507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 385224505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 5e3f1f5be566cc74b9e9688bb9004d87, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &385224508
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 385224505}
+  m_CullTransparentMesh: 1
 --- !u!1001 &389848598
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5059,6 +5378,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 441645494}
+  - component: {fileID: 441645495}
   m_Layer: 0
   m_Name: Tile02
   m_TagString: Untagged
@@ -5081,6 +5401,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &441645495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 441645493}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 1
 --- !u!1001 &454822629
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5168,6 +5502,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 455250843}
+  - component: {fileID: 455250844}
   m_Layer: 0
   m_Name: Tile19
   m_TagString: Untagged
@@ -5190,6 +5525,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &455250844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 455250842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 4
 --- !u!1001 &461671310
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5277,6 +5626,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 470882746}
+  - component: {fileID: 470882747}
   m_Layer: 0
   m_Name: Tile21
   m_TagString: Untagged
@@ -5299,6 +5649,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &470882747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 470882745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 1
+  cartaFija: 0
 --- !u!1001 &496626280
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5542,6 +5906,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 550124373}
+  - component: {fileID: 550124374}
   m_Layer: 0
   m_Name: Tile07
   m_TagString: Untagged
@@ -5564,6 +5929,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &550124374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 550124372}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 1
+  cartaFija: 0
 --- !u!1001 &554928530
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5651,6 +6030,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 559638897}
+  - component: {fileID: 559638898}
   m_Layer: 0
   m_Name: Tile24
   m_TagString: Untagged
@@ -5673,6 +6053,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &559638898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 559638896}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 1
+  cartaFija: 0
 --- !u!1001 &561533937
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5916,6 +6310,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 573067275}
+  - component: {fileID: 573067276}
   m_Layer: 0
   m_Name: Tile15
   m_TagString: Untagged
@@ -5938,6 +6333,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &573067276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 573067274}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 2
 --- !u!1001 &579865842
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6177,6 +6586,143 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: cf97f17ca66823e448521db69dc5afc8, type: 3}
   m_PrefabInstance: {fileID: 633590287}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &643156019
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 643156020}
+  - component: {fileID: 643156022}
+  - component: {fileID: 643156021}
+  m_Layer: 5
+  m_Name: Text (TMP)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &643156020
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 643156019}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1946007926}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &643156021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 643156019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: Jugar
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4281479730
+  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 24
+  m_fontSizeBase: 24
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 0
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_characterHorizontalScale: 1
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &643156022
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 643156019}
+  m_CullTransparentMesh: 1
 --- !u!1001 &644803762
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6567,6 +7113,136 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: cf97f17ca66823e448521db69dc5afc8, type: 3}
   m_PrefabInstance: {fileID: 682686928}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &686125631
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 686125632}
+  m_Layer: 5
+  m_Name: Botones
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &686125632
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 686125631}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1946007926}
+  - {fileID: 692594632}
+  m_Father: {fileID: 1614317815}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &692594631
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 692594632}
+  - component: {fileID: 692594635}
+  - component: {fileID: 692594634}
+  - component: {fileID: 692594633}
+  m_Layer: 5
+  m_Name: Contenedor_Modos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &692594632
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 692594631}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 298433037}
+  - {fileID: 1035782858}
+  - {fileID: 195225337}
+  m_Father: {fileID: 686125632}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 58.083344}
+  m_SizeDelta: {x: 602, y: 343.8333}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &692594633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 692594631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea1a0720baa2e7b4b8123704a67cbce1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MenuNiveles
+  botonJugar: {fileID: 0}
+  contenedorModos: {fileID: 0}
+--- !u!114 &692594634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 692594631}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &692594635
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 692594631}
+  m_CullTransparentMesh: 1
 --- !u!1001 &694543648
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7128,6 +7804,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 733987335}
+  - component: {fileID: 733987336}
   m_Layer: 0
   m_Name: Tile27
   m_TagString: Untagged
@@ -7150,6 +7827,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &733987336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 733987334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 4
 --- !u!1 &737293694
 GameObject:
   m_ObjectHideFlags: 0
@@ -7568,6 +8259,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 756656241}
+  - component: {fileID: 756656242}
   m_Layer: 0
   m_Name: Tile16
   m_TagString: Untagged
@@ -7590,6 +8282,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &756656242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 756656240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 1
 --- !u!1001 &760104196
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8670,6 +9376,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 857076987}
+  - component: {fileID: 857076988}
   m_Layer: 0
   m_Name: Tile29
   m_TagString: Untagged
@@ -8692,6 +9399,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &857076988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 857076986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 3
 --- !u!1 &859857309
 GameObject:
   m_ObjectHideFlags: 0
@@ -9570,6 +10291,11 @@ MonoBehaviour:
   indiceActual: 0
   velocidad: 150
   gm: {fileID: 1366047254}
+  escudoActivo: 0
+  pierdeSiguienteTurno: 0
+  dobleTiroPendiente: 0
+  tiempoRevelacion: 2
+  tiempoResultado: 1
 --- !u!1001 &959083043
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10021,6 +10747,116 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: cf97f17ca66823e448521db69dc5afc8, type: 3}
   m_PrefabInstance: {fileID: 1004975226}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1010645012
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1010645013}
+  - component: {fileID: 1010645016}
+  - component: {fileID: 1010645015}
+  - component: {fileID: 1010645017}
+  - component: {fileID: 1010645018}
+  m_Layer: 5
+  m_Name: CartaImagen
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1010645013
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1010645012}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1470842465}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 300, y: 400}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1010645015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1010645012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1010645016
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1010645012}
+  m_CullTransparentMesh: 1
+--- !u!114 &1010645017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1010645012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fbfea28c39626a41996eb7f1015b782, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartasUIVisual
+  imagenCarta: {fileID: 1010645015}
+  spriteAvanceRapido: {fileID: 21300000, guid: 7f33bc22bec151b47a29d90d686b97c3, type: 3}
+  spriteEscudo: {fileID: 21300000, guid: 4435c4b48c2f0fe4d92e7c57106d0b9c, type: 3}
+  spriteDobleTiro: {fileID: 21300000, guid: ad2b5a96004dbd6478ddc335e1de57d6, type: 3}
+  spriteRetroceso: {fileID: 21300000, guid: e90dfc573d9e720438bf7c64f715f35b, type: 3}
+  spritePierdeTurno: {fileID: 21300000, guid: 48e19464d76eb6c40bef7c12c4c686e0, type: 3}
+  spriteIntercambio: {fileID: 21300000, guid: bd616ea0236c15f4f9b96a7463e0e04c, type: 3}
+  canvasGroup: {fileID: 1010645018}
+  duracionFade: 0.3
+--- !u!225 &1010645018
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1010645012}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1032644901
 GameObject:
   m_ObjectHideFlags: 0
@@ -10030,6 +10866,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1032644902}
+  - component: {fileID: 1032644903}
   m_Layer: 0
   m_Name: Tile08
   m_TagString: Untagged
@@ -10052,6 +10889,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1032644903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1032644901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 4
 --- !u!1 &1035782857
 GameObject:
   m_ObjectHideFlags: 0
@@ -10064,8 +10915,11 @@ GameObject:
   - component: {fileID: 1035782861}
   - component: {fileID: 1035782860}
   - component: {fileID: 1035782859}
+  - component: {fileID: 1035782862}
+  - component: {fileID: 1035782863}
+  - component: {fileID: 1035782864}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Boton3Jugadores
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10078,17 +10932,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1035782857}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1001314572}
-  m_Father: {fileID: 198293690}
+  m_Father: {fileID: 692594632}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -50}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1035782859
@@ -10147,6 +11001,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 131284077}
+        m_TargetAssemblyTypeName: MenuController, Assembly-CSharp
+        m_MethodName: IniciarJuego
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 3
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1035782860
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10160,7 +11026,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.6156863, g: 0.30588236, b: 0.8666667, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -10185,6 +11051,45 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1035782857}
   m_CullTransparentMesh: 1
+--- !u!114 &1035782862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1035782857}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3a8bd52dc49db8419b3b07553c05b04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: "Assembly-CSharp::Bot\xF3nMenuFX"
+--- !u!114 &1035782863
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1035782857}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3a8bd52dc49db8419b3b07553c05b04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: "Assembly-CSharp::Bot\xF3nMenuFX"
+--- !u!114 &1035782864
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1035782857}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 1, g: 0.0627451, b: 0.9411765, a: 0.5}
+  m_EffectDistance: {x: 3, y: -3}
+  m_UseGraphicAlpha: 1
 --- !u!1001 &1044069046
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10542,6 +11447,11 @@ MonoBehaviour:
   indiceActual: 0
   velocidad: 150
   gm: {fileID: 1366047254}
+  escudoActivo: 0
+  pierdeSiguienteTurno: 0
+  dobleTiroPendiente: 0
+  tiempoRevelacion: 2
+  tiempoResultado: 1
 --- !u!1001 &1079621284
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10629,6 +11539,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1083124130}
+  - component: {fileID: 1083124131}
   m_Layer: 0
   m_Name: Tile26
   m_TagString: Untagged
@@ -10651,6 +11562,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1083124131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1083124129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 1
 --- !u!1001 &1106112756
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10778,6 +11703,11 @@ MonoBehaviour:
   indiceActual: 0
   velocidad: 150
   gm: {fileID: 1366047254}
+  escudoActivo: 0
+  pierdeSiguienteTurno: 0
+  dobleTiroPendiente: 0
+  tiempoRevelacion: 2
+  tiempoResultado: 1
 --- !u!1001 &1117553161
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11445,6 +12375,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1166160925}
+  - component: {fileID: 1166160926}
   m_Layer: 0
   m_Name: Tile03
   m_TagString: Untagged
@@ -11467,6 +12398,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1166160926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1166160924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 1
+  cartaFija: 0
 --- !u!1001 &1169483346
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12365,6 +13310,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1258470995}
+  - component: {fileID: 1258470996}
   m_Layer: 0
   m_Name: Tile31
   m_TagString: Untagged
@@ -12387,6 +13333,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1258470996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1258470994}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 2
 --- !u!1001 &1263618428
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12474,6 +13434,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1274693931}
+  - component: {fileID: 1274693932}
   m_Layer: 0
   m_Name: Tile05
   m_TagString: Untagged
@@ -12496,6 +13457,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1274693932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1274693930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 0
 --- !u!1001 &1274776370
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12583,6 +13558,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1293036901}
+  - component: {fileID: 1293036902}
   m_Layer: 0
   m_Name: Tile33
   m_TagString: Untagged
@@ -12605,6 +13581,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1293036902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1293036900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 4
 --- !u!1001 &1297880357
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12907,6 +13897,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1306185132}
+  - component: {fileID: 1306185133}
   m_Layer: 0
   m_Name: Tile22
   m_TagString: Untagged
@@ -12929,6 +13920,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1306185133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1306185131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 6
 --- !u!1001 &1308275546
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13339,7 +14344,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1366047253}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e8fd024ebdbcfbb7783990efbb4fba08, type: 3}
   m_Name: 
@@ -13347,6 +14352,7 @@ MonoBehaviour:
   panelMenu: {fileID: 198293687}
   panelHUD: {fileID: 890495302}
   textoTurno: {fileID: 856791774}
+  uiCartas: {fileID: 1010645017}
   camaraMenu: {fileID: 330585545}
   camaraJuego: {fileID: 714573244}
   dado: {fileID: 6830981}
@@ -14062,6 +15068,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1464204846}
+  - component: {fileID: 1464204847}
   m_Layer: 0
   m_Name: Tile14
   m_TagString: Untagged
@@ -14084,6 +15091,185 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1464204847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1464204845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 1
+  cartaFija: 0
+--- !u!1 &1470842464
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1470842465}
+  - component: {fileID: 1470842468}
+  - component: {fileID: 1470842467}
+  - component: {fileID: 1470842469}
+  - component: {fileID: 1470842470}
+  m_Layer: 5
+  m_Name: TextoCarta
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1470842465
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1470842464}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1010645013}
+  m_Father: {fileID: 131284073}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 200, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1470842467
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1470842464}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: New Text
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 36
+  m_fontSizeBase: 36
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 0
+  m_HorizontalAlignment: 1
+  m_VerticalAlignment: 256
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_characterHorizontalScale: 1
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &1470842468
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1470842464}
+  m_CullTransparentMesh: 1
+--- !u!114 &1470842469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1470842464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2747be84de40878499617e0c03991a76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UICartas
+  textoCarta: {fileID: 1470842467}
+--- !u!225 &1470842470
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1470842464}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1001 &1477361027
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14327,6 +15513,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1486734294}
+  - component: {fileID: 1486734295}
   m_Layer: 0
   m_Name: Tile04
   m_TagString: Untagged
@@ -14349,6 +15536,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1486734295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1486734293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 2
 --- !u!1001 &1490424886
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14782,6 +15983,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1554102127}
+  - component: {fileID: 1554102128}
   m_Layer: 0
   m_Name: Tile25
   m_TagString: Untagged
@@ -14804,6 +16006,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1554102128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1554102126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 2
 --- !u!1 &1558335423
 GameObject:
   m_ObjectHideFlags: 0
@@ -15581,6 +16797,82 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: cf97f17ca66823e448521db69dc5afc8, type: 3}
   m_PrefabInstance: {fileID: 1611015343}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1614317814
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1614317815}
+  - component: {fileID: 1614317817}
+  - component: {fileID: 1614317816}
+  m_Layer: 5
+  m_Name: RightPanel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1614317815
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1614317814}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 686125632}
+  m_Father: {fileID: 198293690}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 200, y: 200}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1614317816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1614317814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.05490196, g: 0.08627451, b: 0.14901961, a: 0.78431374}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1614317817
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1614317814}
+  m_CullTransparentMesh: 1
 --- !u!1001 &1617043169
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16351,6 +17643,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1719399331}
+  - component: {fileID: 1719399332}
   m_Layer: 0
   m_Name: Tile20
   m_TagString: Untagged
@@ -16373,6 +17666,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1719399332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1719399330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 1
 --- !u!1 &1739045769
 GameObject:
   m_ObjectHideFlags: 0
@@ -16787,6 +18094,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1800774371}
+  - component: {fileID: 1800774372}
   m_Layer: 0
   m_Name: Tile32
   m_TagString: Untagged
@@ -16809,6 +18117,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1800774372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800774370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 1
 --- !u!21 &1805841808
 Material:
   serializedVersion: 8
@@ -17271,6 +18593,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1873845606}
+  - component: {fileID: 1873845607}
   m_Layer: 0
   m_Name: Tile30
   m_TagString: Untagged
@@ -17293,6 +18616,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1873845607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1873845605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 4
 --- !u!1001 &1877476239
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17746,6 +19083,192 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: cf97f17ca66823e448521db69dc5afc8, type: 3}
   m_PrefabInstance: {fileID: 1920202926}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1946007925
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1946007926}
+  - component: {fileID: 1946007931}
+  - component: {fileID: 1946007930}
+  - component: {fileID: 1946007929}
+  - component: {fileID: 1946007928}
+  - component: {fileID: 1946007927}
+  - component: {fileID: 1946007932}
+  m_Layer: 5
+  m_Name: BotonJugar
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1946007926
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946007925}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 643156020}
+  m_Father: {fileID: 686125632}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 20}
+  m_SizeDelta: {x: 160, y: 30}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1946007927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946007925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3a8bd52dc49db8419b3b07553c05b04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: "Assembly-CSharp::Bot\xF3nMenuFX"
+--- !u!114 &1946007928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946007925}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea1a0720baa2e7b4b8123704a67cbce1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MenuNiveles
+  botonJugar: {fileID: 1946007925}
+  contenedorModos: {fileID: 0}
+--- !u!114 &1946007929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946007925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 1946007930}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 198293691}
+        m_TargetAssemblyTypeName: MenuNiveles, Assembly-CSharp
+        m_MethodName: MostrarModos
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 131284078}
+        m_TargetAssemblyTypeName: MenuNiveles, Assembly-CSharp
+        m_MethodName: MostrarModos
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &1946007930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946007925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1946007931
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946007925}
+  m_CullTransparentMesh: 1
+--- !u!114 &1946007932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946007925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3a8bd52dc49db8419b3b07553c05b04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: "Assembly-CSharp::Bot\xF3nMenuFX"
 --- !u!1001 &1947988243
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17833,6 +19356,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1948328112}
+  - component: {fileID: 1948328113}
   m_Layer: 0
   m_Name: Tile23
   m_TagString: Untagged
@@ -17855,6 +19379,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1948328113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1948328111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 4
 --- !u!1001 &1957835132
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17982,6 +19520,11 @@ MonoBehaviour:
   indiceActual: 0
   velocidad: 150
   gm: {fileID: 1366047254}
+  escudoActivo: 0
+  pierdeSiguienteTurno: 0
+  dobleTiroPendiente: 0
+  tiempoRevelacion: 2
+  tiempoResultado: 1
 --- !u!1 &1972437704
 GameObject:
   m_ObjectHideFlags: 0
@@ -17991,6 +19534,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1972437705}
+  - component: {fileID: 1972437706}
   m_Layer: 0
   m_Name: Tile28
   m_TagString: Untagged
@@ -18013,6 +19557,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1972437706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1972437704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 1
+  cartaFija: 0
 --- !u!1001 &1977262975
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18100,6 +19658,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1982693071}
+  - component: {fileID: 1982693072}
   m_Layer: 0
   m_Name: Tile11
   m_TagString: Untagged
@@ -18122,6 +19681,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1982693072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1982693070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 1
+  cartaFija: 0
 --- !u!1 &1994373259
 GameObject:
   m_ObjectHideFlags: 0
@@ -18131,6 +19704,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1994373260}
+  - component: {fileID: 1994373261}
   m_Layer: 0
   m_Name: Tile13
   m_TagString: Untagged
@@ -18153,6 +19727,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1994373261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1994373259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  aleatoria: 0
+  cartaFija: 4
 --- !u!1001 &2007285375
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19011,6 +20599,143 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: cf97f17ca66823e448521db69dc5afc8, type: 3}
   m_PrefabInstance: {fileID: 2090437537}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2120775980
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2120775981}
+  - component: {fileID: 2120775983}
+  - component: {fileID: 2120775982}
+  m_Layer: 5
+  m_Name: Titulo
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2120775981
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2120775980}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 198293690}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 130}
+  m_SizeDelta: {x: 200, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2120775982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2120775980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: El gran desafio de la ruta amorfa
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4290832375
+  m_fontColor: {r: 0.96862745, g: 0.90588236, b: 0.7529412, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 24
+  m_fontSizeBase: 24
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 0
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_characterHorizontalScale: 1
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &2120775983
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2120775980}
+  m_CullTransparentMesh: 1
 --- !u!1001 &2134111621
 PrefabInstance:
   m_ObjectHideFlags: 0

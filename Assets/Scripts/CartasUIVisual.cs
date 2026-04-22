@@ -19,7 +19,7 @@ public class CartasUIVisual : MonoBehaviour
     public CanvasGroup canvasGroup; // Para fade in/out
     public float duracionFade = 0.3f;
 
-    void Awake()
+    void Start()
     {
         if (canvasGroup == null)
             canvasGroup = GetComponent<CanvasGroup>();
