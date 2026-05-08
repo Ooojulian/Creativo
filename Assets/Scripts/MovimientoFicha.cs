@@ -20,9 +20,14 @@ public class MovimientoFicha : MonoBehaviour
     private bool enMovimiento = false;
     private CamaraDirectora camaraDirectora;
 
+    [Header("Nuevo Sistema de Cartas")]
+    public PlayerInventory inventario;
+    public int cartasAlEmpezarTurno = 0;
+
     void Awake()
     {
         camaraDirectora = FindAnyObjectByType<CamaraDirectora>();
+        if (inventario == null) inventario = GetComponent<PlayerInventory>();
     }
 
     public void Avanzar(int cantidadPasos)
@@ -30,6 +35,11 @@ public class MovimientoFicha : MonoBehaviour
         if (enMovimiento) return;
 
         int casillasRestantes = ruta.casillas.Count - 1 - indiceActual;
+        
+        // CARTA SPRINT (Reserva): Verificar cercanía a meta antes de mover
+        if (CardTriggerSystem.Instance != null)
+            CardTriggerSystem.Instance.CheckNearGoal(this);
+
         if (cantidadPasos > casillasRestantes)
         {
             Debug.Log($"[MovimientoFicha] {name}: necesita {casillasRestantes} o menos para avanzar, sacó {cantidadPasos}. Turno perdido.");
@@ -65,12 +75,26 @@ public class MovimientoFicha : MonoBehaviour
 
         while (indiceActual < metaFinal)
         {
+            int indiceAnterior = indiceActual;
             indiceActual++;
 
             if (ruta.casillas[indiceActual] == null)
             {
                 Debug.LogWarning($"[MovimientoFicha] casilla[{indiceActual}] es null, saltando.");
                 continue;
+            }
+
+            // CHECK: Overtake (Pisotón)
+            if (CardTriggerSystem.Instance != null)
+            {
+                foreach (var otro in gm.todosLosJugadores)
+                {
+                    if (otro != this && otro.indiceActual == indiceActual)
+                    {
+                        // Si yo paso a alguien que estaba en esta casilla
+                        CardTriggerSystem.Instance.CheckOvertake(otro, this);
+                    }
+                }
             }
 
             Vector3 destino = ruta.casillas[indiceActual].position + Vector3.up * 0.5f;
@@ -89,8 +113,8 @@ public class MovimientoFicha : MonoBehaviour
         enMovimiento = false;
         Debug.Log($"[MovimientoFicha] {name} llegó a casilla {indiceActual}");
 
-        // REVELAR -> ESPERAR -> APLICAR CARTA -> FADE OUT
-        yield return StartCoroutine(RevelarYAplicarCarta());
+        // REVELAR -> AÑADIR A MANO
+        yield return StartCoroutine(RevelarYAñadirCarta());
 
         if (camaraDirectora != null) camaraDirectora.VolverAlTablero();
 
@@ -121,10 +145,10 @@ public class MovimientoFicha : MonoBehaviour
         }
     }
 
-    IEnumerator RevelarYAplicarCarta()
+    IEnumerator RevelarYAñadirCarta()
     {
         if (ruta == null || ruta.casillas == null || ruta.casillas.Count == 0) yield break;
-        if (indiceActual < 0 || indiceActual >= ruta.casillas.Count) yield break;
+        if (indiceActual <= 0 || indiceActual >= ruta.casillas.Count) yield break;
 
         Transform casilla = ruta.casillas[indiceActual];
         if (casilla == null) yield break;
@@ -136,97 +160,30 @@ public class MovimientoFicha : MonoBehaviour
             yield break;
         }
 
-        TipoCarta carta = comp.ObtenerCarta();
+        CardSO card = comp.ObtenerCarta();
 
-        if (carta == TipoCarta.Ninguna)
+        if (card == null)
         {
             if (gm != null && gm.uiCartas != null) gm.uiCartas.Limpiar();
             yield break;
         }
 
-        // 1) Mostrar revelación con fade in
+        // 1) Mostrar revelación
         if (gm != null && gm.uiCartas != null)
-            gm.uiCartas.MostrarRevelacion(carta);
+            gm.uiCartas.MostrarRevelacion(card);
 
         yield return new WaitForSeconds(tiempoRevelacion);
 
-        bool esDesventaja =
-            carta == TipoCarta.Retroceso ||
-            carta == TipoCarta.PierdeTurno ||
-            carta == TipoCarta.Intercambio;
-
-        // 2) Escudo bloquea desventajas
-        if (esDesventaja && escudoActivo)
+        // 2) Añadir a mano
+        if (inventario != null)
         {
-            escudoActivo = false;
-
-            if (gm != null && gm.uiCartas != null)
-                gm.uiCartas.MostrarResultado(carta, true);
-
-            Debug.Log($"[Cartas] {name} bloqueó {carta} con Escudo.");
-
-            // Esperar tiempoResultado y luego hacer fade out y limpiar
-            if (gm != null && gm.uiCartas != null)
-                yield return StartCoroutine(gm.uiCartas.FadeOutYLimpiar(tiempoResultado));
-            else
-                yield return new WaitForSeconds(tiempoResultado);
-
-            yield break;
+            inventario.AddToHand(card);
+            if (CardTriggerSystem.Instance != null)
+                CardTriggerSystem.Instance.CheckCardDrawn(this, card);
         }
 
-        // 3) Mostrar resultado
-        if (gm != null && gm.uiCartas != null)
-            gm.uiCartas.MostrarResultado(carta, false);
-
-        // 4) Aplicar el efecto
-        switch (carta)
-        {
-            case TipoCarta.AvanceRapido:
-            {
-                int nuevo = Mathf.Min(ruta.casillas.Count - 1, indiceActual + 2);
-                indiceActual = nuevo;
-                transform.position = ruta.casillas[indiceActual].position + Vector3.up * 0.5f;
-                Debug.Log($"[Cartas] {name} AvanceRapido -> casilla {indiceActual}");
-                break;
-            }
-
-            case TipoCarta.Escudo:
-                escudoActivo = true;
-                Debug.Log($"[Cartas] {name} obtuvo Escudo.");
-                break;
-
-            case TipoCarta.DobleTiro:
-                dobleTiroPendiente = true;
-                Debug.Log($"[Cartas] {name} obtuvo DobleTiro.");
-                break;
-
-            case TipoCarta.Retroceso:
-            {
-                int nuevo = Mathf.Max(0, indiceActual - 2);
-                indiceActual = nuevo;
-                transform.position = ruta.casillas[indiceActual].position + Vector3.up * 0.5f;
-                Debug.Log($"[Cartas] {name} Retroceso -> casilla {indiceActual}");
-                break;
-            }
-
-            case TipoCarta.PierdeTurno:
-                pierdeSiguienteTurno = true;
-                Debug.Log($"[Cartas] {name} PierdeTurno (siguiente turno).");
-                break;
-
-            case TipoCarta.Intercambio:
-                if (gm != null)
-                {
-                    gm.IntercambiarConOtroJugador(this);
-                    Debug.Log($"[Cartas] {name} Intercambio.");
-                }
-                break;
-        }
-
-        // 5) Esperar tiempoResultado, luego fade out y limpiar la UI automáticamente
+        // 3) Limpiar UI
         if (gm != null && gm.uiCartas != null)
             yield return StartCoroutine(gm.uiCartas.FadeOutYLimpiar(tiempoResultado));
-        else
-            yield return new WaitForSeconds(tiempoResultado);
     }
 }

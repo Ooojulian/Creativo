@@ -10,23 +10,23 @@ public class UICartas : MonoBehaviour
         if (textoCarta != null) textoCarta.text = "";
     }
 
-    public void MostrarRevelacion(TipoCarta carta)
+    public void MostrarRevelacion(CardSO carta)
     {
         if (textoCarta == null) return;
-        if (carta == TipoCarta.Ninguna) { textoCarta.text = ""; return; }
+        if (carta == null) { textoCarta.text = ""; return; }
 
-        textoCarta.text = $"Sacaste: {carta}";
+        textoCarta.text = $"Sacaste: {carta.cardName}";
     }
 
-    public void MostrarResultado(TipoCarta carta, bool bloqueadaPorEscudo)
+    public void MostrarResultado(CardSO carta, bool bloqueadaPorEscudo)
     {
         if (textoCarta == null) return;
-        if (carta == TipoCarta.Ninguna) { textoCarta.text = ""; return; }
+        if (carta == null) { textoCarta.text = ""; return; }
 
         if (bloqueadaPorEscudo)
-            textoCarta.text = $"Sacaste: {carta}\n(Bloqueada por Escudo)";
+            textoCarta.text = $"Sacaste: {carta.cardName}\n(Bloqueada por Escudo)";
         else
-            textoCarta.text = $"Aplicando: {carta}";
+            textoCarta.text = $"Aplicando: {carta.cardName}";
     }
 
     public void Limpiar()

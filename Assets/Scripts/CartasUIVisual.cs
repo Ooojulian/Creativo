@@ -7,14 +7,6 @@ public class CartasUIVisual : MonoBehaviour
     [Header("Imagen de la carta")]
     public Image imagenCarta;
 
-    [Header("Diccionario de imágenes (arrastra aquí desde el Inspector)")]
-    public Sprite spriteAvanceRapido;
-    public Sprite spriteEscudo;
-    public Sprite spriteDobleTiro;
-    public Sprite spriteRetroceso;
-    public Sprite spritePierdeTurno;
-    public Sprite spriteIntercambio;
-
     [Header("Animación")]
     public CanvasGroup canvasGroup; // Para fade in/out
     public float duracionFade = 0.3f;
@@ -27,19 +19,11 @@ public class CartasUIVisual : MonoBehaviour
         Limpiar();
     }
 
-    public void MostrarRevelacion(TipoCarta carta)
+    public void MostrarRevelacion(CardSO carta)
     {
-        if (imagenCarta == null) return;
+        if (imagenCarta == null || carta == null) return;
 
-        Sprite sprite = ObtenerSprite(carta);
-
-        if (sprite == null)
-        {
-            Limpiar();
-            return;
-        }
-
-        imagenCarta.sprite = sprite;
+        imagenCarta.sprite = carta.artwork;
         imagenCarta.gameObject.SetActive(true);
 
         // Fade in suave
@@ -47,7 +31,7 @@ public class CartasUIVisual : MonoBehaviour
             StartCoroutine(FadeIn());
     }
 
-    public void MostrarResultado(TipoCarta carta, bool bloqueadaPorEscudo)
+    public void MostrarResultado(CardSO carta, bool bloqueadaPorEscudo)
     {
         // Mantener la misma imagen, solo cambiar opacity si está bloqueada
         if (bloqueadaPorEscudo && canvasGroup != null)
@@ -95,21 +79,6 @@ public class CartasUIVisual : MonoBehaviour
         }
 
         Limpiar();
-    }
-
-    // Obtener el sprite según el tipo de carta
-    private Sprite ObtenerSprite(TipoCarta carta)
-    {
-        return carta switch
-        {
-            TipoCarta.AvanceRapido  => spriteAvanceRapido,
-            TipoCarta.Escudo        => spriteEscudo,
-            TipoCarta.DobleTiro     => spriteDobleTiro,
-            TipoCarta.Retroceso     => spriteRetroceso,
-            TipoCarta.PierdeTurno   => spritePierdeTurno,
-            TipoCarta.Intercambio   => spriteIntercambio,
-            _                       => null
-        };
     }
 
     // Corrutina de fade in

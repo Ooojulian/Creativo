@@ -41,6 +41,8 @@ public class GameManager : MonoBehaviour
     private int turnoActual = 0;
     private int umbralVictoria = 1;
 
+    public MovimientoFicha JugadorActual => jugadoresActivos.Count > 0 ? jugadoresActivos[turnoActual] : null;
+
     void Start()
     {
         // Fallback: buscar ruta automáticamente si no está asignada
@@ -98,6 +100,13 @@ public class GameManager : MonoBehaviour
 
     public void SiguienteTurno()
     {
+        // NUEVO: Trigger "Inspiración" al final del turno
+        if (CardTriggerSystem.Instance != null && turnoActual < jugadoresActivos.Count)
+        {
+            MovimientoFicha j = jugadoresActivos[turnoActual];
+            CardTriggerSystem.Instance.CheckTurnEnd(j, j.cartasAlEmpezarTurno);
+        }
+
         turnoActual++;
         if (turnoActual >= jugadoresActivos.Count)
             turnoActual = 0;
@@ -116,6 +125,14 @@ public class GameManager : MonoBehaviour
 
         // Jugador actual
         MovimientoFicha j = jugadoresActivos[turnoActual];
+
+        // NUEVO: Guardar cantidad de cartas para trigger "Inspiración"
+        if (j.inventario != null)
+            j.cartasAlEmpezarTurno = j.inventario.hand.Count;
+
+        // NUEVO: Trigger "Desvío" al inicio del turno
+        if (CardTriggerSystem.Instance != null)
+            CardTriggerSystem.Instance.CheckTurnStart(j);
 
         // CARTA: PierdeTurno (saltar turno)
         if (j.pierdeSiguienteTurno)

@@ -1,43 +1,22 @@
 using UnityEngine;
 
-public enum TipoCarta
-{
-    Ninguna,
-
-    // Ventajas
-    AvanceRapido,   // +2
-    Escudo,
-    DobleTiro,
-
-    // Desventajas
-    Retroceso,      // -2
-    PierdeTurno,
-    Intercambio
-}
-
 public class CartaEnCasilla : MonoBehaviour
 {
     [Header("Modo de carta")]
     public bool aleatoria = true;
 
     [Tooltip("Si aleatoria=false, se usa esta carta fija")]
-    public TipoCarta cartaFija = TipoCarta.Ninguna;
+    public CardSO cartaFija;
 
-    public TipoCarta ObtenerCarta()
+    [Header("Pool de cartas (si es aleatoria)")]
+    public CardSO[] poolDeCartas;
+
+    public CardSO ObtenerCarta()
     {
         if (!aleatoria) return cartaFija;
 
-        // Todas las cartas menos Ninguna
-        TipoCarta[] posibles = new TipoCarta[]
-        {
-            TipoCarta.AvanceRapido,
-            TipoCarta.Escudo,
-            TipoCarta.DobleTiro,
-            TipoCarta.Retroceso,
-            TipoCarta.PierdeTurno,
-            TipoCarta.Intercambio
-        };
+        if (poolDeCartas == null || poolDeCartas.Length == 0) return null;
 
-        return posibles[Random.Range(0, posibles.Length)];
+        return poolDeCartas[Random.Range(0, poolDeCartas.Length)];
     }
 }
