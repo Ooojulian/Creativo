@@ -64,7 +64,6 @@ public class GameManager : MonoBehaviour
     public void IniciarPartida(int cantidad)
     {
         panelMenu.SetActive(false);
-        dado.gameObject.SetActive(true);
         jugadoresActivos.Clear();
         ganadores.Clear();
         umbralVictoria = Mathf.CeilToInt(cantidad / 2f);
@@ -75,6 +74,10 @@ public class GameManager : MonoBehaviour
         if (camaraMenu != null)  camaraMenu.gameObject.SetActive(false);
         if (camaraJuego != null) camaraJuego.gameObject.SetActive(true);
         if (panelHUD != null)    panelHUD.SetActive(true);
+
+        // Teletransportar la cámara inmediatamente al tablero para evitar el suavizado desde la posición del menú
+        CamaraDirectora cam = FindAnyObjectByType<CamaraDirectora>();
+        if (cam != null) cam.SnapAlTablero();
 
         // Posicionar jugadores en la casilla Start
         Vector3 posInicio;

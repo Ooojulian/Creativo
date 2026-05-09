@@ -11,7 +11,9 @@ public class DadoLogico : MonoBehaviour
     public TextMeshProUGUI textoInstruccion;
 
     [Header("Posición fija en el tablero (visible desde GameCamera)")]
-    public Vector3 posicionFija = new Vector3(650f, 80f, 250f);
+    public Vector3 posicionFija = new Vector3(650f, 100f, 250f);
+    [Tooltip("Escala del dado para que sea visible desde la vista general")]
+    public float escalaDado = 5f;
 
     [Header("Velocidad de animación")]
     [Tooltip("Duración total del lanzamiento en segundos")]
@@ -20,6 +22,8 @@ public class DadoLogico : MonoBehaviour
     public float pausaResultado = 1.5f;
     [Tooltip("Velocidad máxima de giro en grados/s")]
     public float velocidadGiro = 900f;
+    [Tooltip("Altura del salto durante la animación")]
+    public float alturaSalto = 40f;
 
     public int resultadoActual;
     private bool lanzando = false;
@@ -27,6 +31,7 @@ public class DadoLogico : MonoBehaviour
     private Rigidbody rb;
     private Vector3 ejeRotacion;
     private CamaraDirectora camaraDirectora;
+    private Vector3 escalaOriginal;
 
     // -------------------------------------------------
     void Awake()
@@ -38,16 +43,30 @@ public class DadoLogico : MonoBehaviour
             rb.isKinematic = true;
             rb.useGravity = false;
         }
+
+        // Guardar la escala configurada en el prefab/escena para restaurarla en OnEnable
+        // escalaDado actúa como multiplicador: si es 1 usa la escala del prefab tal cual
+        escalaOriginal = escalaDado > 0
+            ? transform.localScale / escalaDado
+            : transform.localScale;
     }
 
     void OnEnable()
     {
+        // Solo auto-posicionar si la posición actual es el origen (no ha sido configurada)
+        if (posicionFija == Vector3.zero && camaraDirectora != null && camaraDirectora.puntoVistaTablero != null)
+        {
+            Vector3 centro = camaraDirectora.puntoVistaTablero.position;
+            posicionFija = new Vector3(centro.x + 150f, 100f, centro.z - 150f);
+        }
+
         // Cada vez que el dado se activa se reinicia a su posición fija
         lanzando = false;
         esperandoConfirmacion = false;
         ejeRotacion = Vector3.up;
         StopAllCoroutines();
         SnapAPosicion();
+        transform.localScale = escalaOriginal * escalaDado;
 
         if (textoResultado != null)
             textoResultado.gameObject.SetActive(false);
@@ -92,7 +111,7 @@ public class DadoLogico : MonoBehaviour
         if (textoResultado != null)   textoResultado.gameObject.SetActive(false);
         if (textoInstruccion != null) textoInstruccion.gameObject.SetActive(false);
 
-        // Enfocar el dado mientras gira
+        // Enfocar el dado mientras gira (ahora es no-op en CamaraDirectora para mantener vista general)
         if (camaraDirectora != null) camaraDirectora.EnfocarDado();
 
         // Resultado elegido al inicio (sin física)
@@ -124,7 +143,7 @@ public class DadoLogico : MonoBehaviour
             transform.Rotate(ejeSec, vel * 0.4f * Time.deltaTime, Space.Self);
 
             // Pequeño salto al inicio de la animación
-            float salto = Mathf.Sin(t * Mathf.PI * 3f) * 10f * (1f - t);
+            float salto = Mathf.Sin(t * Mathf.PI * 3f) * alturaSalto * (1f - t);
             transform.position = posicionFija + Vector3.up * salto;
 
             yield return null;
