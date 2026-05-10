@@ -24,6 +24,10 @@ public class MovimientoFicha : MonoBehaviour
     public PlayerInventory inventario;
     public int cartasAlEmpezarTurno = 0;
 
+    [Header("Segunda Ficha")]
+    public FichaInversa fichaB;
+    public bool moverFichaB = false; // true = mover FichaB, false = mover FichaA (esta)
+
     void Awake()
     {
         camaraDirectora = FindAnyObjectByType<CamaraDirectora>();
@@ -34,20 +38,34 @@ public class MovimientoFicha : MonoBehaviour
     {
         if (enMovimiento) return;
 
+        // Si eligió mover la ficha B, delegar
+        if (moverFichaB && fichaB != null)
+        {
+            fichaB.Avanzar(cantidadPasos);
+            return;
+        }
+
         int casillasRestantes = ruta.casillas.Count - 1 - indiceActual;
-        
-        // CARTA SPRINT (Reserva): Verificar cercanía a meta antes de mover
+
         if (CardTriggerSystem.Instance != null)
             CardTriggerSystem.Instance.CheckNearGoal(this);
 
         if (cantidadPasos > casillasRestantes)
         {
             Debug.Log($"[MovimientoFicha] {name}: necesita {casillasRestantes} o menos para avanzar, sacó {cantidadPasos}. Turno perdido.");
-            if (gm != null) gm.SiguienteTurno();
+            if (Photon.Pun.PhotonNetwork.IsMasterClient && gm != null) gm.SiguienteTurno();
+            else if (GameSync.Instance == null && gm != null) gm.SiguienteTurno();
             return;
         }
 
         StartCoroutine(MoverPorLasCasillas(cantidadPasos));
+    }
+
+    // Llamado por la UI antes de tirar el dado
+    public void ElegirFicha(bool usarFichaB)
+    {
+        moverFichaB = usarFichaB;
+        Debug.Log($"[{name}] Ficha elegida: {(usarFichaB ? "B (inversa)" : "A (normal)")}");
     }
 
     IEnumerator MoverPorLasCasillas(int pasos)
@@ -118,7 +136,28 @@ public class MovimientoFicha : MonoBehaviour
 
         if (camaraDirectora != null) camaraDirectora.VolverAlTablero();
 
+        // Detectar colisión con ficha enemiga → batalla PPS
+        if (Photon.Pun.PhotonNetwork.IsMasterClient && BatallaPPS.Instance != null && gm != null)
+        {
+            if (gm.DetectarColision(this, null, out int idxDef, out bool esBDef, out int actorDef))
+            {
+                int idxAtk = gm.todosLosJugadores.IndexOf(this);
+                int actorAtk = idxAtk < Photon.Pun.PhotonNetwork.PlayerList.Length
+                    ? Photon.Pun.PhotonNetwork.PlayerList[idxAtk].ActorNumber : -1;
+                BatallaPPS.Instance.IniciarBatalla(actorAtk, actorDef, idxAtk, false, idxDef, esBDef);
+                yield break;
+            }
+        }
+
         bool llegóAMeta = indiceActual >= ruta.casillas.Count - 1;
+
+        // En red: solo host decide avance de turno y meta. Otros clientes solo animaron.
+        bool soyAutoridad = GameSync.Instance == null || Photon.Pun.PhotonNetwork.IsMasterClient;
+        if (!soyAutoridad)
+        {
+            Debug.Log($"[MovimientoFicha] {name} cliente termino animacion. Espera turno de host.");
+            yield break;
+        }
 
         if (gm != null)
         {

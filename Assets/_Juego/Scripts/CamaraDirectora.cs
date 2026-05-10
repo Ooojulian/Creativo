@@ -13,9 +13,9 @@ public class CamaraDirectora : MonoBehaviour
 
     [Header("Suavizado")]
     [Tooltip("Tiempo aproximado para alcanzar la posición objetivo (menor = más rápido)")]
-    public float smoothTimePos = 0.3f;
+    public float smoothTimePos = 0.8f;
     [Tooltip("Tiempo aproximado para alcanzar la rotación objetivo")]
-    public float smoothTimeRot = 0.2f;
+    public float smoothTimeRot = 0.6f;
 
     // Variables internas para SmoothDamp
     private Vector3 currentVelocityPos;

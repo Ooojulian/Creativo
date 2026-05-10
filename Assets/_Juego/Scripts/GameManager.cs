@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using TMPro;
+using Photon.Pun;
 
 public class GameManager : MonoBehaviour
 {
@@ -27,6 +28,12 @@ public class GameManager : MonoBehaviour
     public GameObject panelFin;
     public TextMeshProUGUI textoFin;
     public TextMeshProUGUI textoGanadoresHUD;
+
+    [Header("Selección de Ficha")]
+    public SeleccionFichaUI seleccionFichaUI;
+
+    [Header("HUD persistente")]
+    public TextMeshProUGUI textoResultadoDadoHUD;
 
     // Separación entre fichas en la casilla de inicio
     private static readonly Vector3[] offsetsInicio = {
@@ -56,6 +63,10 @@ public class GameManager : MonoBehaviour
         if (panelFin != null)    panelFin.SetActive(false);
         if (camaraJuego != null) camaraJuego.gameObject.SetActive(false);
         if (camaraMenu != null)  camaraMenu.gameObject.SetActive(true);
+
+        if (textoTurno != null)            textoTurno.text = "";
+        if (textoResultadoDadoHUD != null) textoResultadoDadoHUD.text = "";
+        if (textoGanadoresHUD != null)     textoGanadoresHUD.text = "";
 
         foreach (var jugador in todosLosJugadores)
             jugador.gameObject.SetActive(false);
@@ -93,6 +104,15 @@ public class GameManager : MonoBehaviour
             jugador.transform.position = posInicio + offsetsInicio[i];
             jugador.gameObject.SetActive(true);
             jugadoresActivos.Add(jugador);
+
+            // Activar e inicializar ficha B (va de meta a inicio)
+            if (jugador.fichaB != null)
+            {
+                jugador.fichaB.gameObject.SetActive(true);
+                jugador.fichaB.Inicializar();
+                Vector3 posMeta = ruta.casillas[ruta.casillas.Count - 1].position + Vector3.up * 0.5f;
+                jugador.fichaB.transform.position = posMeta + offsetsInicio[i];
+            }
         }
 
         Debug.Log($"Partida iniciada con {cantidad} jugadores. Posición inicio: {posInicio}");
@@ -149,11 +169,22 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Turno del Jugador {turnoActual + 1}");
         dado.jugador = j;
 
-        if (!dado.gameObject.activeSelf)
-            dado.gameObject.SetActive(true);
+        if (dado.gameObject.activeSelf)
+            dado.gameObject.SetActive(false);
 
         if (textoTurno != null)
             textoTurno.text = $"Turno: Jugador {turnoActual + 1}";
+
+        // Sin red: activar dado directo
+        if (GameSync.Instance == null)
+        {
+            dado.gameObject.SetActive(true);
+            return;
+        }
+
+        // Con red: host avisa quién juega, cliente correcto activa dado
+        if (PhotonNetwork.IsMasterClient)
+            GameSync.Instance.AnunciarTurno(turnoActual);
     }
 
     public void LlegarAMeta(MovimientoFicha jugador)
@@ -231,6 +262,56 @@ public class GameManager : MonoBehaviour
         }
 
         Debug.Log($"[Cartas] Intercambio: {jugador.name} <-> {otro.name}");
+    }
+
+    // Detecta si hay ficha enemiga en la misma casilla. Devuelve datos para batalla.
+    // Solo el host debe llamarlo y luego invocar BatallaPPS.IniciarBatalla.
+    public bool DetectarColision(MovimientoFicha atacanteA, FichaInversa atacanteB,
+        out int idxFichaDef, out bool esFichaBDef, out int actorDef)
+    {
+        idxFichaDef = -1;
+        esFichaBDef = false;
+        actorDef = -1;
+
+        int casillaAtk;
+        int idxJugadorAtk;
+        if (atacanteA != null)
+        {
+            casillaAtk = atacanteA.indiceActual;
+            idxJugadorAtk = todosLosJugadores.IndexOf(atacanteA);
+        }
+        else
+        {
+            casillaAtk = atacanteB.indiceActual;
+            idxJugadorAtk = -1;
+            for (int k = 0; k < todosLosJugadores.Count; k++)
+                if (todosLosJugadores[k].fichaB == atacanteB) { idxJugadorAtk = k; break; }
+        }
+
+        for (int i = 0; i < jugadoresActivos.Count; i++)
+        {
+            var otro = jugadoresActivos[i];
+            int idxOtro = todosLosJugadores.IndexOf(otro);
+            if (idxOtro == idxJugadorAtk) continue;
+
+            if (otro.indiceActual == casillaAtk && otro.gameObject.activeSelf)
+            {
+                idxFichaDef = idxOtro;
+                esFichaBDef = false;
+                actorDef = idxOtro < Photon.Pun.PhotonNetwork.PlayerList.Length
+                    ? Photon.Pun.PhotonNetwork.PlayerList[idxOtro].ActorNumber : -1;
+                return true;
+            }
+            if (otro.fichaB != null && otro.fichaB.indiceActual == casillaAtk && otro.fichaB.gameObject.activeSelf)
+            {
+                idxFichaDef = idxOtro;
+                esFichaBDef = true;
+                actorDef = idxOtro < Photon.Pun.PhotonNetwork.PlayerList.Length
+                    ? Photon.Pun.PhotonNetwork.PlayerList[idxOtro].ActorNumber : -1;
+                return true;
+            }
+        }
+        return false;
     }
 
     public void VolverAlMenu()

@@ -21,26 +21,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public void Conectar()
     {
-        if (PhotonNetwork.IsConnected)
-        {
-            UnirseOCrearSala();
-            return;
-        }
+        if (PhotonNetwork.IsConnected) return;
         Debug.Log("[Red] Conectando a Photon...");
         PhotonNetwork.ConnectUsingSettings();
     }
 
     public override void OnConnectedToMaster()
     {
-        Debug.Log("[Red] Conectado al servidor Photon.");
-        UnirseOCrearSala();
-    }
-
-    private void UnirseOCrearSala()
-    {
-        RoomOptions opciones = new RoomOptions { MaxPlayers = 4 };
-        PhotonNetwork.JoinOrCreateRoom("SalaCreativo", opciones, TypedLobby.Default);
-        Debug.Log("[Red] Uniéndose a sala...");
+        Debug.Log("[Red] Conectado al servidor Photon. Esperando accion del menu.");
     }
 
     public override void OnJoinedRoom()

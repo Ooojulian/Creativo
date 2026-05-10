@@ -164,6 +164,10 @@ public class DadoLogico : MonoBehaviour
             textoResultado.gameObject.SetActive(true);
         }
 
+        // Sincronizar resultado a otros clientes
+        if (GameSync.Instance != null)
+            GameSync.Instance.SincronizarResultadoDado(resultadoActual);
+
         // Pausa para visualizar el resultado
         yield return new WaitForSeconds(pausaResultado);
 
@@ -186,12 +190,21 @@ public class DadoLogico : MonoBehaviour
 
         if (jugador == null) { Debug.LogWarning("No hay jugador asignado al dado."); return; }
 
-        // Si hay red, enviar movimiento a todos los clientes
+        // Ocultar dado mientras elige ficha
+        gameObject.SetActive(false);
+
+        // Mostrar panel selección ficha A/B
+        var ui = FindAnyObjectByType<SeleccionFichaUI>();
+        if (ui != null) ui.MostrarSeleccion(jugador);
+        else EjecutarMovimiento(); // fallback si no hay UI
+    }
+
+    public void EjecutarMovimiento()
+    {
         if (GameSync.Instance != null)
         {
-            int indiceFicha = jugador.GetComponent<GameManager>() != null ? 0 :
-                FindAnyObjectByType<GameManager>().todosLosJugadores.IndexOf(jugador);
-            GameSync.Instance.EnviarResultadoDado(resultadoActual, indiceFicha);
+            int indiceFicha = FindAnyObjectByType<GameManager>().todosLosJugadores.IndexOf(jugador);
+            GameSync.Instance.EnviarResultadoDado(resultadoActual, indiceFicha, jugador.moverFichaB);
         }
         else
         {
