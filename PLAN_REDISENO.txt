@@ -1,0 +1,105 @@
+================================================================
+PLAN DE REDISEÑO — "CREATIVO" (Aventura/Fantasía)
+================================================================
+
+CONCEPTO CENTRAL
+----------------
+Dos fichas por jugador que viajan en sentidos opuestos.
+  - Ficha A: va de inicio → meta
+  - Ficha B: va de meta → inicio
+El jugador elige cada turno cuál ficha mover.
+Cuando una ficha cae en la misma casilla que una ficha enemiga → BATALLA.
+
+----------------------------------------------------------------
+LAS 3 DECISIONES REALES DEL JUGADOR POR TURNO
+----------------------------------------------------------------
+  1. ¿Cuál ficha muevo? (A o B — decisión táctica)
+  2. ¿Juego una carta antes de mover? (usar ahora o guardarla)
+  3. Si hay batalla → elegir Piedra, Papel o Tijera
+
+----------------------------------------------------------------
+MECÁNICA DE BATALLA (Piedra, Papel, Tijera)
+----------------------------------------------------------------
+- Cuando una ficha cae en casilla de una ficha enemiga:
+    → Ambos jugadores eligen en secreto (UI con 3 botones)
+    → No se revela hasta que ambos confirman
+- Ganador: la ficha enemiga retrocede N casillas (o vuelve al inicio)
+- Empate: nadie se mueve, continúa el turno
+- Bonus: cartas pueden modificar la batalla
+    Ej: carta "Trampa" = si rival elige Piedra, pierde automáticamente
+
+CONDICIÓN DE VICTORIA
+- Un jugador gana cuando AMBAS fichas llegan a su destino
+    (Ficha A llega a meta  +  Ficha B llega a inicio)
+
+----------------------------------------------------------------
+DIVISIÓN DEL TRABAJO — 5 PERSONAS
+----------------------------------------------------------------
+
+  Dev 1 — Sistema de 2 fichas
+    - Refactorizar MovimientoFicha.cs
+    - UI de selección de ficha (¿cuál mover?)
+    - Lógica de dirección invertida para Ficha B
+
+  Dev 2 — Sistema de batalla
+    - Detección de colisión en casilla
+    - UI de PPS (Piedra, Papel, Tijera)
+    - Resolver ganador/perdedor
+    - Reposicionar ficha perdedora
+
+  Dev 3 — Cartas revisadas
+    - Conectar cartas a la batalla (modificadores)
+    - UI de mano visible durante el turno
+    - Decisión de jugar carta antes de mover
+
+  Dev 4 — Tablero + Arte
+    - Rediseñar tablero (36 casillas, estética fantasía)
+    - Casillas especiales con efectos
+    - Animaciones de fichas
+
+  Dev 5 — Game Manager + UX
+    - Refactorizar GameManager.cs
+    - HUD claro (turno, fichas, cartas en mano)
+    - Pantalla de fin de partida
+
+----------------------------------------------------------------
+ORDEN DE EJECUCIÓN — 2 SEMANAS
+----------------------------------------------------------------
+
+SEMANA 1 — Núcleo jugable
+  [ ] Ficha A y Ficha B por jugador con dirección opuesta
+  [ ] UI de selección de qué ficha mover
+  [ ] Detección de choque en casilla
+  [ ] Battle screen PPS básica (elige → ambos confirman → resultado)
+  [ ] Reposicionar ficha perdedora al inicio
+
+SEMANA 2 — Pulir + Cartas + Arte
+  [ ] Integrar cartas a la batalla (modificadores)
+  [ ] Arte del tablero fantasía
+  [ ] Animaciones de fichas
+  [ ] HUD limpio y legible
+  [ ] Pruebas con 2-4 jugadores, ajustar balance
+
+----------------------------------------------------------------
+ESTADO DEL CÓDIGO EXISTENTE
+----------------------------------------------------------------
+
+  GameManager.cs        → REFACTORIZAR (agregar lógica de 2 fichas)
+  MovimientoFicha.cs    → REFACTORIZAR (soporte dirección inversa)
+  CardSO.cs             → MANTENER, extender para batalla
+  CardManager.cs        → MANTENER, extender para batalla
+  CamaraDirectora.cs    → MANTENER
+  DadoLogico.cs         → MANTENER
+  BoardManager.cs       → MANTENER estructura
+  GestorDeRuta.cs       → MANTENER estructura
+
+----------------------------------------------------------------
+OBJETIVO PARA EL PROFESOR
+----------------------------------------------------------------
+Cambiar de "un click y listo" a 3 decisiones por turno:
+  mover cuál ficha  +  jugar carta  +  batalla PPS
+
+La batalla PPS garantiza interacción directa entre jugadores
+y convierte esto en un juego real con tensión y estrategia.
+
+================================================================
