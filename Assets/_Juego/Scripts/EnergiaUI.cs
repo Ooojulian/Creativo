@@ -11,10 +11,10 @@ public class EnergiaUI : MonoBehaviour
 
     void Start()
     {
+        if (textoEnergia != null) textoEnergia.gameObject.SetActive(false);
+
         if (GameManager.Instance != null)
-        {
             GameManager.Instance.OnTurnStarted += ActualizarSuscripcion;
-        }
     }
 
     private void OnDestroy()
@@ -37,11 +37,12 @@ public class EnergiaUI : MonoBehaviour
         if (currentController != null)
         {
             currentController.OnEnergiaCambiada.AddListener(RefrescarTexto);
+            if (textoEnergia != null) textoEnergia.gameObject.SetActive(true);
             RefrescarTexto(currentController.EnergiaActual);
         }
         else
         {
-            if (textoEnergia != null) textoEnergia.text = "Energia: 0";
+            if (textoEnergia != null) textoEnergia.gameObject.SetActive(false);
         }
     }
 

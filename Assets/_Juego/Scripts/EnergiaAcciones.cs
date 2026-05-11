@@ -1,27 +1,27 @@
 using UnityEngine;
 
-/// <summary>
-/// Proporciona métodos para gastar energía en acciones especiales.
-/// </summary>
 public class EnergiaAcciones : MonoBehaviour
 {
-    [Header("Costos")]
-    public int costoBoostDado = 2;
-    public int costoDobleMovimiento = 4;
+    public static EnergiaAcciones Instance;
 
-    public void AplicarBoostDado()
+    [Header("Costos")]
+    public int costoTiradaExtra = 3;
+    public int costoDobleMovimiento = 5;
+
+    void Awake() { Instance = this; }
+
+    // Relanza el dado después de ver el resultado. Solo disponible en estado esperandoConfirmacion.
+    public void UsarTiradaExtra()
     {
         var gm = GameManager.Instance;
         if (gm == null || gm.JugadorActual == null) return;
+        if (gm.dado == null || !gm.dado.EsperandoConfirmacion) return;
 
         var ctrl = gm.JugadorActual.GetComponent<EnergiaController>();
-        if (ctrl != null && ctrl.GastarEnergia(costoBoostDado))
+        if (ctrl != null && ctrl.GastarEnergia(costoTiradaExtra))
         {
-            if (gm.dado != null)
-            {
-                gm.dado.modificadorExterno += 2;
-                Debug.Log($"[Energia] Boost de dado (+2) aplicado a {gm.JugadorActual.name}");
-            }
+            gm.dado.RelanzarDado();
+            Debug.Log($"[Energia] Tirada extra usada por {gm.JugadorActual.name}");
         }
     }
 
@@ -29,6 +29,7 @@ public class EnergiaAcciones : MonoBehaviour
     {
         var gm = GameManager.Instance;
         if (gm == null || gm.JugadorActual == null) return;
+        if (gm.dado == null || !gm.dado.EsperandoConfirmacion) return;
 
         var ctrl = gm.JugadorActual.GetComponent<EnergiaController>();
         if (ctrl != null && ctrl.GastarEnergia(costoDobleMovimiento))
@@ -42,9 +43,7 @@ public class EnergiaAcciones : MonoBehaviour
     {
         var ctrl = usuario.GetComponent<EnergiaController>();
         if (ctrl != null)
-        {
             return ctrl.GastarEnergia(carta.costoEnergia);
-        }
-        return true; // Si no hay sistema de energía, permitir jugar
+        return true;
     }
 }

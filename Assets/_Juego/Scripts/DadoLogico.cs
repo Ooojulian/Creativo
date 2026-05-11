@@ -29,6 +29,8 @@ public class DadoLogico : MonoBehaviour
     public int modificadorExterno = 0;
     private bool lanzando = false;
     private bool esperandoConfirmacion = false;
+
+    public bool EsperandoConfirmacion => esperandoConfirmacion;
     private Rigidbody rb;
     private Vector3 ejeRotacion;
     private CamaraDirectora camaraDirectora;
@@ -217,6 +219,16 @@ public class DadoLogico : MonoBehaviour
         {
             jugador.Avanzar(resultadoActual);
         }
+    }
+
+    // Cancela la confirmación actual y lanza el dado de nuevo (tirada extra por energía).
+    public void RelanzarDado()
+    {
+        if (!esperandoConfirmacion) return;
+        esperandoConfirmacion = false;
+        if (textoResultado != null) textoResultado.gameObject.SetActive(false);
+        if (textoInstruccion != null) textoInstruccion.gameObject.SetActive(false);
+        Lanzar();
     }
 
     // Mapeo original del script: up=5, -up=2, forward=6, -forward=1, right=3, -right=4
