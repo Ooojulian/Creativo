@@ -22,6 +22,9 @@ public class BatallaPPS : MonoBehaviourPun
     [Header("Referencias")]
     public GameManager gameManager;
 
+    // Eventos: (ganador: 0=empate, 1=atacante, 2=defensor, idxAtacante, idxDefensor)
+    public event System.Action<int, int, int> OnBattleResult;
+
     // Estado batalla
     private int actorAtacante = -1;
     private int actorDefensor = -1;
@@ -132,6 +135,9 @@ public class BatallaPPS : MonoBehaviourPun
             : ganador == 1 ? "Atacante gana" : "Defensor gana";
         if (textoResultado != null)
             textoResultado.text = $"{(EleccionPPS)elecAtk} vs {(EleccionPPS)elecDef}\n{resultado}";
+
+        if (OnBattleResult != null)
+            OnBattleResult.Invoke(ganador, indiceFichaAtacante, indiceFichaDefensor);
 
         if (PhotonNetwork.IsMasterClient)
             StartCoroutine(AplicarResultado(ganador));

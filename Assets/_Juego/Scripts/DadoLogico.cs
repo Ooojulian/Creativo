@@ -26,6 +26,7 @@ public class DadoLogico : MonoBehaviour
     public float alturaSalto = 40f;
 
     public int resultadoActual;
+    public int modificadorExterno = 0;
     private bool lanzando = false;
     private bool esperandoConfirmacion = false;
     private Rigidbody rb;
@@ -156,7 +157,13 @@ public class DadoLogico : MonoBehaviour
         // lanzando permanece true hasta que el jugador confirme con SPACE
         // para evitar que se pueda tirar de nuevo durante la pausa
 
-        Debug.Log($"Resultado del dado: {resultadoActual}");
+        // Aplicar modificadores de energía/cartas
+        if (modificadorExterno != 0)
+        {
+            Debug.Log($"[Dado] Aplicando modificador de {modificadorExterno} al resultado {resultadoActual}");
+            resultadoActual += modificadorExterno;
+            modificadorExterno = 0; // Resetear tras uso
+        }
 
         if (textoResultado != null)
         {
