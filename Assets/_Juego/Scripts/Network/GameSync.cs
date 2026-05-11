@@ -147,6 +147,30 @@ public class GameSync : MonoBehaviourPunCallbacks
         gameManager.SiguienteTurno();
     }
 
+    // ─── INICIAR PARTIDA ─────────────────────────────────────────────────────
+
+    public void IniciarPartida(int cantidad)
+    {
+        if (!PhotonNetwork.IsMasterClient) return;
+        photonView.RPC(nameof(RPC_IniciarPartida), RpcTarget.All, cantidad);
+    }
+
+    [PunRPC]
+    private void RPC_IniciarPartida(int cantidad)
+    {
+        if (gameManager == null) gameManager = FindAnyObjectByType<GameManager>();
+        var menu = MenuController.Instance;
+        if (menu != null)
+        {
+            if (menu.panelEspera != null)        menu.panelEspera.SetActive(false);
+            if (menu.panelMenu != null)          menu.panelMenu.SetActive(false);
+            if (menu.fondoMenu != null)          menu.fondoMenu.SetActive(false);
+            if (menu.panelUnirse != null)        menu.panelUnirse.SetActive(false);
+            if (menu.botonIniciarPartida != null) menu.botonIniciarPartida.gameObject.SetActive(false);
+        }
+        gameManager.IniciarPartida(cantidad);
+    }
+
     // ─── SALA ────────────────────────────────────────────────────────────────
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
