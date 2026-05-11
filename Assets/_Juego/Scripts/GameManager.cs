@@ -5,6 +5,10 @@ using Photon.Pun;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance;
+
+    public event System.Action<MovimientoFicha> OnTurnStarted;
+    public event System.Action<MovimientoFicha> OnTurnEnded;
     [Header("Interfaz")]
     public GameObject panelMenu;
 
@@ -49,6 +53,11 @@ public class GameManager : MonoBehaviour
     private int umbralVictoria = 1;
 
     public MovimientoFicha JugadorActual => jugadoresActivos.Count > 0 ? jugadoresActivos[turnoActual] : null;
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
@@ -130,6 +139,9 @@ public class GameManager : MonoBehaviour
             CardTriggerSystem.Instance.CheckTurnEnd(j, j.cartasAlEmpezarTurno);
         }
 
+        if (OnTurnEnded != null)
+            OnTurnEnded.Invoke(jugadoresActivos[turnoActual]);
+
         turnoActual++;
         if (turnoActual >= jugadoresActivos.Count)
             turnoActual = 0;
@@ -185,6 +197,9 @@ public class GameManager : MonoBehaviour
         // Con red: host avisa quién juega, cliente correcto activa dado
         if (PhotonNetwork.IsMasterClient)
             GameSync.Instance.AnunciarTurno(turnoActual);
+
+        if (OnTurnStarted != null)
+            OnTurnStarted.Invoke(j);
     }
 
     public void LlegarAMeta(MovimientoFicha jugador)
