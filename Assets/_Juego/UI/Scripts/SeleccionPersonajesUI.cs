@@ -203,7 +203,7 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
         if (_modeloActual == null) return;
         float dir = _rotDirManual != 0
             ? _rotDirManual * velocidadRotacion * 2f
-            : velocidadRotacion;
+            : -velocidadRotacion;
         _modeloActual.transform.Rotate(Vector3.up, dir * Time.deltaTime, Space.World);
     }
 
@@ -294,7 +294,7 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
         GameObject nuevoModelo = Instantiate(
             prefab,
             new Vector3(0f, -200f, 0f),
-            Quaternion.identity
+            Quaternion.Euler(0f, 180f, 0f)
         );
         nuevoModelo.name = $"_Preview_{datos.id}";
 
