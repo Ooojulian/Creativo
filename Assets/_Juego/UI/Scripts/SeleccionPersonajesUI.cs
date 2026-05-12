@@ -28,6 +28,7 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
         public string id;
         public string nombreUI;
         public string prefabPath;       // ruta Assets/ completa
+        public string materialPath;     // ruta Assets/ del material PBR propio del personaje
         public string cardElementName;  // name= en UXML
     }
 
@@ -36,24 +37,28 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
             id             = "Caballero",
             nombreUI       = "CABALLERO",
             prefabPath     = "Assets/_ThirdParty/Personajes/DogKnight/Prefab/DogPBR.prefab",
+            materialPath   = "Assets/_ThirdParty/Personajes/DogKnight/Material/PBR.mat",
             cardElementName= "card-caballero"
         },
         new DatosPersonaje {
             id             = "Fantasma",
             nombreUI       = "FANTASMA",
             prefabPath     = "Assets/_ThirdParty/Personajes/GhostCharacter_Free/Prefabs/Ghost.prefab",
+            materialPath   = "Assets/_ThirdParty/Personajes/GhostCharacter_Free/Materials/MaterialGhost.mat",
             cardElementName= "card-fantasma"
         },
         new DatosPersonaje {
             id             = "Heroe",
             nombreUI       = "HÉROE",
             prefabPath     = "Assets/_ThirdParty/Personajes/RPG Tiny Hero Duo/Prefab/MaleCharacterPBR.prefab",
+            materialPath   = "Assets/_ThirdParty/Personajes/RPG Tiny Hero Duo/Material/PBR_Default.mat",
             cardElementName= "card-heroe"
         },
         new DatosPersonaje {
             id             = "Heroina",
             nombreUI       = "HEROÍNA",
             prefabPath     = "Assets/_ThirdParty/Personajes/RPG Tiny Hero Duo/Prefab/FemaleCharacterPBR.prefab",
+            materialPath   = "Assets/_ThirdParty/Personajes/RPG Tiny Hero Duo/Material/PBR_Default.mat",
             cardElementName= "card-heroina"
         },
     };
@@ -76,7 +81,6 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
     private Camera        _camPreview;
     private RenderTexture _rt;
     private GameObject    _modeloActual;
-    private int           _rotDirManual    = 0;
     private Coroutine     _coroutineActual = null;
 
     // ── Referencias UI ────────────────────────────────────────────────────────
@@ -85,8 +89,6 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
     private VisualElement _root;
     private Button        _btnVolver;
     private Button        _btnConfirmar;
-    private Button        _btnRotIzq;
-    private Button        _btnRotDer;
     private Label         _lblSeleccion;
     private Label         _lblJugadores;
     private Label         _lblNombrePersonaje;
@@ -135,8 +137,6 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
         _root               = _doc.rootVisualElement;
         _btnVolver          = _root.Q<Button>("btn-volver");
         _btnConfirmar       = _root.Q<Button>("btn-confirmar");
-        _btnRotIzq          = _root.Q<Button>("btn-rot-izq");
-        _btnRotDer          = _root.Q<Button>("btn-rot-der");
         _lblSeleccion       = _root.Q<Label>("lbl-seleccion");
         _lblJugadores       = _root.Q<Label>("lbl-jugadores");
         _lblNombrePersonaje = _root.Q<Label>("lbl-personaje-nombre");
@@ -148,10 +148,6 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
 
         _btnVolver?.RegisterCallback<ClickEvent>(_ => Volver());
         _btnConfirmar?.RegisterCallback<ClickEvent>(_ => Confirmar());
-        _btnRotIzq?.RegisterCallback<PointerDownEvent>(_ => _rotDirManual = -1);
-        _btnRotIzq?.RegisterCallback<PointerUpEvent>(_ => _rotDirManual = 0);
-        _btnRotDer?.RegisterCallback<PointerDownEvent>(_ => _rotDirManual = 1);
-        _btnRotDer?.RegisterCallback<PointerUpEvent>(_ => _rotDirManual = 0);
 
         foreach (var p in Personajes)
         {
@@ -201,10 +197,7 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
     void Update()
     {
         if (_modeloActual == null) return;
-        float dir = _rotDirManual != 0
-            ? _rotDirManual * velocidadRotacion * 2f
-            : -velocidadRotacion;
-        _modeloActual.transform.Rotate(Vector3.up, dir * Time.deltaTime, Space.World);
+        _modeloActual.transform.Rotate(Vector3.up, -velocidadRotacion * Time.deltaTime, Space.World);
     }
 
     // ── Infraestructura de preview (se crea por código en Awake) ─────────────
@@ -323,7 +316,8 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
         Debug.Log($"[Preview] Layer re-asignado post-yield: root={_modeloActual.layer}");
 
         ValidarVisibilidad(_modeloActual, datos.id);
-        Debug.Log("[Preview] Visibilidad validada.");
+        AplicarMaterial(_modeloActual, datos.materialPath);
+        Debug.Log("[Preview] Visibilidad validada y material aplicado.");
 
         yield return null; // segundo frame para que los renderers se inicialicen
         Debug.Log("[Preview] POST yield 2");
@@ -349,6 +343,32 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
             Debug.LogWarning($"[Preview] Prefab no encontrado: {datos.prefabPath}");
 
         return prefab;
+    }
+
+    private static void AplicarMaterial(GameObject go, string materialPath)
+    {
+        if (string.IsNullOrEmpty(materialPath)) return;
+
+        Material mat = null;
+#if UNITY_EDITOR
+        mat = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+#endif
+        if (mat == null)
+        {
+            Debug.LogWarning($"[Preview] Material no encontrado: {materialPath}");
+            return;
+        }
+
+        foreach (var r in go.GetComponentsInChildren<Renderer>(true))
+        {
+            // Asignar el material a todos los slots del renderer
+            var mats = new Material[r.sharedMaterials.Length];
+            for (int i = 0; i < mats.Length; i++)
+                mats[i] = mat;
+            r.sharedMaterials = mats;
+        }
+
+        Debug.Log($"[Preview] Material '{mat.name}' aplicado a {go.name}");
     }
 
     private static void AsignarLayerRecursivo(GameObject go, int layer)

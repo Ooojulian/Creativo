@@ -42,32 +42,29 @@
                     class="text-dim" style="font-size: 12px;" />
             </ui:VisualElement>
 
-            <!-- Botones de rotación flotantes -->
-            <ui:Button name="btn-rot-izq" text="◀" class="seleccion-rot-btn seleccion-rot-izq" />
-            <ui:Button name="btn-rot-der" text="▶" class="seleccion-rot-btn seleccion-rot-der" />
 
         </ui:VisualElement>
 
         <!-- ─── 3. SELECTOR HORIZONTAL ───────────────────────────── -->
         <ui:VisualElement name="char-strip" class="seleccion-char-strip">
 
-            <ui:VisualElement name="card-caballero" class="char-chip">
-                <ui:Label text="🐾" class="chip-icon" />
+            <ui:VisualElement name="card-caballero" class="char-chip"
+                style="background-image: url('../Presentation_Cards/knight.png');">
                 <ui:Label text="CABALLERO" class="chip-name" />
             </ui:VisualElement>
 
-            <ui:VisualElement name="card-fantasma" class="char-chip">
-                <ui:Label text="👻" class="chip-icon" />
+            <ui:VisualElement name="card-fantasma" class="char-chip"
+                style="background-image: url('../Presentation_Cards/ghost.png');">
                 <ui:Label text="FANTASMA" class="chip-name" />
             </ui:VisualElement>
 
-            <ui:VisualElement name="card-heroe" class="char-chip">
-                <ui:Label text="⚔️" class="chip-icon" />
+            <ui:VisualElement name="card-heroe" class="char-chip"
+                style="background-image: url('../Presentation_Cards/hero.png');">
                 <ui:Label text="HÉROE" class="chip-name" />
             </ui:VisualElement>
 
-            <ui:VisualElement name="card-heroina" class="char-chip">
-                <ui:Label text="🏹" class="chip-icon" />
+            <ui:VisualElement name="card-heroina" class="char-chip"
+                style="background-image: url('../Presentation_Cards/heroine.png');">
                 <ui:Label text="HEROÍNA" class="chip-name" />
             </ui:VisualElement>
 
