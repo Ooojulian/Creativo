@@ -19,6 +19,7 @@ public class MovimientoFicha : MonoBehaviour
 
     private bool enMovimiento = false;
     private CamaraDirectora camaraDirectora;
+    private PersonajeAnimador _animador;
 
     [Header("Nuevo Sistema de Cartas")]
     public PlayerInventory inventario;
@@ -32,6 +33,7 @@ public class MovimientoFicha : MonoBehaviour
     {
         camaraDirectora = FindAnyObjectByType<CamaraDirectora>();
         if (inventario == null) inventario = GetComponent<PlayerInventory>();
+        _animador = GetComponentInChildren<PersonajeAnimador>();
     }
 
     public void Avanzar(int cantidadPasos)
@@ -71,6 +73,7 @@ public class MovimientoFicha : MonoBehaviour
     IEnumerator MoverPorLasCasillas(int pasos)
     {
         enMovimiento = true;
+        _animador?.SetMoviendo(true);
 
         // Ocultar dado y enfocar al jugador
         if (gm != null && gm.dado != null)
@@ -129,6 +132,7 @@ public class MovimientoFicha : MonoBehaviour
         }
 
         enMovimiento = false;
+        _animador?.SetMoviendo(false);
         Debug.Log($"[MovimientoFicha] {name} llegó a casilla {indiceActual}");
 
         // REVELAR -> AÑADIR A MANO
@@ -163,6 +167,7 @@ public class MovimientoFicha : MonoBehaviour
         {
             if (llegóAMeta)
             {
+                _animador?.SetVictoria();
                 gm.LlegarAMeta(this);
             }
             else

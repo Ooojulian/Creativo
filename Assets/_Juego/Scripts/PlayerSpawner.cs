@@ -63,6 +63,11 @@ public class PlayerSpawner : MonoBehaviour
 
         _instanciaLocal = Instantiate(prefab, posicion, Quaternion.identity);
 
+        // Adjuntar PersonajeAnimador si el prefab no lo tiene ya
+        var animador = _instanciaLocal.GetComponentInChildren<PersonajeAnimador>();
+        if (animador == null)
+            _instanciaLocal.AddComponent<PersonajeAnimador>();
+
         // Aplicar color del jugador local
         if (PhotonNetwork.IsConnected && PhotonNetwork.LocalPlayer != null)
             JugadorColorManager.Instance?.AplicarColor(_instanciaLocal, PhotonNetwork.LocalPlayer);
