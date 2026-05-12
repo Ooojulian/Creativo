@@ -67,9 +67,8 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
     [Header("Viewport 3D (opcional — se auto-crea si está vacío)")]
     [SerializeField] private float velocidadRotacion = 40f;
 
-    // Layer 31 = User Layer reservado. Evita conflictos con layers del proyecto.
-    // No necesita existir en Project Settings con nombre — solo necesita ser != 0.
-    private const int LAYER_PREVIEW = 31;
+    // Layer 8 = "CharPreview" registrado en Project Settings → Tags and Layers.
+    private const int LAYER_PREVIEW = 8;
     private const int RT_SIZE       = 512;
 
     // ── Estado de preview ─────────────────────────────────────────────────────
@@ -77,7 +76,8 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
     private Camera        _camPreview;
     private RenderTexture _rt;
     private GameObject    _modeloActual;
-    private int           _rotDirManual = 0;
+    private int           _rotDirManual    = 0;
+    private Coroutine     _coroutineActual = null;
 
     // ── Referencias UI ────────────────────────────────────────────────────────
 
@@ -104,18 +104,20 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
     {
         _doc = GetComponent<UIDocument>();
         CrearInfraestructuraPreview();
+
+        // Fix 4: excluir layer 8 desde Awake para que sea efectivo antes de Start
+        Camera mainCam = Camera.main;
+        if (mainCam != null)
+        {
+            mainCam.cullingMask &= ~(1 << LAYER_PREVIEW);
+            Debug.Log($"[Preview] Main Camera cullingMask actualizado: {mainCam.cullingMask}");
+        }
     }
 
     void Start()
     {
-        // Excluir layer de preview de la cámara principal para que el modelo
-        // no se vea flotando en la escena del tablero.
-        Camera main = Camera.main;
-        if (main != null)
-            main.cullingMask &= ~(1 << LAYER_PREVIEW);
-
-        // Fix Causa A: vincular RT después de 2 frames para que el layout de
-        // UI Toolkit ya tenga dimensiones asignadas al elemento render-texture-display.
+        // VincularRTConDelay se inicia aquí — es la única coroutine de Start,
+        // no interfiere con _coroutineActual (que solo gestiona carga de modelo).
         StartCoroutine(VincularRTConDelay());
     }
 
@@ -225,6 +227,8 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
         // herede un cullingMask de otro componente o del prefab de cámara.
         _camPreview.cullingMask = 0;
         _camPreview.cullingMask = 1 << LAYER_PREVIEW;
+        Debug.Log($"[Preview] cullingMask={_camPreview.cullingMask} " +
+                  $"(esperado={1 << 8}, layer8=correcto={_camPreview.cullingMask == (1 << 8)})");
         _camPreview.targetTexture   = _rt;
         _camPreview.nearClipPlane   = 0.01f;
         _camPreview.farClipPlane    = 500f;
@@ -262,54 +266,74 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
 
     private void CargarModelo(DatosPersonaje datos)
     {
-        StartCoroutine(CargarModeloCoroutine(datos));
+        // Cancelar coroutine anterior antes de destruir el modelo para evitar
+        // que la coroutine vieja intente acceder al objeto ya destruido.
+        if (_coroutineActual != null)
+        {
+            StopCoroutine(_coroutineActual);
+            _coroutineActual = null;
+        }
+        if (_modeloActual != null)
+        {
+            Destroy(_modeloActual);
+            _modeloActual = null;
+        }
+        _coroutineActual = StartCoroutine(CargarModeloCoroutine(datos));
     }
 
     private IEnumerator CargarModeloCoroutine(DatosPersonaje datos)
     {
-        DestruirModelo(); // destruir el anterior antes de instanciar
+        Debug.Log($"[Preview] INICIO coroutine {datos.id}");
 
         GameObject prefab = CargarPrefab(datos);
         if (prefab == null) yield break;
 
-        // Instanciar muy lejos del tablero (y=−200) para que sea invisible sin la RT
-        Vector3 posPreview = new Vector3(0f, -200f, 0f);
-        _modeloActual = Instantiate(prefab, posPreview, Quaternion.identity);
-        _modeloActual.name = $"_Preview_{datos.id}";
+        // Instanciar en variable LOCAL — no en _modeloActual todavía.
+        // Esto evita que si CargarModelo() se llama de nuevo mientras corremos,
+        // la nueva invocación destruya el objeto que esta coroutine está usando.
+        GameObject nuevoModelo = Instantiate(
+            prefab,
+            new Vector3(0f, -200f, 0f),
+            Quaternion.identity
+        );
+        nuevoModelo.name = $"_Preview_{datos.id}";
 
-        // Fix Causa D: limpiar scripts ANTES del yield, pero asignar layer DESPUÉS.
-        // Motivo: Instantiate() dispara Awake() en el mismo frame; si GhostScript.Awake
-        // o cualquier otro script resetea el layer, nuestra asignación previa se pierde.
-        // Al esperar un frame dejamos que todos los Awake() corran y LUEGO sobreescribimos.
-        LimpiarScriptsDeGameplay(_modeloActual);
-        Debug.Log($"[Preview] Instancia creada: {_modeloActual.name} en layer={_modeloActual.layer} (antes de yield)");
+        // Limpiar scripts y asignar layer síncronamente, antes del yield.
+        // LimpiarScripts desactiva GhostScript antes de que Start() corra.
+        // Layer se asigna aquí Y de nuevo post-yield por si algún Start() lo resetea.
+        LimpiarScriptsDeGameplay(nuevoModelo);
+        AsignarLayerRecursivo(nuevoModelo, LAYER_PREVIEW);
+        Debug.Log($"[Preview] Scripts limpiados. Layer root={nuevoModelo.layer} (pre-yield)");
 
-        yield return null; // deja que Awake() de los scripts del prefab ejecute
+        // Exponer la referencia compartida ahora que el objeto está limpio
+        _modeloActual = nuevoModelo;
 
-        // Ahora asignar layer — después de que Awake() ya no puede resetearlo
+        yield return null; // deja que Start() de scripts restantes corra
+        Debug.Log($"[Preview] POST yield 1 — modelo vivo: {_modeloActual != null}");
+
+        // Verificar que el modelo no fue destruido mientras esperábamos
+        if (_modeloActual == null || _modeloActual != nuevoModelo)
+        {
+            Debug.LogWarning("[Preview] Modelo destruido durante yield 1, abortando.");
+            yield break;
+        }
+
+        // Re-asignar layer por si algún Start() lo reseteó
         AsignarLayerRecursivo(_modeloActual, LAYER_PREVIEW);
+        Debug.Log($"[Preview] Layer re-asignado post-yield: root={_modeloActual.layer}");
 
-        // Verificar que el layer quedó bien en todos los transforms
-        int layersMal = 0;
-        foreach (var t in _modeloActual.GetComponentsInChildren<Transform>(true))
-            if (t.gameObject.layer != LAYER_PREVIEW) layersMal++;
-        Debug.Log($"[Preview] Layer asignado: {LAYER_PREVIEW}. Transforms con layer incorrecto: {layersMal}");
+        ValidarVisibilidad(_modeloActual, datos.id);
+        Debug.Log("[Preview] Visibilidad validada.");
 
         yield return null; // segundo frame para que los renderers se inicialicen
+        Debug.Log("[Preview] POST yield 2");
 
-        // Validar visibilidad del modelo
-        bool modeloVisible = ValidarVisibilidad(_modeloActual, datos.id);
-        if (!modeloVisible)
-            Debug.LogWarning($"[Preview] {datos.id}: modelo sin renderers visibles.");
+        if (_modeloActual == null) { yield break; }
 
-        // Posicionar cámara basada en bounds reales
         AjustarCamara(_modeloActual);
+        Debug.Log("[Preview] COROUTINE COMPLETA");
 
-        // Log de estado final del pipeline
-        Debug.Log($"[Preview] Pipeline completo. CamEnabled={_camPreview?.enabled}, " +
-                  $"cullingMask={_camPreview?.cullingMask}, " +
-                  $"RT created={_rt?.IsCreated()}, " +
-                  $"displayRect={_renderDisplay?.layout}");
+        _coroutineActual = null;
     }
 
     private GameObject CargarPrefab(DatosPersonaje datos)
@@ -327,12 +351,16 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
         return prefab;
     }
 
-    // ── Tarea 2: asignación de layer recursiva usando GetComponentsInChildren ─
-
     private static void AsignarLayerRecursivo(GameObject go, int layer)
     {
+        if (go == null)
+        {
+            Debug.LogError("[Preview] AsignarLayerRecursivo: go es NULL");
+            return;
+        }
         foreach (var t in go.GetComponentsInChildren<Transform>(includeInactive: true))
             t.gameObject.layer = layer;
+        Debug.Log($"[Preview] Layer recursivo aplicado. Root layer={go.layer}");
     }
 
     // ── Tarea 3: limpieza de scripts de gameplay ──────────────────────────────
@@ -441,8 +469,8 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
         _camPreview.nearClipPlane = Mathf.Max(0.01f, distancia * 0.01f);
         _camPreview.farClipPlane  = distancia * 3f;
 
-        Debug.Log($"[Preview] Cámara ajustada → pos={_camPreview.transform.position}, " +
-                  $"centro={centro}, dist={distancia:F2}");
+        Debug.Log($"[Preview] Bounds center={b.center}, camPos={_camPreview.transform.position}, " +
+                  $"camTarget hacia {centro}, dist={distancia:F2}");
     }
 
     private static Bounds CalcularBoundsEstatico(GameObject go)
@@ -459,7 +487,8 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
 
     private void DestruirModelo()
     {
-        StopAllCoroutines();
+        // No llama StopAllCoroutines() — VincularRTConDelay corre independientemente.
+        // La coroutine de carga se cancela en CargarModelo() antes de llamar aquí.
         if (_modeloActual != null)
         {
             Destroy(_modeloActual);
