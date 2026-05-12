@@ -1,0 +1,91 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <Style src="../USS/FantasyTheme.uss" />
+
+    <!--
+        Layout (columna, de arriba a abajo):
+          1. header      — fijo
+          2. viewport    — flex-grow (ocupa el espacio disponible)
+          3. char-strip  — fijo ~100px: selector horizontal de personajes
+          4. footer      — fijo: botón confirmar
+    -->
+    <ui:VisualElement name="root" class="seleccion-root">
+
+        <!-- ─── 1. HEADER ─────────────────────────────────────────── -->
+        <ui:VisualElement name="header" class="seleccion-header">
+
+            <ui:Button name="btn-volver" text="← VOLVER" class="btn btn--ghost seleccion-btn-volver" />
+
+            <ui:Label text="ELIGE TU HÉROE" class="text-header seleccion-titulo" />
+
+            <ui:VisualElement name="players-status" class="seleccion-status-wrap">
+                <ui:VisualElement class="seleccion-color-row">
+                    <ui:VisualElement name="color-indicador" class="player-color-badge" />
+                    <ui:Label name="lbl-color" text="Tu color" class="text-dim seleccion-lbl-color" />
+                </ui:VisualElement>
+                <ui:Label name="lbl-jugadores" text="" class="text-dim seleccion-lbl-jugadores" />
+                <ui:VisualElement name="player-dots" class="players-indicator" style="margin-top: 4px;" />
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+
+        <!-- ─── 2. VIEWPORT 3D ───────────────────────────────────── -->
+        <ui:VisualElement name="viewport-wrap" class="seleccion-viewport-wrap">
+
+            <!-- Superficie que muestra la RenderTexture (backgroundImage asignado en runtime) -->
+            <ui:VisualElement name="render-texture-display" class="seleccion-render-display" />
+
+            <!-- Nombre del personaje flotando sobre el viewport (bottom) -->
+            <ui:VisualElement class="seleccion-nombre-overlay">
+                <ui:Label name="lbl-personaje-nombre" text="—"
+                    class="text-header" style="font-size: 20px; margin-bottom: 0;" />
+                <ui:Label name="lbl-personaje-desc" text="Selecciona un personaje"
+                    class="text-dim" style="font-size: 12px;" />
+            </ui:VisualElement>
+
+            <!-- Botones de rotación flotantes -->
+            <ui:Button name="btn-rot-izq" text="◀" class="seleccion-rot-btn seleccion-rot-izq" />
+            <ui:Button name="btn-rot-der" text="▶" class="seleccion-rot-btn seleccion-rot-der" />
+
+        </ui:VisualElement>
+
+        <!-- ─── 3. SELECTOR HORIZONTAL ───────────────────────────── -->
+        <ui:VisualElement name="char-strip" class="seleccion-char-strip">
+
+            <ui:VisualElement name="card-caballero" class="char-chip">
+                <ui:Label text="🐾" class="chip-icon" />
+                <ui:Label text="CABALLERO" class="chip-name" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="card-fantasma" class="char-chip">
+                <ui:Label text="👻" class="chip-icon" />
+                <ui:Label text="FANTASMA" class="chip-name" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="card-heroe" class="char-chip">
+                <ui:Label text="⚔️" class="chip-icon" />
+                <ui:Label text="HÉROE" class="chip-name" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="card-heroina" class="char-chip">
+                <ui:Label text="🏹" class="chip-icon" />
+                <ui:Label text="HEROÍNA" class="chip-name" />
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+
+        <!-- ─── 4. FOOTER ─────────────────────────────────────────── -->
+        <ui:VisualElement name="footer" class="seleccion-footer">
+
+            <ui:VisualElement style="flex-direction: column;">
+                <ui:Label name="lbl-seleccion" text="Ningún personaje seleccionado" class="text-dim" />
+                <ui:Label name="lbl-seleccion-sub" text="Haz clic en un héroe para elegirlo"
+                    class="text-dim" style="font-size: 11px; margin-top: 2px;" />
+            </ui:VisualElement>
+
+            <ui:Button name="btn-confirmar" text="CONFIRMAR SELECCIÓN →"
+                class="btn btn--primary seleccion-btn-confirmar" />
+
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

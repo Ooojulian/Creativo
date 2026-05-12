@@ -1,0 +1,53 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:Template name="MenuInicio" />
+    <Style src="../USS/FantasyTheme.uss" />
+
+    <ui:VisualElement name="root" class="root-container" style="flex-direction: column;">
+
+        <!-- Fondo decorativo superior -->
+        <ui:VisualElement name="bg-top" style="
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background-color: #c9952a;" />
+
+        <!-- Contenedor central -->
+        <ui:VisualElement name="center-wrap" style="
+            align-items: center; justify-content: center; flex-grow: 1;">
+
+            <!-- Logo / Título -->
+            <ui:VisualElement name="logo-block" style="align-items: center; margin-bottom: 48px;">
+                <ui:Label name="title-label" text="CREATIVO" class="title-logo" />
+                <ui:Label name="subtitle-label" text="JUEGO DE MESA FANTASY" class="title-subtitle" />
+
+                <!-- Separador dorado decorativo -->
+                <ui:VisualElement style="
+                    width: 200px; height: 2px;
+                    background-color: #c9952a; opacity: 0.6;" />
+            </ui:VisualElement>
+
+            <!-- Panel de botones -->
+            <ui:VisualElement name="btn-panel" class="panel" style="
+                width: 320px; align-items: stretch; padding: 32px 40px;">
+
+                <ui:Button name="btn-jugar" text="JUGAR" class="btn btn--primary"
+                    style="margin-bottom: 14px;" />
+
+                <ui:Button name="btn-opciones" text="OPCIONES" class="btn btn--secondary"
+                    style="margin-bottom: 14px;" />
+
+                <ui:Button name="btn-salir" text="SALIR" class="btn btn--ghost" />
+
+            </ui:VisualElement>
+
+            <!-- Versión -->
+            <ui:Label name="version-label" text="v0.3  •  Alpha" class="text-dim"
+                style="margin-top: 24px;" />
+
+        </ui:VisualElement>
+
+        <!-- Borde inferior dorado -->
+        <ui:VisualElement style="
+            position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+            background-color: #c9952a;" />
+
+    </ui:VisualElement>
+</ui:UXML>

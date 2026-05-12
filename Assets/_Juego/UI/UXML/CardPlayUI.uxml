@@ -1,0 +1,36 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../USS/FantasyTheme.uss" />
+
+    <!-- Panel de decisión de carta -->
+    <ui:VisualElement name="cardplay-root" style="
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        align-items: center; justify-content: flex-end;
+        padding-bottom: 120px;">
+
+        <ui:VisualElement name="cardplay-panel" class="panel" style="
+            width: 360px; align-items: center; padding: 24px 28px;">
+
+            <ui:Label name="lbl-pregunta" text="¿Qué deseas hacer?"
+                class="text-header" style="font-size: 18px; margin-bottom: 18px;" />
+
+            <ui:VisualElement class="divider" style="align-self: stretch;" />
+
+            <ui:VisualElement style="
+                flex-direction: row; justify-content: space-between;
+                align-self: stretch; margin-top: 12px;">
+
+                <ui:Button name="btn-usar" text="✦ USAR AHORA" class="btn btn--primary"
+                    style="flex-grow: 1; margin-right: 8px; min-width: 0;" />
+
+                <ui:Button name="btn-guardar" text="◆ GUARDAR" class="btn btn--secondary"
+                    style="flex-grow: 1; margin-left: 8px; min-width: 0;" />
+
+            </ui:VisualElement>
+
+            <ui:Button name="btn-cerrar" text="✕ Cancelar" class="btn btn--ghost"
+                style="align-self: stretch; height: 36px; font-size: 13px; margin-top: 8px;" />
+
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>
