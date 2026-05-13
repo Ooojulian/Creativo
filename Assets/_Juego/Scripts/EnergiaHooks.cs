@@ -54,28 +54,39 @@ public class EnergiaHooks : MonoBehaviour
 
     private void HandleTurnStarted(MovimientoFicha jugador)
     {
-        if (!controllers.ContainsKey(jugador)) return;
+        if (jugador == null) return;
+        
+        // Asegurar que el jugador tenga controlador si no lo tenía en el Start
+        if (!controllers.ContainsKey(jugador))
+        {
+            var c = jugador.GetComponent<EnergiaController>();
+            if (c == null) c = jugador.gameObject.AddComponent<EnergiaController>();
+            controllers[jugador] = c;
+        }
+
         var ctrl = controllers[jugador];
+        Debug.Log($"[Energía] Inicio de turno para {jugador.name}. Procesando premios...");
 
         // 1. Ganar +1 automático
         ctrl.GanarEnergia(energiaPorTurno);
+        Debug.Log($"[Energía] {jugador.name} recibe +{energiaPorTurno} de energía por inicio de turno.");
 
         // 2. Ganar +2 si ganó batalla previa
         if (ultimoGanadorBatalla == jugador)
         {
             ctrl.GanarEnergia(energiaPorBatallaGanada);
+            Debug.Log($"[Energía] {jugador.name} recibe +{energiaPorBatallaGanada} por victoria en batalla previa.");
             ultimoGanadorBatalla = null; // Resetear
         }
 
         // 3. Ganar +3 si está en meta intermedia
-        // Definimos "meta intermedia" como cualquier casilla tipo NodeType.Finish que NO sea la última de la ruta
-        // O si simplemente está en una casilla específica. Aquí usaremos el BoardNode.nodeType.
         if (jugador.ruta != null && jugador.indiceActual > 0 && jugador.indiceActual < jugador.ruta.casillas.Count - 1)
         {
             var node = jugador.ruta.casillas[jugador.indiceActual].GetComponent<BoardNode>();
             if (node != null && node.nodeType == BoardNode.NodeType.Finish)
             {
                 ctrl.GanarEnergia(energiaPorMetaIntermedia);
+                Debug.Log($"[Energía] {jugador.name} recibe +{energiaPorMetaIntermedia} por estar en meta intermedia.");
             }
         }
     }
