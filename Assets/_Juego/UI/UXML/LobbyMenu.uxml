@@ -61,7 +61,10 @@
                 style="align-self: stretch; margin-bottom: 20px;" />
 
             <ui:Button name="btn-iniciar-partida" text="▶ INICIAR PARTIDA" class="btn btn--primary"
-                style="align-self: stretch; margin-bottom: 12px; display: none;" />
+                style="align-self: stretch; margin-bottom: 4px; display: none;" />
+
+            <ui:Label name="lbl-aviso-minimo" text="Se necesitan al menos 2 jugadores"
+                style="margin-bottom: 12px; display: none;" />
 
             <ui:Button name="btn-abandonar-sala" text="ABANDONAR SALA" class="btn btn--danger"
                 style="align-self: stretch;" />

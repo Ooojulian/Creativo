@@ -97,6 +97,8 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
     private VisualElement _colorIndicador;
     private Label         _lblColor;
     private VisualElement _renderDisplay;
+    private VisualElement _panelAvisoAbandono;
+    private Label         _lblAvisoAbandono;
 
     private DatosPersonaje? _seleccionActual = null;
 
@@ -134,6 +136,8 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
 
     void OnEnable()
     {
+        PhotonNetwork.AddCallbackTarget(this);
+
         _root               = _doc.rootVisualElement;
         _btnVolver          = _root.Q<Button>("btn-volver");
         _btnConfirmar       = _root.Q<Button>("btn-confirmar");
@@ -145,6 +149,8 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
         _colorIndicador     = _root.Q<VisualElement>("color-indicador");
         _lblColor           = _root.Q<Label>("lbl-color");
         _renderDisplay      = _root.Q<VisualElement>("render-texture-display");
+        _panelAvisoAbandono = _root.Q<VisualElement>("panel-aviso-abandono");
+        _lblAvisoAbandono   = _root.Q<Label>("lbl-aviso-abandono");
 
         _btnVolver?.RegisterCallback<ClickEvent>(_ => Volver());
         _btnConfirmar?.RegisterCallback<ClickEvent>(_ => Confirmar());
@@ -169,6 +175,8 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
 
     void OnDisable()
     {
+        PhotonNetwork.RemoveCallbackTarget(this);
+
         _renderDisplay?.UnregisterCallback<GeometryChangedEvent>(OnDisplayGeometryChanged);
         DestruirModelo();
         if (_camPreview != null) _camPreview.enabled = false;
@@ -659,7 +667,36 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
     }
 
     public override void OnPlayerEnteredRoom(Player p) => ActualizarIndicadorJugadores();
-    public override void OnPlayerLeftRoom(Player p)    => ActualizarIndicadorJugadores();
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        ActualizarIndicadorJugadores();
+        Debug.Log($"[SeleccionPersonajes] Jugador abandonó: {otherPlayer.NickName}. " +
+                  $"Quedan: {PhotonNetwork.CurrentRoom.PlayerCount}");
+
+        if (PhotonNetwork.CurrentRoom.PlayerCount < 2)
+            StartCoroutine(VolverALobbyPorAbandonos());
+    }
+
+    private IEnumerator VolverALobbyPorAbandonos()
+    {
+        MostrarAvisoAbandono("Un jugador abandonó la partida. Volviendo a la sala...");
+        yield return new WaitForSeconds(3f);
+
+        if (PhotonNetwork.IsMasterClient)
+            PhotonNetwork.LoadLevel(escenaLobby);
+        else
+            SceneManager.LoadScene(escenaLobby);
+    }
+
+    private void MostrarAvisoAbandono(string mensaje)
+    {
+        if (_panelAvisoAbandono != null)
+            _panelAvisoAbandono.style.display = DisplayStyle.Flex;
+        if (_lblAvisoAbandono != null)
+            _lblAvisoAbandono.text = mensaje;
+    }
+
     public override void OnJoinedRoom()
     {
         ActualizarIndicadorColor();

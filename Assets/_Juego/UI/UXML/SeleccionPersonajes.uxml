@@ -85,4 +85,16 @@
         </ui:VisualElement>
 
     </ui:VisualElement>
+
+    <!-- Overlay de aviso de abandono, oculto por defecto -->
+    <ui:VisualElement name="panel-aviso-abandono" style="display: none; position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba(0,0,0,0.75);
+        align-items: center; justify-content: center;">
+        <ui:Label name="lbl-aviso-abandono" text=""
+            style="color: rgb(255,220,100); font-size: 20px;
+            -unity-text-align: middle-center;
+            white-space: normal; max-width: 400px;" />
+    </ui:VisualElement>
+
 </ui:UXML>

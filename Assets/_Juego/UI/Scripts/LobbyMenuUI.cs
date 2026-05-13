@@ -44,6 +44,7 @@ public class LobbyMenuUI : MonoBehaviourPunCallbacks
     private VisualElement _listaJugadores;
     private Button        _btnIniciar;
     private Button        _btnAbandonar;
+    private Label         _lblAvisoMinimo;
 
     private const string LETRAS = "ABCDEFGHJKLMNPQRSTUVWXYZ";
     private string _codigoPendiente;
@@ -57,6 +58,7 @@ public class LobbyMenuUI : MonoBehaviourPunCallbacks
 
     void OnEnable()
     {
+        PhotonNetwork.AutomaticallySyncScene = true;
         PhotonNetwork.AddCallbackTarget(this);
 
         _root = _doc.rootVisualElement;
@@ -80,6 +82,7 @@ public class LobbyMenuUI : MonoBehaviourPunCallbacks
         _listaJugadores = _root.Q<VisualElement>("lista-jugadores");
         _btnIniciar     = _root.Q<Button>("btn-iniciar-partida");
         _btnAbandonar   = _root.Q<Button>("btn-abandonar-sala");
+        _lblAvisoMinimo = _root.Q<Label>("lbl-aviso-minimo");
 
         Debug.Log($"[Lobby] btn-crear null: {_btnCrear == null}");
         Debug.Log($"[Lobby] btn-unirse-panel null: {_btnUnirsePanel == null}");
@@ -292,7 +295,15 @@ public class LobbyMenuUI : MonoBehaviourPunCallbacks
             _btnIniciar.style.display = PhotonNetwork.IsMasterClient
                 ? DisplayStyle.Flex
                 : DisplayStyle.None;
-            _btnIniciar.SetEnabled(count >= 2);
+            _btnIniciar.SetEnabled(PhotonNetwork.IsMasterClient && count >= 2);
+        }
+
+        // Aviso de mínimo de jugadores: visible solo al master con menos de 2
+        if (_lblAvisoMinimo != null)
+        {
+            _lblAvisoMinimo.style.display = PhotonNetwork.IsMasterClient && count < 2
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
         }
     }
 
