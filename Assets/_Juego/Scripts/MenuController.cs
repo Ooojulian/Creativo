@@ -1,3 +1,8 @@
+// La lógica UI de este script ha sido migrada a LobbyMenuUI.cs (UI Toolkit).
+// Este componente se mantiene en SampleScene como stub para GameSync.RPC_IniciarPartida,
+// que comprueba MenuController.Instance con null-guard antes de usarlo.
+// No conectar referencias UI aquí; el componente puede desactivarse una vez que
+// GameSync.RPC_IniciarPartida sea refactorizado para no depender de MenuController.
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;

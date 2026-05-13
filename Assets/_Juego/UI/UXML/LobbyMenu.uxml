@@ -7,13 +7,16 @@
         <!-- Panel principal del menú -->
         <ui:VisualElement name="panel-menu" class="panel lobby-container" style="padding: 36px 40px;">
 
-            <ui:Label text="SALA DE ESPERA" class="text-header"
+            <ui:Label text="SALA DE JUEGO" class="text-header"
                 style="margin-bottom: 24px; font-size: 20px;" />
 
             <ui:Button name="btn-crear" text="✦ CREAR SALA" class="btn btn--primary"
                 style="align-self: stretch; margin-bottom: 12px;" />
 
             <ui:Button name="btn-unirse-panel" text="◆ UNIRSE CON CÓDIGO" class="btn btn--secondary"
+                style="align-self: stretch; margin-bottom: 12px;" />
+
+            <ui:Button name="btn-volver" text="VOLVER" class="btn btn--ghost"
                 style="align-self: stretch;" />
 
         </ui:VisualElement>
@@ -30,10 +33,14 @@
                 style="align-self: stretch; margin-bottom: 20px;"
                 placeholder="XXXX" />
 
+            <ui:Label name="lbl-error-unirse" text=""
+                class="text-dim" style="color: #c04040; -unity-text-align: middle-center;
+                margin-bottom: 8px; display: none;" />
+
             <ui:Button name="btn-confirmar-unirse" text="UNIRSE →" class="btn btn--primary"
                 style="align-self: stretch; margin-bottom: 12px;" />
 
-            <ui:Button name="btn-cancelar-unirse" text="CANCELAR" class="btn btn--ghost"
+            <ui:Button name="btn-cancelar-unirse" text="VOLVER" class="btn btn--ghost"
                 style="align-self: stretch;" />
 
         </ui:VisualElement>
@@ -44,20 +51,19 @@
 
             <ui:Label text="EN SALA" class="text-header" style="margin-bottom: 8px;" />
 
-            <ui:Label name="lbl-codigo-sala" text="Código: ----" class="text-code"
-                style="margin-bottom: 24px;" />
+            <ui:Label name="lbl-codigo-sala" text="----" class="text-code"
+                style="margin-bottom: 4px;" />
 
-            <!-- Puntos de jugadores -->
-            <ui:VisualElement name="player-dots-lobby" class="players-indicator"
-                style="margin-bottom: 16px;" />
+            <ui:Label name="lbl-contador-jugadores" text="0 / 4"
+                class="badge badge--gold" style="margin-bottom: 20px;" />
 
-            <ui:Label name="lbl-espera" text="Esperando jugadores..."
-                class="text-body" style="-unity-text-align: middle-center; margin-bottom: 24px;" />
+            <ui:VisualElement name="lista-jugadores"
+                style="align-self: stretch; margin-bottom: 20px;" />
 
-            <ui:Button name="btn-iniciar" text="▶ INICIAR PARTIDA" class="btn btn--primary"
+            <ui:Button name="btn-iniciar-partida" text="▶ INICIAR PARTIDA" class="btn btn--primary"
                 style="align-self: stretch; margin-bottom: 12px; display: none;" />
 
-            <ui:Button name="btn-salir-sala" text="SALIR DE LA SALA" class="btn btn--ghost"
+            <ui:Button name="btn-abandonar-sala" text="ABANDONAR SALA" class="btn btn--danger"
                 style="align-self: stretch;" />
 
         </ui:VisualElement>

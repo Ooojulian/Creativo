@@ -66,8 +66,8 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
     // ── Inspector (opcionales — si no se asignan, se crean por código) ────────
 
     [Header("Escenas")]
-    [SerializeField] private string escenaMenuInicio = "MenuInicio";
-    [SerializeField] private string escenaJuego      = "SampleScene";
+    [SerializeField] private string escenaLobby  = "Lobby";
+    [SerializeField] private string escenaJuego  = "SampleScene";
 
     [Header("Viewport 3D (opcional — se auto-crea si está vacío)")]
     [SerializeField] private float velocidadRotacion = 40f;
@@ -575,7 +575,7 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
     private void Volver()
     {
         DestruirModelo();
-        SceneManager.LoadScene(escenaMenuInicio);
+        SceneManager.LoadScene(escenaLobby);
     }
 
     // ── Indicadores UI ────────────────────────────────────────────────────────

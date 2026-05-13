@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class MenuInicioUI : MonoBehaviour
 {
     [Header("Escenas")]
-    [SerializeField] private string escenaSeleccionPersonajes = "SeleccionPersonajes";
+    [SerializeField] private string escenaLobby = "Lobby";
 
     private UIDocument _doc;
     private Button _btnJugar;
@@ -40,7 +40,7 @@ public class MenuInicioUI : MonoBehaviour
 
     private void IrASeleccion()
     {
-        SceneManager.LoadScene(escenaSeleccionPersonajes);
+        SceneManager.LoadScene(escenaLobby);
     }
 
     private void AbrirOpciones()

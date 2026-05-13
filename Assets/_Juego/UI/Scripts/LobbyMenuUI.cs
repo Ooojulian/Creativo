@@ -1,11 +1,13 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
 
 /// <summary>
-/// Versión UI Toolkit de MenuController.
-/// Maneja el lobby Photon: crear sala, unirse, esperar, iniciar.
+/// UI Toolkit del lobby Photon: crear sala, unirse, esperar, iniciar.
+/// Reemplaza la capa UI de MenuController (la lógica Photon queda aquí).
 /// </summary>
 [RequireComponent(typeof(UIDocument))]
 public class LobbyMenuUI : MonoBehaviourPunCallbacks
@@ -14,6 +16,8 @@ public class LobbyMenuUI : MonoBehaviourPunCallbacks
 
     [Header("Configuración")]
     [SerializeField] private int maxJugadores = 4;
+    [SerializeField] private string escenaMenuInicio    = "MenuInicio";
+    [SerializeField] private string escenaSeleccion     = "SeleccionPersonajes";
 
     private UIDocument    _doc;
     private VisualElement _root;
@@ -26,21 +30,24 @@ public class LobbyMenuUI : MonoBehaviourPunCallbacks
     // Botones menú
     private Button _btnCrear;
     private Button _btnUnirsePanel;
+    private Button _btnVolver;
 
     // Botones unirse
     private TextField _inputCodigo;
     private Button    _btnConfirmarUnirse;
     private Button    _btnCancelarUnirse;
+    private Label     _lblErrorUnirse;
 
     // Espera
     private Label         _lblCodigoSala;
-    private Label         _lblEspera;
+    private Label         _lblContador;
+    private VisualElement _listaJugadores;
     private Button        _btnIniciar;
-    private Button        _btnSalirSala;
-    private VisualElement _playerDotsLobby;
+    private Button        _btnAbandonar;
 
     private const string LETRAS = "ABCDEFGHJKLMNPQRSTUVWXYZ";
     private string _codigoPendiente;
+    private string _accionPendiente;   // "crear" | "unirse"
 
     void Awake()
     {
@@ -50,7 +57,10 @@ public class LobbyMenuUI : MonoBehaviourPunCallbacks
 
     void OnEnable()
     {
+        PhotonNetwork.AddCallbackTarget(this);
+
         _root = _doc.rootVisualElement;
+        Debug.Log($"[Lobby] OnEnable. Root null: {_root == null}");
 
         _panelMenu   = _root.Q<VisualElement>("panel-menu");
         _panelUnirse = _root.Q<VisualElement>("panel-unirse");
@@ -58,44 +68,80 @@ public class LobbyMenuUI : MonoBehaviourPunCallbacks
 
         _btnCrear        = _root.Q<Button>("btn-crear");
         _btnUnirsePanel  = _root.Q<Button>("btn-unirse-panel");
+        _btnVolver       = _root.Q<Button>("btn-volver");
 
         _inputCodigo        = _root.Q<TextField>("input-codigo");
         _btnConfirmarUnirse = _root.Q<Button>("btn-confirmar-unirse");
         _btnCancelarUnirse  = _root.Q<Button>("btn-cancelar-unirse");
+        _lblErrorUnirse     = _root.Q<Label>("lbl-error-unirse");
 
-        _lblCodigoSala   = _root.Q<Label>("lbl-codigo-sala");
-        _lblEspera       = _root.Q<Label>("lbl-espera");
-        _btnIniciar      = _root.Q<Button>("btn-iniciar");
-        _btnSalirSala    = _root.Q<Button>("btn-salir-sala");
-        _playerDotsLobby = _root.Q<VisualElement>("player-dots-lobby");
+        _lblCodigoSala  = _root.Q<Label>("lbl-codigo-sala");
+        _lblContador    = _root.Q<Label>("lbl-contador-jugadores");
+        _listaJugadores = _root.Q<VisualElement>("lista-jugadores");
+        _btnIniciar     = _root.Q<Button>("btn-iniciar-partida");
+        _btnAbandonar   = _root.Q<Button>("btn-abandonar-sala");
 
-        _btnCrear?.RegisterCallback<ClickEvent>(_ => CrearSala());
-        _btnUnirsePanel?.RegisterCallback<ClickEvent>(_ => MostrarPanelUnirse());
-        _btnConfirmarUnirse?.RegisterCallback<ClickEvent>(_ => ConfirmarUnirse());
-        _btnCancelarUnirse?.RegisterCallback<ClickEvent>(_ => CancelarUnirse());
-        _btnIniciar?.RegisterCallback<ClickEvent>(_ => IniciarPartida());
-        _btnSalirSala?.RegisterCallback<ClickEvent>(_ => SalirDeSala());
+        Debug.Log($"[Lobby] btn-crear null: {_btnCrear == null}");
+        Debug.Log($"[Lobby] btn-unirse-panel null: {_btnUnirsePanel == null}");
+        Debug.Log($"[Lobby] btn-volver null: {_btnVolver == null}");
+        Debug.Log($"[Lobby] btn-confirmar-unirse null: {_btnConfirmarUnirse == null}");
+        Debug.Log($"[Lobby] btn-cancelar-unirse null: {_btnCancelarUnirse == null}");
+        Debug.Log($"[Lobby] btn-iniciar-partida null: {_btnIniciar == null}");
+        Debug.Log($"[Lobby] btn-abandonar-sala null: {_btnAbandonar == null}");
+
+        // Filtro automático del input: solo A-Z, máx 4 caracteres, mayúsculas
+        if (_inputCodigo != null)
+        {
+            _inputCodigo.maxLength = 4;
+            _inputCodigo.RegisterValueChangedCallback(evt =>
+            {
+                string filtrado = new string(
+                    evt.newValue.ToUpper().Where(c => c >= 'A' && c <= 'Z').ToArray()
+                );
+                if (filtrado != evt.newValue)
+                    _inputCodigo.SetValueWithoutNotify(filtrado);
+            });
+        }
+
+        if (_btnCrear        != null) _btnCrear.clicked        += CrearSala;
+        if (_btnUnirsePanel  != null) _btnUnirsePanel.clicked  += MostrarPanelUnirse;
+        if (_btnVolver       != null) _btnVolver.clicked       += VolverAlMenu;
+        if (_btnConfirmarUnirse != null) _btnConfirmarUnirse.clicked += ConfirmarUnirse;
+        if (_btnCancelarUnirse  != null) _btnCancelarUnirse.clicked  += CancelarUnirse;
+        if (_btnIniciar      != null) _btnIniciar.clicked      += IniciarPartida;
+        if (_btnAbandonar    != null) _btnAbandonar.clicked    += SalirDeSala;
 
         MostrarPanel(_panelMenu);
     }
 
     void OnDisable()
     {
-        _btnCrear?.UnregisterCallback<ClickEvent>(_ => CrearSala());
-        _btnUnirsePanel?.UnregisterCallback<ClickEvent>(_ => MostrarPanelUnirse());
-        _btnConfirmarUnirse?.UnregisterCallback<ClickEvent>(_ => ConfirmarUnirse());
-        _btnCancelarUnirse?.UnregisterCallback<ClickEvent>(_ => CancelarUnirse());
-        _btnIniciar?.UnregisterCallback<ClickEvent>(_ => IniciarPartida());
-        _btnSalirSala?.UnregisterCallback<ClickEvent>(_ => SalirDeSala());
+        PhotonNetwork.RemoveCallbackTarget(this);
+
+        if (_btnCrear        != null) _btnCrear.clicked        -= CrearSala;
+        if (_btnUnirsePanel  != null) _btnUnirsePanel.clicked  -= MostrarPanelUnirse;
+        if (_btnVolver       != null) _btnVolver.clicked       -= VolverAlMenu;
+        if (_btnConfirmarUnirse != null) _btnConfirmarUnirse.clicked -= ConfirmarUnirse;
+        if (_btnCancelarUnirse  != null) _btnCancelarUnirse.clicked  -= CancelarUnirse;
+        if (_btnIniciar      != null) _btnIniciar.clicked      -= IniciarPartida;
+        if (_btnAbandonar    != null) _btnAbandonar.clicked    -= SalirDeSala;
     }
 
     // ── Acciones ──────────────────────────────────────────────────────────────
 
     public void CrearSala()
     {
+        if (!PhotonNetwork.IsConnected)
+        {
+            _accionPendiente = "crear";
+            PhotonNetwork.NickName = "Host";
+            PhotonNetwork.ConnectUsingSettings();
+            MostrarEspera(null);
+            return;
+        }
         if (!PhotonNetwork.IsConnectedAndReady)
         {
-            Debug.LogWarning("[Lobby] Photon no listo.");
+            Debug.LogWarning("[Lobby] Photon conectando, espera.");
             return;
         }
         string codigo = GenerarCodigo();
@@ -107,60 +153,89 @@ public class LobbyMenuUI : MonoBehaviourPunCallbacks
 
     private void MostrarPanelUnirse()
     {
+        OcultarError();
+        if (_inputCodigo != null) _inputCodigo.SetValueWithoutNotify("");
         MostrarPanel(_panelUnirse);
     }
 
     private void ConfirmarUnirse()
     {
-        if (_inputCodigo == null || string.IsNullOrWhiteSpace(_inputCodigo.text))
+        // .value es la propiedad correcta de TextField en UI Toolkit
+        string codigo = _inputCodigo?.value ?? "";
+        Debug.Log($"[Lobby] ConfirmarUnirse llamado. Código: '{codigo}'");
+        Debug.Log($"[Lobby] Photon conectado: {PhotonNetwork.IsConnected}");
+        Debug.Log($"[Lobby] Photon estado: {PhotonNetwork.NetworkClientState}");
+
+        if (string.IsNullOrWhiteSpace(codigo))
         {
-            Debug.LogWarning("[Lobby] Código vacío.");
+            MostrarError("Ingresa un código de 4 letras.");
             return;
         }
-        _codigoPendiente = _inputCodigo.text.Trim().ToUpper();
+        OcultarError();
+        _codigoPendiente = codigo.Trim().ToUpper();
         PhotonNetwork.NickName = "Jugador" + Random.Range(2, 99);
-        MostrarEspera(null);
 
-        if (PhotonNetwork.IsConnectedAndReady)
+        if (!PhotonNetwork.IsConnected)
         {
-            PhotonNetwork.JoinRoom(_codigoPendiente);
-            _codigoPendiente = null;
-        }
-        else
-        {
+            _accionPendiente = "unirse";
             PhotonNetwork.ConnectUsingSettings();
+            MostrarEspera(null);
+            return;
         }
+        if (!PhotonNetwork.IsConnectedAndReady)
+        {
+            Debug.LogWarning("[Lobby] Photon conectando, espera.");
+            return;
+        }
+        PhotonNetwork.JoinRoom(_codigoPendiente);
+        _codigoPendiente = null;
+        MostrarEspera(null);
     }
 
     private void CancelarUnirse()
     {
+        OcultarError();
         MostrarPanel(_panelMenu);
+    }
+
+    private void VolverAlMenu()
+    {
+        SceneManager.LoadScene(escenaMenuInicio);
     }
 
     public void IniciarPartida()
     {
         if (!PhotonNetwork.IsMasterClient) return;
-        int cantidad = PhotonNetwork.CurrentRoom.PlayerCount;
-        GameSync.Instance.IniciarPartida(cantidad);
+        PhotonNetwork.LoadLevel(escenaSeleccion);
     }
 
     private void SalirDeSala()
     {
-        PhotonNetwork.LeaveRoom();
+        if (PhotonNetwork.InRoom) PhotonNetwork.LeaveRoom();
         MostrarPanel(_panelMenu);
+    }
+
+    private void MostrarError(string msg)
+    {
+        if (_lblErrorUnirse == null) return;
+        _lblErrorUnirse.text = msg;
+        _lblErrorUnirse.style.display = DisplayStyle.Flex;
+    }
+
+    private void OcultarError()
+    {
+        if (_lblErrorUnirse != null)
+            _lblErrorUnirse.style.display = DisplayStyle.None;
     }
 
     // ── UI ────────────────────────────────────────────────────────────────────
 
     private void MostrarPanel(VisualElement objetivo)
     {
-        _panelMenu?.Q<VisualElement>()?.RemoveFromHierarchy();  // no-op si null
-
         void Set(VisualElement el, bool visible)
         {
             if (el != null) el.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
         }
-
         Set(_panelMenu,   objetivo == _panelMenu);
         Set(_panelUnirse, objetivo == _panelUnirse);
         Set(_panelEspera, objetivo == _panelEspera);
@@ -170,37 +245,54 @@ public class LobbyMenuUI : MonoBehaviourPunCallbacks
     {
         MostrarPanel(_panelEspera);
         if (_lblCodigoSala != null)
-            _lblCodigoSala.text = codigo != null ? codigo : "----";
-        if (_lblEspera != null)
-            _lblEspera.text = "Conectando...";
-        _btnIniciar?.RemoveFromClassList("display-none");
-        if (_btnIniciar != null) _btnIniciar.style.display = DisplayStyle.None;
+            _lblCodigoSala.text = codigo ?? "----";
+        if (_btnIniciar != null)
+            _btnIniciar.style.display = DisplayStyle.None;
     }
 
-    private void ActualizarEspera()
+    private void ActualizarListaJugadores()
     {
         if (!PhotonNetwork.InRoom) return;
         int count = PhotonNetwork.CurrentRoom.PlayerCount;
-        int max   = PhotonNetwork.CurrentRoom.MaxPlayers;
 
-        if (_lblEspera != null)
-            _lblEspera.text = $"Jugadores en sala: {count}/{max}\nEsperando...";
+        if (_lblContador != null)
+            _lblContador.text = $"{count} / {maxJugadores}";
 
-        bool puedeIniciar = PhotonNetwork.IsMasterClient && count >= 2;
-        if (_btnIniciar != null)
-            _btnIniciar.style.display = puedeIniciar ? DisplayStyle.Flex : DisplayStyle.None;
-
-        // Puntos de jugadores
-        if (_playerDotsLobby != null)
+        if (_listaJugadores != null)
         {
-            _playerDotsLobby.Clear();
-            for (int i = 0; i < max; i++)
+            _listaJugadores.Clear();
+            for (int i = 0; i < maxJugadores; i++)
             {
-                var dot = new VisualElement();
-                dot.AddToClassList("player-dot");
-                if (i < count) dot.AddToClassList("player-dot--active");
-                _playerDotsLobby.Add(dot);
+                var slot = new VisualElement();
+                slot.AddToClassList("jugador-slot");
+
+                var lbl = new Label();
+                if (i < count)
+                {
+                    var jugador = PhotonNetwork.PlayerList[i];
+                    string nombre = jugador.NickName;
+                    if (jugador.IsLocal)        nombre += " (Tú)";
+                    if (jugador.IsMasterClient) nombre += " ★";
+                    lbl.text = "● " + nombre;
+                    lbl.AddToClassList("jugador-activo");
+                }
+                else
+                {
+                    lbl.text = "○  —";
+                    lbl.AddToClassList("jugador-vacio");
+                }
+                slot.Add(lbl);
+                _listaJugadores.Add(slot);
             }
+        }
+
+        // Botón iniciar: visible solo al master, activo desde 2 jugadores
+        if (_btnIniciar != null)
+        {
+            _btnIniciar.style.display = PhotonNetwork.IsMasterClient
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
+            _btnIniciar.SetEnabled(count >= 2);
         }
     }
 
@@ -216,8 +308,18 @@ public class LobbyMenuUI : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
-        if (_codigoPendiente != null)
+        Debug.Log($"[Lobby] OnConnectedToMaster. Acción pendiente: {_accionPendiente != null}");
+        if (_accionPendiente == "crear")
         {
+            _accionPendiente = null;
+            string codigo = GenerarCodigo();
+            if (_lblCodigoSala != null) _lblCodigoSala.text = codigo;
+            var opts = new RoomOptions { MaxPlayers = (byte)maxJugadores, IsVisible = false };
+            PhotonNetwork.CreateRoom(codigo, opts, TypedLobby.Default);
+        }
+        else if (_accionPendiente == "unirse" && _codigoPendiente != null)
+        {
+            _accionPendiente = null;
             PhotonNetwork.JoinRoom(_codigoPendiente);
             _codigoPendiente = null;
         }
@@ -225,16 +327,18 @@ public class LobbyMenuUI : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-        ActualizarEspera();
+        Debug.Log("[Lobby] OnJoinedRoom exitoso");
+        ActualizarListaJugadores();
     }
 
-    public override void OnPlayerEnteredRoom(Player p) => ActualizarEspera();
-    public override void OnPlayerLeftRoom(Player p)    => ActualizarEspera();
+    public override void OnPlayerEnteredRoom(Player p) => ActualizarListaJugadores();
+    public override void OnPlayerLeftRoom(Player p)    => ActualizarListaJugadores();
 
     public override void OnJoinRoomFailed(short code, string msg)
     {
-        Debug.LogWarning($"[Lobby] No se pudo unir: {msg}");
+        Debug.Log($"[Lobby] OnJoinRoomFailed: {code} - {msg}");
         MostrarPanel(_panelUnirse);
+        MostrarError("Sala no encontrada. Verifica el código.");
     }
 
     public override void OnCreateRoomFailed(short code, string msg)

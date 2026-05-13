@@ -683,3 +683,21 @@
     min-width: 240px;
     margin-bottom: 0;
 }
+
+/* ─── Slots de jugadores en sala de espera ─────────────────────────────── */
+.jugador-slot {
+    padding: 6px 12px;
+    margin: 3px 0;
+    border-radius: 6px;
+    background-color: rgba(255,255,255,0.05);
+}
+
+.jugador-activo {
+    color: rgb(255, 220, 100);
+    font-size: 15px;
+}
+
+.jugador-vacio {
+    color: rgba(255,255,255,0.3);
+    font-size: 14px;
+}
