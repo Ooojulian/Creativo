@@ -2,7 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 using System.Collections;
-
+using System;
+using Random = UnityEngine.Random;
 public class DadoLogico : MonoBehaviour
 {
     [Header("Referencias")]
@@ -31,7 +32,12 @@ public class DadoLogico : MonoBehaviour
     private Rigidbody rb;
     private Vector3 ejeRotacion;
     private CamaraDirectora camaraDirectora;
+<<<<<<< Updated upstream:Assets/_Juego/Scripts/DadoLogico.cs
     private Vector3 escalaOriginal;
+=======
+    private Action<int> onDadoLanzado;
+    private MovimientoFicha jugador_asignado;
+>>>>>>> Stashed changes:Assets/Scripts/DadoLogico.cs
 
     // -------------------------------------------------
     void Awake()
@@ -72,7 +78,7 @@ public class DadoLogico : MonoBehaviour
             textoResultado.gameObject.SetActive(false);
         if (textoInstruccion != null)
         {
-            textoInstruccion.text = "ESPACIO \u2014 Tirar el dado";
+            textoInstruccion.text = "ESPACIO — Tirar el dado";
             textoInstruccion.gameObject.SetActive(true);
         }
     }
@@ -153,9 +159,6 @@ public class DadoLogico : MonoBehaviour
         transform.position = posicionFija;
         transform.rotation = RotacionParaResultado(resultadoActual);
 
-        // lanzando permanece true hasta que el jugador confirme con SPACE
-        // para evitar que se pueda tirar de nuevo durante la pausa
-
         Debug.Log($"Resultado del dado: {resultadoActual}");
 
         if (textoResultado != null)
@@ -176,7 +179,7 @@ public class DadoLogico : MonoBehaviour
         esperandoConfirmacion = true;
         if (textoInstruccion != null)
         {
-            textoInstruccion.text = "ESPACIO \u2014 Mover ficha";
+            textoInstruccion.text = "ESPACIO — Mover ficha";
             textoInstruccion.gameObject.SetActive(true);
         }
     }
@@ -188,6 +191,7 @@ public class DadoLogico : MonoBehaviour
         if (textoInstruccion != null)
             textoInstruccion.gameObject.SetActive(false);
 
+<<<<<<< Updated upstream:Assets/_Juego/Scripts/DadoLogico.cs
         if (jugador == null) { Debug.LogWarning("No hay jugador asignado al dado."); return; }
 
         // Ocultar dado mientras elige ficha
@@ -209,6 +213,21 @@ public class DadoLogico : MonoBehaviour
         else
         {
             jugador.Avanzar(resultadoActual);
+=======
+        // Si hay callback (de GestorTurnos), usar ese
+        if (onDadoLanzado != null)
+        {
+            onDadoLanzado?.Invoke(resultadoActual);
+        }
+        // Si no, fallback al jugador asignado directo
+        else if (jugador != null)
+        {
+            jugador.Avanzar(resultadoActual);
+        }
+        else
+        {
+            Debug.LogWarning("No hay jugador asignado al dado.");
+>>>>>>> Stashed changes:Assets/Scripts/DadoLogico.cs
         }
     }
 
@@ -224,6 +243,19 @@ public class DadoLogico : MonoBehaviour
             case 3: return Quaternion.Euler(0, 0, 90);
             case 4: return Quaternion.Euler(0, 0, -90);
             default: return Quaternion.identity;
+        }
+    }
+
+    public void PrepararParaLanzar(MovimientoFicha nuevoJugador, Action<int> onLanzado)
+    {
+        jugador_asignado = nuevoJugador;
+        onDadoLanzado = onLanzado;
+        
+        // Mostrar UI "ESPACIO para tirar"
+        if (textoInstruccion != null)
+        {
+            textoInstruccion.text = "ESPACIO — Tirar el dado";
+            textoInstruccion.gameObject.SetActive(true);
         }
     }
 }

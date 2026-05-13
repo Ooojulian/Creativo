@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI textoTurno;
 
     [Header("Cartas UI")]
-    public CartasUIVisual uiCartas;
+    public CartaVisualCasilla uiCartas;  // ← CAMBIADO: CartasUIVisual → CartaVisualCasilla
 
     [Header("Cámaras")]
     public Camera camaraMenu;
@@ -23,6 +23,10 @@ public class GameManager : MonoBehaviour
     public DadoLogico dado;
     public List<MovimientoFicha> todosLosJugadores;
     public GestorDeRuta ruta;
+
+    [Header("Sistemas")]  // ← NUEVA SECCIÓN
+    public SistemaCartas sistemaCartas;
+    public GestorTurnos gestorTurnos;
 
     [Header("Pantalla de Fin")]
     public GameObject panelFin;
@@ -52,9 +56,15 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        // Fallback: buscar ruta automáticamente si no está asignada
+        // Fallback: buscar referencias automáticamente si no están asignadas
         if (ruta == null)
             ruta = FindAnyObjectByType<GestorDeRuta>();
+
+        if (gestorTurnos == null)
+            gestorTurnos = FindAnyObjectByType<GestorTurnos>();
+
+        if (sistemaCartas == null)
+            sistemaCartas = Resources.Load<SistemaCartas>("SistemaCartas");
 
         panelMenu.SetActive(true);
         dado.gameObject.SetActive(false);
@@ -149,6 +159,7 @@ public class GameManager : MonoBehaviour
         // Jugador actual
         MovimientoFicha j = jugadoresActivos[turnoActual];
 
+<<<<<<< Updated upstream:Assets/_Juego/Scripts/GameManager.cs
         // NUEVO: Guardar cantidad de cartas para trigger "Inspiración"
         if (j.inventario != null)
             j.cartasAlEmpezarTurno = j.inventario.hand.Count;
@@ -185,6 +196,22 @@ public class GameManager : MonoBehaviour
         // Con red: host avisa quién juega, cliente correcto activa dado
         if (PhotonNetwork.IsMasterClient)
             GameSync.Instance.AnunciarTurno(turnoActual);
+=======
+        Debug.Log($"Turno del Jugador {turnoActual + 1}");
+
+        if (textoTurno != null)
+            textoTurno.text = $"Turno: Jugador {turnoActual + 1}";
+        
+        // ← CAMBIO IMPORTANTE: Usar GestorTurnos en lugar de dar turno directo
+        if (gestorTurnos != null)
+        {
+            gestorTurnos.IniciarTurno();
+        }
+        else
+        {
+            Debug.LogError("[GameManager] GestorTurnos no asignado");
+        }
+>>>>>>> Stashed changes:Assets/Scripts/GameManager.cs
     }
 
     public void LlegarAMeta(MovimientoFicha jugador)
@@ -235,34 +262,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // =========================
-    // CARTA: INTERCAMBIO
-    // =========================
-    public void IntercambiarConOtroJugador(MovimientoFicha jugador)
-    {
-        // Elegir otro jugador activo (distinto al actual)
-        var candidatos = new List<MovimientoFicha>(jugadoresActivos);
-        candidatos.Remove(jugador);
-        if (candidatos.Count == 0) return;
+    // ────────────────────────────────────────
+    // MÉTODOS PÚBLICOS PARA OTROS SCRIPTS
+    // ────────────────────────────────────────
 
-        MovimientoFicha otro = candidatos[Random.Range(0, candidatos.Count)];
-
-        // Intercambiar índices
-        int a = jugador.indiceActual;
-        int b = otro.indiceActual;
-
-        jugador.indiceActual = b;
-        otro.indiceActual = a;
-
-        // Reposicionar en el tablero
-        if (ruta != null && ruta.casillas != null && ruta.casillas.Count > 0)
-        {
-            jugador.transform.position = ruta.casillas[jugador.indiceActual].position + Vector3.up * 0.5f;
-            otro.transform.position = ruta.casillas[otro.indiceActual].position + Vector3.up * 0.5f;
-        }
-
-        Debug.Log($"[Cartas] Intercambio: {jugador.name} <-> {otro.name}");
-    }
+    public SistemaCartas ObtenerSistemaCartas() => sistemaCartas;
+    
+    public CartaVisualCasilla ObtenerUICartas() => uiCartas;
+    
+    public List<MovimientoFicha> ObtenerJugadoresActivos() => new List<MovimientoFicha>(jugadoresActivos);
 
     // Detecta si hay ficha enemiga en la misma casilla. Devuelve datos para batalla.
     // Solo el host debe llamarlo y luego invocar BatallaPPS.IniciarBatalla.
