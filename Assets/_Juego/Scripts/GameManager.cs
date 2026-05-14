@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using TMPro;
 using Photon.Pun;
@@ -61,17 +62,14 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        // Fallback: buscar ruta automáticamente si no está asignada
         if (ruta == null)
             ruta = FindAnyObjectByType<GestorDeRuta>();
 
-        panelMenu.SetActive(true);
         dado.gameObject.SetActive(false);
 
         if (panelHUD != null)    panelHUD.SetActive(false);
         if (panelFin != null)    panelFin.SetActive(false);
-        if (camaraJuego != null) camaraJuego.gameObject.SetActive(false);
-        if (camaraMenu != null)  camaraMenu.gameObject.SetActive(true);
+        if (panelMenu != null)   panelMenu.SetActive(false);
 
         if (textoTurno != null)            textoTurno.text = "";
         if (textoResultadoDadoHUD != null) textoResultadoDadoHUD.text = "";
@@ -79,11 +77,27 @@ public class GameManager : MonoBehaviour
 
         foreach (var jugador in todosLosJugadores)
             jugador.gameObject.SetActive(false);
+
+        if (PhotonNetwork.InRoom)
+        {
+            // Viene del Lobby con sala activa
+            int cantidad = PhotonNetwork.CurrentRoom.PlayerCount;
+            if (camaraMenu != null)  camaraMenu.gameObject.SetActive(false);
+            if (camaraJuego != null) camaraJuego.gameObject.SetActive(true);
+            IniciarPartida(cantidad);
+        }
+        else
+        {
+            // Modo local: arrancar directamente con todos los jugadores asignados
+            if (camaraMenu != null)  camaraMenu.gameObject.SetActive(false);
+            if (camaraJuego != null) camaraJuego.gameObject.SetActive(true);
+            IniciarPartida(todosLosJugadores.Count);
+        }
     }
 
     public void IniciarPartida(int cantidad)
     {
-        panelMenu.SetActive(false);
+        if (panelMenu != null) panelMenu.SetActive(false);
         jugadoresActivos.Clear();
         ganadores.Clear();
         umbralVictoria = Mathf.CeilToInt(cantidad / 2f);
@@ -331,17 +345,9 @@ public class GameManager : MonoBehaviour
 
     public void VolverAlMenu()
     {
-        ganadores.Clear();
-        jugadoresActivos.Clear();
-        turnoActual = 0;
+        if (PhotonNetwork.InRoom)
+            PhotonNetwork.LeaveRoom();
 
-        foreach (var jugador in todosLosJugadores)
-            jugador.gameObject.SetActive(false);
-
-        if (panelFin != null)    panelFin.SetActive(false);
-        if (panelHUD != null)    panelHUD.SetActive(false);
-        if (camaraJuego != null) camaraJuego.gameObject.SetActive(false);
-        if (camaraMenu != null)  camaraMenu.gameObject.SetActive(true);
-        if (panelMenu != null)   panelMenu.SetActive(true);
+        SceneManager.LoadScene("MenuInicio");
     }
 }
