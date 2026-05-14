@@ -4,6 +4,7 @@ using TMPro;
 using System.Collections;
 using System;
 using Random = UnityEngine.Random;
+
 public class DadoLogico : MonoBehaviour
 {
     [Header("Referencias")]
@@ -32,12 +33,8 @@ public class DadoLogico : MonoBehaviour
     private Rigidbody rb;
     private Vector3 ejeRotacion;
     private CamaraDirectora camaraDirectora;
-<<<<<<< Updated upstream:Assets/_Juego/Scripts/DadoLogico.cs
     private Vector3 escalaOriginal;
-=======
     private Action<int> onDadoLanzado;
-    private MovimientoFicha jugador_asignado;
->>>>>>> Stashed changes:Assets/Scripts/DadoLogico.cs
 
     // -------------------------------------------------
     void Awake()
@@ -51,7 +48,6 @@ public class DadoLogico : MonoBehaviour
         }
 
         // Guardar la escala configurada en el prefab/escena para restaurarla en OnEnable
-        // escalaDado actúa como multiplicador: si es 1 usa la escala del prefab tal cual
         escalaOriginal = escalaDado > 0
             ? transform.localScale / escalaDado
             : transform.localScale;
@@ -114,10 +110,10 @@ public class DadoLogico : MonoBehaviour
     {
         lanzando = true;
 
-        if (textoResultado != null)   textoResultado.gameObject.SetActive(false);
+        if (textoResultado != null) textoResultado.gameObject.SetActive(false);
         if (textoInstruccion != null) textoInstruccion.gameObject.SetActive(false);
 
-        // Enfocar el dado mientras gira (ahora es no-op en CamaraDirectora para mantener vista general)
+        // Enfocar el dado mientras gira
         if (camaraDirectora != null) camaraDirectora.EnfocarDado();
 
         // Resultado elegido al inicio (sin física)
@@ -167,10 +163,6 @@ public class DadoLogico : MonoBehaviour
             textoResultado.gameObject.SetActive(true);
         }
 
-        // Sincronizar resultado a otros clientes
-        if (GameSync.Instance != null)
-            GameSync.Instance.SincronizarResultadoDado(resultadoActual);
-
         // Pausa para visualizar el resultado
         yield return new WaitForSeconds(pausaResultado);
 
@@ -191,29 +183,6 @@ public class DadoLogico : MonoBehaviour
         if (textoInstruccion != null)
             textoInstruccion.gameObject.SetActive(false);
 
-<<<<<<< Updated upstream:Assets/_Juego/Scripts/DadoLogico.cs
-        if (jugador == null) { Debug.LogWarning("No hay jugador asignado al dado."); return; }
-
-        // Ocultar dado mientras elige ficha
-        gameObject.SetActive(false);
-
-        // Mostrar panel selección ficha A/B
-        var ui = FindAnyObjectByType<SeleccionFichaUI>();
-        if (ui != null) ui.MostrarSeleccion(jugador);
-        else EjecutarMovimiento(); // fallback si no hay UI
-    }
-
-    public void EjecutarMovimiento()
-    {
-        if (GameSync.Instance != null)
-        {
-            int indiceFicha = FindAnyObjectByType<GameManager>().todosLosJugadores.IndexOf(jugador);
-            GameSync.Instance.EnviarResultadoDado(resultadoActual, indiceFicha, jugador.moverFichaB);
-        }
-        else
-        {
-            jugador.Avanzar(resultadoActual);
-=======
         // Si hay callback (de GestorTurnos), usar ese
         if (onDadoLanzado != null)
         {
@@ -227,7 +196,6 @@ public class DadoLogico : MonoBehaviour
         else
         {
             Debug.LogWarning("No hay jugador asignado al dado.");
->>>>>>> Stashed changes:Assets/Scripts/DadoLogico.cs
         }
     }
 
@@ -246,9 +214,12 @@ public class DadoLogico : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Prepara el dado para lanzar con un callback cuando se confirme el movimiento
+    /// </summary>
     public void PrepararParaLanzar(MovimientoFicha nuevoJugador, Action<int> onLanzado)
     {
-        jugador_asignado = nuevoJugador;
+        jugador = nuevoJugador;
         onDadoLanzado = onLanzado;
         
         // Mostrar UI "ESPACIO para tirar"

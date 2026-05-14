@@ -7,12 +7,10 @@ using System.Collections;
 /// </summary>
 public class EfectoCarta : MonoBehaviour
 {
-    private GestorDeRuta ruta;
     private GameManager gameManager;
     
     void Start()
     {
-        ruta = FindAnyObjectByType<GestorDeRuta>();
         gameManager = FindAnyObjectByType<GameManager>();
     }
     
@@ -75,15 +73,17 @@ public class EfectoCarta : MonoBehaviour
     
     private void AplicarMovimiento(CartaDefinicion carta, MovimientoFicha objetivo)
     {
+        if (gameManager == null || gameManager.casillas == null) return;
+        
         // valor1 = +/-X casillas
         int casillasNuevas = Mathf.Clamp(
             objetivo.indiceActual + carta.valor1,
             0,
-            ruta.casillas.Count - 1
+            gameManager.casillas.Count - 1
         );
         
         objetivo.indiceActual = casillasNuevas;
-        objetivo.transform.position = ruta.casillas[casillasNuevas].position + Vector3.up * 0.5f;
+        objetivo.transform.position = gameManager.casillas[casillasNuevas].position + Vector3.up * 0.5f;
         
         string direccion = carta.valor1 > 0 ? "avanza" : "retrocede";
         Debug.Log($"[EfectoCarta] {objetivo.name} {direccion} a casilla {casillasNuevas}");
@@ -163,6 +163,8 @@ public class EfectoCarta : MonoBehaviour
     
     private void AplicarIntercambio(CartaDefinicion carta, MovimientoFicha objetivo1, MovimientoFicha objetivo2 = null)
     {
+        if (gameManager == null || gameManager.casillas == null) return;
+        
         if (objetivo2 == null)
         {
             // Intercambiar con jugador aleatorio
@@ -179,8 +181,8 @@ public class EfectoCarta : MonoBehaviour
         objetivo1.indiceActual = objetivo2.indiceActual;
         objetivo2.indiceActual = temp;
         
-        objetivo1.transform.position = ruta.casillas[objetivo1.indiceActual].position + Vector3.up * 0.5f;
-        objetivo2.transform.position = ruta.casillas[objetivo2.indiceActual].position + Vector3.up * 0.5f;
+        objetivo1.transform.position = gameManager.casillas[objetivo1.indiceActual].position + Vector3.up * 0.5f;
+        objetivo2.transform.position = gameManager.casillas[objetivo2.indiceActual].position + Vector3.up * 0.5f;
         
         Debug.Log($"[EfectoCarta] Intercambio: {objetivo1.name} <-> {objetivo2.name}");
     }

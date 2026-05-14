@@ -9,7 +9,6 @@ public class GestorTurnos : MonoBehaviour
     [SerializeField] private GameManager gameManager;
     [SerializeField] private DadoLogico dado;
     [SerializeField] private EfectoCarta efectoCarta;
-    [SerializeField] private GestorDeRuta ruta; 
     [Header("UI")]
     [SerializeField] private UIPanelCartas uiPanelCartas;
     
@@ -27,7 +26,10 @@ public class GestorTurnos : MonoBehaviour
         Finalizando,
         Completado
     }
-    
+    public void ContinuarDespuesDeSeleccion()
+    {
+        MostrarSeleccionCartas();
+    }
     private EstadoTurno estadoActual = EstadoTurno.Esperando;
     private int turnoActual = 0;
     
@@ -40,6 +42,11 @@ public class GestorTurnos : MonoBehaviour
         if (dado == null) dado = FindAnyObjectByType<DadoLogico>();
         if (efectoCarta == null) efectoCarta = FindAnyObjectByType<EfectoCarta>();
         if (uiPanelCartas == null) uiPanelCartas = FindAnyObjectByType<UIPanelCartas>();
+        
+        Debug.Log($"[GestorTurnos] GameManager: {(gameManager != null ? "OK" : "FALTA")}");
+        Debug.Log($"[GestorTurnos] Dado: {(dado != null ? "OK" : "FALTA")}");
+        Debug.Log($"[GestorTurnos] EfectoCarta: {(efectoCarta != null ? "OK" : "FALTA")}");
+        Debug.Log($"[GestorTurnos] UIPanelCartas: {(uiPanelCartas != null ? "OK" : "FALTA")}");
     }
     
     public void AsignarJugadores(List<MovimientoFicha> nuevosJugadores)
@@ -74,7 +81,17 @@ public class GestorTurnos : MonoBehaviour
         Debug.Log($"[GestorTurnos] Turno {turnoActual} iniciado para {jugadorActual.name}");
         OnTurnoIniciado?.Invoke(jugadorActual);
         
-        MostrarSeleccionCartas();
+        // ✅ MOSTRAR SELECCIÓN DE FICHA PRIMERO
+        SeleccionFichaUI seleccionUI = FindAnyObjectByType<SeleccionFichaUI>();
+        if (seleccionUI != null)
+        {
+            seleccionUI.MostrarSeleccion(jugadorActual);
+        }
+        else
+        {
+            // Si no hay panel, continuar directo a cartas
+            MostrarSeleccionCartas();
+        }
     }
     
     private void MostrarSeleccionCartas()
@@ -121,7 +138,17 @@ public class GestorTurnos : MonoBehaviour
         estadoActual = EstadoTurno.Moviendo;
         
         if (jugadorActual != null)
-            jugadorActual.Avanzar(resultado);
+        {
+            // ✅ VERIFICAR CUÁL FICHA MOVER
+            if (jugadorActual.moverFichaB && jugadorActual.fichaB != null)
+            {
+                jugadorActual.fichaB.Avanzar(resultado);
+            }
+            else
+            {
+                jugadorActual.Avanzar(resultado);
+            }
+        }
     }
     
     public void OnMovimientoCompletado(MovimientoFicha jugador)
@@ -134,19 +161,19 @@ public class GestorTurnos : MonoBehaviour
     
     private IEnumerator AplicarCartasDeCasilla()
     {
-        if (ruta == null || ruta.casillas == null) 
+        if (gameManager == null || gameManager.casillas == null || gameManager.casillas.Count == 0) 
         {
             FinalizarTurno();
             yield break;
         }
         
-        if (jugadorActual.indiceActual < 0 || jugadorActual.indiceActual >= ruta.casillas.Count) 
+        if (jugadorActual.indiceActual < 0 || jugadorActual.indiceActual >= gameManager.casillas.Count) 
         {
             FinalizarTurno();
             yield break;
         }
         
-        Transform casilla = ruta.casillas[jugadorActual.indiceActual];
+        Transform casilla = gameManager.casillas[jugadorActual.indiceActual];
         
         SistemaCartas sistemaCartas = gameManager.ObtenerSistemaCartas();
         CartaDefinicion carta = sistemaCartas.ObtenerCartaAleatoria();
@@ -157,7 +184,7 @@ public class GestorTurnos : MonoBehaviour
             yield break;
         }
         
-        CartaVisualCasilla uiCartas = gameManager.ObtenerUICartas();
+        CartasUIVisual uiCartas = gameManager.ObtenerUICartas();
         if (uiCartas != null)
             uiCartas.MostrarRevelacion(carta);
         

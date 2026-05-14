@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using TMPro;
-using Photon.Pun;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,7 +12,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI textoTurno;
 
     [Header("Cartas UI")]
-    public CartaVisualCasilla uiCartas;  // ← CAMBIADO: CartasUIVisual → CartaVisualCasilla
+    public CartasUIVisual uiCartas;
 
     [Header("Cámaras")]
     public Camera camaraMenu;
@@ -22,9 +21,9 @@ public class GameManager : MonoBehaviour
     [Header("Elementos del Juego")]
     public DadoLogico dado;
     public List<MovimientoFicha> todosLosJugadores;
-    public GestorDeRuta ruta;
+    public List<Transform> casillas; // Reemplaza GestorDeRuta
 
-    [Header("Sistemas")]  // ← NUEVA SECCIÓN
+    [Header("Sistemas")]
     public SistemaCartas sistemaCartas;
     public GestorTurnos gestorTurnos;
 
@@ -32,9 +31,6 @@ public class GameManager : MonoBehaviour
     public GameObject panelFin;
     public TextMeshProUGUI textoFin;
     public TextMeshProUGUI textoGanadoresHUD;
-
-    [Header("Selección de Ficha")]
-    public SeleccionFichaUI seleccionFichaUI;
 
     [Header("HUD persistente")]
     public TextMeshProUGUI textoResultadoDadoHUD;
@@ -56,10 +52,6 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        // Fallback: buscar referencias automáticamente si no están asignadas
-        if (ruta == null)
-            ruta = FindAnyObjectByType<GestorDeRuta>();
-
         if (gestorTurnos == null)
             gestorTurnos = FindAnyObjectByType<GestorTurnos>();
 
@@ -84,6 +76,8 @@ public class GameManager : MonoBehaviour
 
     public void IniciarPartida(int cantidad)
     {
+        Debug.Log($"[GameManager] IniciarPartida llamado con {cantidad} jugadores"); // ✅ LOG INICIAL
+        
         panelMenu.SetActive(false);
         jugadoresActivos.Clear();
         ganadores.Clear();
@@ -96,36 +90,59 @@ public class GameManager : MonoBehaviour
         if (camaraJuego != null) camaraJuego.gameObject.SetActive(true);
         if (panelHUD != null)    panelHUD.SetActive(true);
 
-        // Teletransportar la cámara inmediatamente al tablero para evitar el suavizado desde la posición del menú
+        // Teletransportar la cámara inmediatamente al tablero
         CamaraDirectora cam = FindAnyObjectByType<CamaraDirectora>();
         if (cam != null) cam.SnapAlTablero();
 
+        Debug.Log($"[GameManager] casillas count: {(casillas != null ? casillas.Count : "NULL")}");
+        Debug.Log($"[GameManager] todosLosJugadores count: {(todosLosJugadores != null ? todosLosJugadores.Count : "NULL")}");
+
         // Posicionar jugadores en la casilla Start
         Vector3 posInicio;
-        if (ruta != null && ruta.casillas.Count > 0)
-            posInicio = ruta.casillas[0].position + Vector3.up * 0.5f;
+        if (casillas != null && casillas.Count > 0)
+            posInicio = casillas[0].position + Vector3.up * 0.5f;
         else
+        {
+            Debug.LogError("[GameManager] NO HAY CASILLAS EN LA ESCENA!");
             posInicio = Vector3.zero;
+        }
+
+        if (todosLosJugadores == null || todosLosJugadores.Count == 0)
+        {
+            Debug.LogError("[GameManager] NO HAY JUGADORES EN todosLosJugadores!");
+            return;
+        }
 
         for (int i = 0; i < cantidad; i++)
         {
+            if (i >= todosLosJugadores.Count)
+            {
+                Debug.LogError($"[GameManager] Índice {i} fuera de rango en todosLosJugadores");
+                break;
+            }
+
             MovimientoFicha jugador = todosLosJugadores[i];
             jugador.indiceActual = 0;
             jugador.transform.position = posInicio + offsetsInicio[i];
             jugador.gameObject.SetActive(true);
             jugadoresActivos.Add(jugador);
-
-            // Activar e inicializar ficha B (va de meta a inicio)
-            if (jugador.fichaB != null)
-            {
-                jugador.fichaB.gameObject.SetActive(true);
-                jugador.fichaB.Inicializar();
-                Vector3 posMeta = ruta.casillas[ruta.casillas.Count - 1].position + Vector3.up * 0.5f;
-                jugador.fichaB.transform.position = posMeta + offsetsInicio[i];
-            }
+            Debug.Log($"[GameManager] Jugador {i+1} posicionado en {jugador.transform.position}");
         }
 
-        Debug.Log($"Partida iniciada con {cantidad} jugadores. Posición inicio: {posInicio}");
+        if (gestorTurnos == null)
+        {
+            gestorTurnos = FindAnyObjectByType<GestorTurnos>();
+            if (gestorTurnos == null)
+            {
+                Debug.LogError("[GameManager] GestorTurnos no encontrado en la escena!");
+                return;
+            }
+        }   
+        Debug.Log($"[GameManager] Partida iniciada con {cantidad} jugadores. Posición inicio: {posInicio}");
+
+        // ✅ ASIGNAR JUGADORES A GESTOR TURNOS
+        if (gestorTurnos != null)
+            gestorTurnos.AsignarJugadores(jugadoresActivos);
 
         turnoActual = 0;
         PrepararTurno();
@@ -133,13 +150,6 @@ public class GameManager : MonoBehaviour
 
     public void SiguienteTurno()
     {
-        // NUEVO: Trigger "Inspiración" al final del turno
-        if (CardTriggerSystem.Instance != null && turnoActual < jugadoresActivos.Count)
-        {
-            MovimientoFicha j = jugadoresActivos[turnoActual];
-            CardTriggerSystem.Instance.CheckTurnEnd(j, j.cartasAlEmpezarTurno);
-        }
-
         turnoActual++;
         if (turnoActual >= jugadoresActivos.Count)
             turnoActual = 0;
@@ -159,50 +169,12 @@ public class GameManager : MonoBehaviour
         // Jugador actual
         MovimientoFicha j = jugadoresActivos[turnoActual];
 
-<<<<<<< Updated upstream:Assets/_Juego/Scripts/GameManager.cs
-        // NUEVO: Guardar cantidad de cartas para trigger "Inspiración"
-        if (j.inventario != null)
-            j.cartasAlEmpezarTurno = j.inventario.hand.Count;
-
-        // NUEVO: Trigger "Desvío" al inicio del turno
-        if (CardTriggerSystem.Instance != null)
-            CardTriggerSystem.Instance.CheckTurnStart(j);
-
-        // CARTA: PierdeTurno (saltar turno)
-        if (j.pierdeSiguienteTurno)
-        {
-            j.pierdeSiguienteTurno = false;
-            Debug.Log($"[Cartas] Jugador {turnoActual + 1} pierde el turno.");
-            SiguienteTurno();
-            return;
-        }
-
-        Debug.Log($"Turno del Jugador {turnoActual + 1}");
-        dado.jugador = j;
-
-        if (dado.gameObject.activeSelf)
-            dado.gameObject.SetActive(false);
-
-        if (textoTurno != null)
-            textoTurno.text = $"Turno: Jugador {turnoActual + 1}";
-
-        // Sin red: activar dado directo
-        if (GameSync.Instance == null)
-        {
-            dado.gameObject.SetActive(true);
-            return;
-        }
-
-        // Con red: host avisa quién juega, cliente correcto activa dado
-        if (PhotonNetwork.IsMasterClient)
-            GameSync.Instance.AnunciarTurno(turnoActual);
-=======
         Debug.Log($"Turno del Jugador {turnoActual + 1}");
 
         if (textoTurno != null)
             textoTurno.text = $"Turno: Jugador {turnoActual + 1}";
         
-        // ← CAMBIO IMPORTANTE: Usar GestorTurnos en lugar de dar turno directo
+        // Usar GestorTurnos para manejar el turno
         if (gestorTurnos != null)
         {
             gestorTurnos.IniciarTurno();
@@ -211,7 +183,6 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogError("[GameManager] GestorTurnos no asignado");
         }
->>>>>>> Stashed changes:Assets/Scripts/GameManager.cs
     }
 
     public void LlegarAMeta(MovimientoFicha jugador)
@@ -263,64 +234,14 @@ public class GameManager : MonoBehaviour
     }
 
     // ────────────────────────────────────────
-    // MÉTODOS PÚBLICOS PARA OTROS SCRIPTS
+    // MÉTODOS PÚBLICOS
     // ────────────────────────────────────────
 
     public SistemaCartas ObtenerSistemaCartas() => sistemaCartas;
     
-    public CartaVisualCasilla ObtenerUICartas() => uiCartas;
+    public CartasUIVisual ObtenerUICartas() => uiCartas;
     
     public List<MovimientoFicha> ObtenerJugadoresActivos() => new List<MovimientoFicha>(jugadoresActivos);
-
-    // Detecta si hay ficha enemiga en la misma casilla. Devuelve datos para batalla.
-    // Solo el host debe llamarlo y luego invocar BatallaPPS.IniciarBatalla.
-    public bool DetectarColision(MovimientoFicha atacanteA, FichaInversa atacanteB,
-        out int idxFichaDef, out bool esFichaBDef, out int actorDef)
-    {
-        idxFichaDef = -1;
-        esFichaBDef = false;
-        actorDef = -1;
-
-        int casillaAtk;
-        int idxJugadorAtk;
-        if (atacanteA != null)
-        {
-            casillaAtk = atacanteA.indiceActual;
-            idxJugadorAtk = todosLosJugadores.IndexOf(atacanteA);
-        }
-        else
-        {
-            casillaAtk = atacanteB.indiceActual;
-            idxJugadorAtk = -1;
-            for (int k = 0; k < todosLosJugadores.Count; k++)
-                if (todosLosJugadores[k].fichaB == atacanteB) { idxJugadorAtk = k; break; }
-        }
-
-        for (int i = 0; i < jugadoresActivos.Count; i++)
-        {
-            var otro = jugadoresActivos[i];
-            int idxOtro = todosLosJugadores.IndexOf(otro);
-            if (idxOtro == idxJugadorAtk) continue;
-
-            if (otro.indiceActual == casillaAtk && otro.gameObject.activeSelf)
-            {
-                idxFichaDef = idxOtro;
-                esFichaBDef = false;
-                actorDef = idxOtro < Photon.Pun.PhotonNetwork.PlayerList.Length
-                    ? Photon.Pun.PhotonNetwork.PlayerList[idxOtro].ActorNumber : -1;
-                return true;
-            }
-            if (otro.fichaB != null && otro.fichaB.indiceActual == casillaAtk && otro.fichaB.gameObject.activeSelf)
-            {
-                idxFichaDef = idxOtro;
-                esFichaBDef = true;
-                actorDef = idxOtro < Photon.Pun.PhotonNetwork.PlayerList.Length
-                    ? Photon.Pun.PhotonNetwork.PlayerList[idxOtro].ActorNumber : -1;
-                return true;
-            }
-        }
-        return false;
-    }
 
     public void VolverAlMenu()
     {

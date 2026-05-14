@@ -588,43 +588,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbc54570e3f27ac3fb87bcb4e9d4d575, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GestorDeRuta
-  casillas:
-  - {fileID: 902674446}
-  - {fileID: 66601165}
-  - {fileID: 441645494}
-  - {fileID: 1166160925}
-  - {fileID: 1486734294}
-  - {fileID: 1274693931}
-  - {fileID: 362369748}
-  - {fileID: 550124373}
-  - {fileID: 1032644902}
-  - {fileID: 91338776}
-  - {fileID: 241255089}
-  - {fileID: 1982693071}
-  - {fileID: 375772169}
-  - {fileID: 1994373260}
-  - {fileID: 1464204846}
-  - {fileID: 573067275}
-  - {fileID: 756656241}
-  - {fileID: 348565418}
-  - {fileID: 959169}
-  - {fileID: 455250843}
-  - {fileID: 1719399331}
-  - {fileID: 470882746}
-  - {fileID: 1306185132}
-  - {fileID: 1948328112}
-  - {fileID: 559638897}
-  - {fileID: 1554102127}
-  - {fileID: 1083124130}
-  - {fileID: 733987335}
-  - {fileID: 1972437705}
-  - {fileID: 857076987}
-  - {fileID: 1873845606}
-  - {fileID: 1258470995}
-  - {fileID: 1800774371}
-  - {fileID: 1293036901}
-  - {fileID: 791770364}
-  - {fileID: 281413181}
 --- !u!1 &66601164
 GameObject:
   m_ObjectHideFlags: 0
@@ -1397,6 +1360,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 216224822}
   m_CullTransparentMesh: 1
+--- !u!1 &220531352
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 220531354}
+  - component: {fileID: 220531353}
+  m_Layer: 0
+  m_Name: GestorTurnos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &220531353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 220531352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 503c57b0d64eb4e40b8fa71c7f061fa0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GestorTurnos
+  gameManager: {fileID: 1366047254}
+  dado: {fileID: 6830981}
+  efectoCarta: {fileID: 0}
+  uiPanelCartas: {fileID: 0}
+--- !u!4 &220531354
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 220531352}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 418.9959, y: 29.99452, z: 757.60724}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &226595816
 GameObject:
   m_ObjectHideFlags: 0
@@ -1567,6 +1578,43 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!84 &236559089
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 6
+  m_Width: 128
+  m_Height: 128
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 94
+  m_ColorFormat: 48
+  m_MipMap: 1
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_UseDynamicScaleExplicit: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 0
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1 &241255088
 GameObject:
   m_ObjectHideFlags: 0
@@ -3105,10 +3153,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95901fec81481c4b89b073bf0802ffad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FichaInversa
-  ruta: {fileID: 66313766}
   indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
 --- !u!114 &578562731
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3121,19 +3167,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 492c03d97b8579436800b817e7bb1aa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovimientoFicha
-  ruta: {fileID: 66313766}
-  indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
-  escudoActivo: 0
-  pierdeSiguienteTurno: 0
-  dobleTiroPendiente: 0
-  tiempoRevelacion: 2
-  tiempoResultado: 1
-  inventario: {fileID: 0}
-  cartasAlEmpezarTurno: 0
+  indiceActual: 0
   fichaB: {fileID: 0}
-  moverFichaB: 0
 --- !u!4 &594108143 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 46f311046d2104da8b56be3d0a49a119, type: 3}
@@ -3366,43 +3402,6 @@ MonoBehaviour:
   sceneViewId: 3
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!84 &731568005
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 128
-  m_Height: 128
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 94
-  m_ColorFormat: 48
-  m_MipMap: 1
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 0
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
 --- !u!1 &733987334
 GameObject:
   m_ObjectHideFlags: 0
@@ -4065,19 +4064,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 492c03d97b8579436800b817e7bb1aa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovimientoFicha
-  ruta: {fileID: 66313766}
-  indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
-  escudoActivo: 0
-  pierdeSiguienteTurno: 0
-  dobleTiroPendiente: 0
-  tiempoRevelacion: 2
-  tiempoResultado: 1
-  inventario: {fileID: 0}
-  cartasAlEmpezarTurno: 0
+  indiceActual: 0
   fichaB: {fileID: 2083967944}
-  moverFichaB: 0
 --- !u!1 &985232889
 GameObject:
   m_ObjectHideFlags: 0
@@ -4702,19 +4691,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 492c03d97b8579436800b817e7bb1aa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovimientoFicha
-  ruta: {fileID: 66313766}
-  indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
-  escudoActivo: 0
-  pierdeSiguienteTurno: 0
-  dobleTiroPendiente: 0
-  tiempoRevelacion: 2
-  tiempoResultado: 1
-  inventario: {fileID: 0}
-  cartasAlEmpezarTurno: 0
+  indiceActual: 0
   fichaB: {fileID: 578562730}
-  moverFichaB: 0
 --- !u!1001 &1081095198
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4860,19 +4839,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 492c03d97b8579436800b817e7bb1aa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovimientoFicha
-  ruta: {fileID: 66313766}
-  indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
-  escudoActivo: 0
-  pierdeSiguienteTurno: 0
-  dobleTiroPendiente: 0
-  tiempoRevelacion: 2
-  tiempoResultado: 1
-  inventario: {fileID: 0}
-  cartasAlEmpezarTurno: 0
+  indiceActual: 0
   fichaB: {fileID: 1906783810}
-  moverFichaB: 0
 --- !u!1 &1166160924
 GameObject:
   m_ObjectHideFlags: 0
@@ -5583,11 +5552,12 @@ MonoBehaviour:
   - {fileID: 1964455106}
   - {fileID: 1062106794}
   - {fileID: 1108432512}
-  ruta: {fileID: 66313766}
+  casillas: []
+  sistemaCartas: {fileID: 0}
+  gestorTurnos: {fileID: 0}
   panelFin: {fileID: 1170638330}
   textoFin: {fileID: 1302847095}
   textoGanadoresHUD: {fileID: 0}
-  seleccionFichaUI: {fileID: 545381876}
   textoResultadoDadoHUD: {fileID: 1026583656}
 --- !u!4 &1366047255
 Transform:
@@ -5763,7 +5733,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 704595408193292942, guid: 34d71198bd59f3a4db26f79e7ef0ff91, type: 3}
       propertyPath: randSeed
-      value: 147326341
+      value: 6861343
       objectReference: {fileID: 0}
     - target: {fileID: 704595408193292942, guid: 34d71198bd59f3a4db26f79e7ef0ff91, type: 3}
       propertyPath: showCelSet
@@ -6114,6 +6084,43 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!84 &1606445897
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 6
+  m_Width: 128
+  m_Height: 128
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 94
+  m_ColorFormat: 48
+  m_MipMap: 1
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_UseDynamicScaleExplicit: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 0
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1 &1617597156
 GameObject:
   m_ObjectHideFlags: 0
@@ -6297,10 +6304,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95901fec81481c4b89b073bf0802ffad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FichaInversa
-  ruta: {fileID: 66313766}
   indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
 --- !u!114 &1617734915
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6313,56 +6318,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 492c03d97b8579436800b817e7bb1aa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovimientoFicha
-  ruta: {fileID: 66313766}
-  indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
-  escudoActivo: 0
-  pierdeSiguienteTurno: 0
-  dobleTiroPendiente: 0
-  tiempoRevelacion: 2
-  tiempoResultado: 1
-  inventario: {fileID: 0}
-  cartasAlEmpezarTurno: 0
+  indiceActual: 0
   fichaB: {fileID: 0}
-  moverFichaB: 0
---- !u!84 &1663567595
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 128
-  m_Height: 128
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 94
-  m_ColorFormat: 48
-  m_MipMap: 1
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 0
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
 --- !u!1 &1719399330
 GameObject:
   m_ObjectHideFlags: 0
@@ -6977,10 +6935,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95901fec81481c4b89b073bf0802ffad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FichaInversa
-  ruta: {fileID: 66313766}
   indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
 --- !u!114 &1906783811
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6993,19 +6949,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 492c03d97b8579436800b817e7bb1aa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovimientoFicha
-  ruta: {fileID: 66313766}
-  indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
-  escudoActivo: 0
-  pierdeSiguienteTurno: 0
-  dobleTiroPendiente: 0
-  tiempoRevelacion: 2
-  tiempoResultado: 1
-  inventario: {fileID: 0}
-  cartasAlEmpezarTurno: 0
+  indiceActual: 0
   fichaB: {fileID: 0}
-  moverFichaB: 0
 --- !u!1 &1945430488
 GameObject:
   m_ObjectHideFlags: 0
@@ -7219,19 +7165,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 492c03d97b8579436800b817e7bb1aa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovimientoFicha
-  ruta: {fileID: 66313766}
-  indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
-  escudoActivo: 0
-  pierdeSiguienteTurno: 0
-  dobleTiroPendiente: 0
-  tiempoRevelacion: 2
-  tiempoResultado: 1
-  inventario: {fileID: 0}
-  cartasAlEmpezarTurno: 0
+  indiceActual: 0
   fichaB: {fileID: 1617734914}
-  moverFichaB: 0
 --- !u!1 &1972437704
 GameObject:
   m_ObjectHideFlags: 0
@@ -7561,10 +7497,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95901fec81481c4b89b073bf0802ffad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FichaInversa
-  ruta: {fileID: 66313766}
   indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
 --- !u!114 &2083967945
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7577,19 +7511,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 492c03d97b8579436800b817e7bb1aa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovimientoFicha
-  ruta: {fileID: 66313766}
-  indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
-  escudoActivo: 0
-  pierdeSiguienteTurno: 0
-  dobleTiroPendiente: 0
-  tiempoRevelacion: 2
-  tiempoResultado: 1
-  inventario: {fileID: 0}
-  cartasAlEmpezarTurno: 0
+  indiceActual: 0
   fichaB: {fileID: 0}
-  moverFichaB: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -7609,3 +7533,4 @@ SceneRoots:
   - {fileID: 56462997}
   - {fileID: 667448555}
   - {fileID: 545381877}
+  - {fileID: 220531354}

@@ -167,15 +167,15 @@ public class BatallaPPS : MonoBehaviourPun
         if (esB && jugador.fichaB != null)
         {
             // Ficha B: vuelve a meta (su inicio)
-            int idx = jugador.ruta.casillas.Count - 1;
+            int idx = gameManager.casillas.Count - 1;
             jugador.fichaB.indiceActual = idx;
-            jugador.fichaB.transform.position = jugador.ruta.casillas[idx].position + Vector3.up * 0.5f;
+            jugador.fichaB.transform.position = gameManager.casillas[idx].position + Vector3.up * 0.5f;
         }
         else
         {
             // Ficha A: vuelve a inicio
             jugador.indiceActual = 0;
-            jugador.transform.position = jugador.ruta.casillas[0].position + Vector3.up * 0.5f;
+            jugador.transform.position = gameManager.casillas[0].position + Vector3.up * 0.5f;
         }
     }
 
