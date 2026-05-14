@@ -4,6 +4,9 @@ using System;
 
 public class GestorDeRutas : MonoBehaviour
 {
+    [Header("Ruta del Tablero")]
+    public List<Transform> casillas = new List<Transform>();
+
     private List<MovimientoFicha> jugadores = new List<MovimientoFicha>();
     private int turnoActual = 0;
     

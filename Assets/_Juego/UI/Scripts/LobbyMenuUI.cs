@@ -132,12 +132,18 @@ public class LobbyMenuUI : MonoBehaviourPunCallbacks
 
     // ── Acciones ──────────────────────────────────────────────────────────────
 
+    private string NombreGuardado()
+    {
+        string nombre = PlayerPrefs.GetString("NombreJugador", "").Trim();
+        return string.IsNullOrEmpty(nombre) ? $"Jugador{Random.Range(10, 99)}" : nombre;
+    }
+
     public void CrearSala()
     {
         if (!PhotonNetwork.IsConnected)
         {
             _accionPendiente = "crear";
-            PhotonNetwork.NickName = "Host";
+            PhotonNetwork.NickName = NombreGuardado();
             PhotonNetwork.ConnectUsingSettings();
             MostrarEspera(null);
             return;
@@ -148,7 +154,7 @@ public class LobbyMenuUI : MonoBehaviourPunCallbacks
             return;
         }
         string codigo = GenerarCodigo();
-        PhotonNetwork.NickName = "Host";
+        PhotonNetwork.NickName = NombreGuardado();
         var opts = new RoomOptions { MaxPlayers = (byte)maxJugadores, IsVisible = false };
         PhotonNetwork.CreateRoom(codigo, opts, TypedLobby.Default);
         MostrarEspera(codigo);
@@ -176,7 +182,7 @@ public class LobbyMenuUI : MonoBehaviourPunCallbacks
         }
         OcultarError();
         _codigoPendiente = codigo.Trim().ToUpper();
-        PhotonNetwork.NickName = "Jugador" + Random.Range(2, 99);
+        PhotonNetwork.NickName = NombreGuardado();
 
         if (!PhotonNetwork.IsConnected)
         {
