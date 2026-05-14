@@ -1,0 +1,27 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../USS/FantasyTheme.uss" />
+
+    <ui:VisualElement name="energia-hud" class="hud-energy" style="flex-direction: column; align-items: flex-end;">
+
+        <!-- Fila superior: icono + valor -->
+        <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 6px;">
+            <ui:Label name="energy-icon" text="⚡" class="energy-icon" />
+            <ui:Label name="energy-value" text="0" class="energy-value" />
+            <ui:Label text="ENERGÍA" class="energy-label" />
+        </ui:VisualElement>
+
+        <!-- Botón Tirada Extra -->
+        <ui:Button name="btn-tirada-extra" class="btn-energy"
+            style="margin-bottom: 4px;" >
+            <ui:Label text="⚡ Tirada Extra" style="font-size: 13px; flex-grow: 1; -unity-text-align: middle-left;" />
+            <ui:Label name="costo-tirada" text="(3⚡)" style="font-size: 11px; color: #8a7f6a;" />
+        </ui:Button>
+
+        <!-- Botón Doble Movimiento -->
+        <ui:Button name="btn-doble-mov" class="btn-energy">
+            <ui:Label text="⚡ Doble Mov." style="font-size: 13px; flex-grow: 1; -unity-text-align: middle-left;" />
+            <ui:Label name="costo-doble" text="(5⚡)" style="font-size: 11px; color: #8a7f6a;" />
+        </ui:Button>
+
+    </ui:VisualElement>
+</ui:UXML>

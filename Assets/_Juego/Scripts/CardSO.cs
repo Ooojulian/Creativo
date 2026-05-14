@@ -20,4 +20,5 @@ public class CardSO : ScriptableObject
     [TextArea] public string savedConditionDescription;
     [TextArea] public string savedEffectDescription;
     public Sprite artwork;
+    public int costoEnergia = 1;
 }

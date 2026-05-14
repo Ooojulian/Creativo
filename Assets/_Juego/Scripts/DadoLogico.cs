@@ -2,8 +2,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 using System.Collections;
-using System;
-using Random = UnityEngine.Random;
 
 public class DadoLogico : MonoBehaviour
 {
@@ -28,13 +26,15 @@ public class DadoLogico : MonoBehaviour
     public float alturaSalto = 40f;
 
     public int resultadoActual;
+    public int modificadorExterno = 0;
     private bool lanzando = false;
     private bool esperandoConfirmacion = false;
+
+    public bool EsperandoConfirmacion => esperandoConfirmacion;
     private Rigidbody rb;
     private Vector3 ejeRotacion;
     private CamaraDirectora camaraDirectora;
     private Vector3 escalaOriginal;
-    private Action<int> onDadoLanzado;
 
     // -------------------------------------------------
     void Awake()
@@ -48,6 +48,7 @@ public class DadoLogico : MonoBehaviour
         }
 
         // Guardar la escala configurada en el prefab/escena para restaurarla en OnEnable
+        // escalaDado actúa como multiplicador: si es 1 usa la escala del prefab tal cual
         escalaOriginal = escalaDado > 0
             ? transform.localScale / escalaDado
             : transform.localScale;
@@ -74,7 +75,7 @@ public class DadoLogico : MonoBehaviour
             textoResultado.gameObject.SetActive(false);
         if (textoInstruccion != null)
         {
-            textoInstruccion.text = "ESPACIO — Tirar el dado";
+            textoInstruccion.text = "ESPACIO \u2014 Tirar el dado";
             textoInstruccion.gameObject.SetActive(true);
         }
     }
@@ -110,10 +111,10 @@ public class DadoLogico : MonoBehaviour
     {
         lanzando = true;
 
-        if (textoResultado != null) textoResultado.gameObject.SetActive(false);
+        if (textoResultado != null)   textoResultado.gameObject.SetActive(false);
         if (textoInstruccion != null) textoInstruccion.gameObject.SetActive(false);
 
-        // Enfocar el dado mientras gira
+        // Enfocar el dado mientras gira (ahora es no-op en CamaraDirectora para mantener vista general)
         if (camaraDirectora != null) camaraDirectora.EnfocarDado();
 
         // Resultado elegido al inicio (sin física)
@@ -155,13 +156,26 @@ public class DadoLogico : MonoBehaviour
         transform.position = posicionFija;
         transform.rotation = RotacionParaResultado(resultadoActual);
 
-        Debug.Log($"Resultado del dado: {resultadoActual}");
+        // lanzando permanece true hasta que el jugador confirme con SPACE
+        // para evitar que se pueda tirar de nuevo durante la pausa
+
+        // Aplicar modificadores de energía/cartas
+        if (modificadorExterno != 0)
+        {
+            Debug.Log($"[Dado] Aplicando modificador de {modificadorExterno} al resultado {resultadoActual}");
+            resultadoActual += modificadorExterno;
+            modificadorExterno = 0; // Resetear tras uso
+        }
 
         if (textoResultado != null)
         {
             textoResultado.text = $"Dado: {resultadoActual}";
             textoResultado.gameObject.SetActive(true);
         }
+
+        // Sincronizar resultado a otros clientes
+        if (GameSync.Instance != null)
+            GameSync.Instance.SincronizarResultadoDado(resultadoActual);
 
         // Pausa para visualizar el resultado
         yield return new WaitForSeconds(pausaResultado);
@@ -171,7 +185,7 @@ public class DadoLogico : MonoBehaviour
         esperandoConfirmacion = true;
         if (textoInstruccion != null)
         {
-            textoInstruccion.text = "ESPACIO — Mover ficha";
+            textoInstruccion.text = "ESPACIO \u2014 Mover ficha";
             textoInstruccion.gameObject.SetActive(true);
         }
     }
@@ -183,20 +197,38 @@ public class DadoLogico : MonoBehaviour
         if (textoInstruccion != null)
             textoInstruccion.gameObject.SetActive(false);
 
-        // Si hay callback (de GestorTurnos), usar ese
-        if (onDadoLanzado != null)
+        if (jugador == null) { Debug.LogWarning("No hay jugador asignado al dado."); return; }
+
+        // Ocultar dado mientras elige ficha
+        gameObject.SetActive(false);
+
+        // Mostrar panel selección ficha A/B
+        var ui = FindAnyObjectByType<SeleccionFichaUI>();
+        if (ui != null) ui.MostrarSeleccion(jugador);
+        else EjecutarMovimiento(); // fallback si no hay UI
+    }
+
+    public void EjecutarMovimiento()
+    {
+        if (GameSync.Instance != null)
         {
-            onDadoLanzado?.Invoke(resultadoActual);
-        }
-        // Si no, fallback al jugador asignado directo
-        else if (jugador != null)
-        {
-            jugador.Avanzar(resultadoActual);
+            int indiceFicha = FindAnyObjectByType<GameManager>().todosLosJugadores.IndexOf(jugador);
+            GameSync.Instance.EnviarResultadoDado(resultadoActual, indiceFicha, jugador.moverFichaB);
         }
         else
         {
-            Debug.LogWarning("No hay jugador asignado al dado.");
+            jugador.Avanzar(resultadoActual);
         }
+    }
+
+    // Cancela la confirmación actual y lanza el dado de nuevo (tirada extra por energía).
+    public void RelanzarDado()
+    {
+        if (!esperandoConfirmacion) return;
+        esperandoConfirmacion = false;
+        if (textoResultado != null) textoResultado.gameObject.SetActive(false);
+        if (textoInstruccion != null) textoInstruccion.gameObject.SetActive(false);
+        Lanzar();
     }
 
     // Mapeo original del script: up=5, -up=2, forward=6, -forward=1, right=3, -right=4
@@ -211,22 +243,6 @@ public class DadoLogico : MonoBehaviour
             case 3: return Quaternion.Euler(0, 0, 90);
             case 4: return Quaternion.Euler(0, 0, -90);
             default: return Quaternion.identity;
-        }
-    }
-
-    /// <summary>
-    /// Prepara el dado para lanzar con un callback cuando se confirme el movimiento
-    /// </summary>
-    public void PrepararParaLanzar(MovimientoFicha nuevoJugador, Action<int> onLanzado)
-    {
-        jugador = nuevoJugador;
-        onDadoLanzado = onLanzado;
-        
-        // Mostrar UI "ESPACIO para tirar"
-        if (textoInstruccion != null)
-        {
-            textoInstruccion.text = "ESPACIO — Tirar el dado";
-            textoInstruccion.gameObject.SetActive(true);
         }
     }
 }

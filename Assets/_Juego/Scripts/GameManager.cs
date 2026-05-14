@@ -4,6 +4,11 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance;
+
+    public event System.Action<MovimientoFicha> OnTurnStarted;
+    public event System.Action<MovimientoFicha> OnTurnEnded;
+    
     [Header("Interfaz")]
     public GameObject panelMenu;
 
@@ -21,7 +26,7 @@ public class GameManager : MonoBehaviour
     [Header("Elementos del Juego")]
     public DadoLogico dado;
     public List<MovimientoFicha> todosLosJugadores;
-    public List<Transform> casillas; // Reemplaza GestorDeRuta
+    public List<Transform> casillas;
 
     [Header("Sistemas")]
     public SistemaCartas sistemaCartas;
@@ -35,7 +40,6 @@ public class GameManager : MonoBehaviour
     [Header("HUD persistente")]
     public TextMeshProUGUI textoResultadoDadoHUD;
 
-    // Separación entre fichas en la casilla de inicio
     private static readonly Vector3[] offsetsInicio = {
         new Vector3(-20f, 0f,  20f),
         new Vector3( 20f, 0f,  20f),
@@ -49,6 +53,11 @@ public class GameManager : MonoBehaviour
     private int umbralVictoria = 1;
 
     public MovimientoFicha JugadorActual => jugadoresActivos.Count > 0 ? jugadoresActivos[turnoActual] : null;
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
@@ -76,7 +85,7 @@ public class GameManager : MonoBehaviour
 
     public void IniciarPartida(int cantidad)
     {
-        Debug.Log($"[GameManager] IniciarPartida llamado con {cantidad} jugadores"); // ✅ LOG INICIAL
+        Debug.Log($"[GameManager] IniciarPartida llamado con {cantidad} jugadores");
         
         panelMenu.SetActive(false);
         jugadoresActivos.Clear();
@@ -90,14 +99,12 @@ public class GameManager : MonoBehaviour
         if (camaraJuego != null) camaraJuego.gameObject.SetActive(true);
         if (panelHUD != null)    panelHUD.SetActive(true);
 
-        // Teletransportar la cámara inmediatamente al tablero
         CamaraDirectora cam = FindAnyObjectByType<CamaraDirectora>();
         if (cam != null) cam.SnapAlTablero();
 
         Debug.Log($"[GameManager] casillas count: {(casillas != null ? casillas.Count : "NULL")}");
         Debug.Log($"[GameManager] todosLosJugadores count: {(todosLosJugadores != null ? todosLosJugadores.Count : "NULL")}");
 
-        // Posicionar jugadores en la casilla Start
         Vector3 posInicio;
         if (casillas != null && casillas.Count > 0)
             posInicio = casillas[0].position + Vector3.up * 0.5f;
@@ -140,7 +147,6 @@ public class GameManager : MonoBehaviour
         }   
         Debug.Log($"[GameManager] Partida iniciada con {cantidad} jugadores. Posición inicio: {posInicio}");
 
-        // ✅ ASIGNAR JUGADORES A GESTOR TURNOS
         if (gestorTurnos != null)
             gestorTurnos.AsignarJugadores(jugadoresActivos);
 
@@ -150,6 +156,16 @@ public class GameManager : MonoBehaviour
 
     public void SiguienteTurno()
     {
+        // ✅ TRIGGER "Inspiración" al final del turno
+        if (CardTriggerSystem.Instance != null && turnoActual < jugadoresActivos.Count)
+        {
+            MovimientoFicha j = jugadoresActivos[turnoActual];
+            CardTriggerSystem.Instance.CheckTurnEnd(j, j.cartasAlEmpezarTurno);
+        }
+
+        if (OnTurnEnded != null)
+            OnTurnEnded.Invoke(jugadoresActivos[turnoActual]);
+
         turnoActual++;
         if (turnoActual >= jugadoresActivos.Count)
             turnoActual = 0;
@@ -158,7 +174,6 @@ public class GameManager : MonoBehaviour
 
     private void PrepararTurno()
     {
-        // Saltar jugadores que ya llegaron a la meta
         int intentos = 0;
         while (ganadores.Contains(jugadoresActivos[turnoActual]) && intentos < jugadoresActivos.Count)
         {
@@ -166,7 +181,6 @@ public class GameManager : MonoBehaviour
             intentos++;
         }
 
-        // Jugador actual
         MovimientoFicha j = jugadoresActivos[turnoActual];
 
         Debug.Log($"Turno del Jugador {turnoActual + 1}");
@@ -174,7 +188,6 @@ public class GameManager : MonoBehaviour
         if (textoTurno != null)
             textoTurno.text = $"Turno: Jugador {turnoActual + 1}";
         
-        // Usar GestorTurnos para manejar el turno
         if (gestorTurnos != null)
         {
             gestorTurnos.IniciarTurno();
@@ -183,6 +196,13 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogError("[GameManager] GestorTurnos no asignado");
         }
+
+        // ✅ PHOTON: Sincronizar turno
+        if (PhotonNetwork.IsMasterClient)
+            GameSync.Instance.AnunciarTurno(turnoActual);
+
+        if (OnTurnStarted != null)
+            OnTurnStarted.Invoke(j);
     }
 
     public void LlegarAMeta(MovimientoFicha jugador)
@@ -193,7 +213,6 @@ public class GameManager : MonoBehaviour
         int numJugador = jugadoresActivos.IndexOf(jugador) + 1;
         Debug.Log($"[GameManager] Jugador {numJugador} llegó a la meta! ({ganadores.Count}/{umbralVictoria})");
 
-        // Actualizar indicador visual en el HUD
         if (textoGanadoresHUD != null)
         {
             string lista = "En meta: ";
@@ -232,10 +251,6 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-
-    // ────────────────────────────────────────
-    // MÉTODOS PÚBLICOS
-    // ────────────────────────────────────────
 
     public SistemaCartas ObtenerSistemaCartas() => sistemaCartas;
     

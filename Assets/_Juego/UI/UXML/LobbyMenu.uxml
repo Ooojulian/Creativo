@@ -1,0 +1,75 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../USS/FantasyTheme.uss" />
+
+    <!-- Lobby Photon (crear sala / unirse / esperar) -->
+    <ui:VisualElement name="lobby-root" class="root-container">
+
+        <!-- Panel principal del menú -->
+        <ui:VisualElement name="panel-menu" class="panel lobby-container" style="padding: 36px 40px;">
+
+            <ui:Label text="SALA DE JUEGO" class="text-header"
+                style="margin-bottom: 24px; font-size: 20px;" />
+
+            <ui:Button name="btn-crear" text="✦ CREAR SALA" class="btn btn--primary"
+                style="align-self: stretch; margin-bottom: 12px;" />
+
+            <ui:Button name="btn-unirse-panel" text="◆ UNIRSE CON CÓDIGO" class="btn btn--secondary"
+                style="align-self: stretch; margin-bottom: 12px;" />
+
+            <ui:Button name="btn-volver" text="VOLVER" class="btn btn--ghost"
+                style="align-self: stretch;" />
+
+        </ui:VisualElement>
+
+        <!-- Panel para ingresar código -->
+        <ui:VisualElement name="panel-unirse" class="panel lobby-container"
+            style="padding: 36px 40px; display: none;">
+
+            <ui:Label text="INGRESA EL CÓDIGO" class="text-header"
+                style="margin-bottom: 20px;" />
+
+            <ui:TextField name="input-codigo" class="input-field"
+                max-length="4"
+                style="align-self: stretch; margin-bottom: 20px;"
+                placeholder="XXXX" />
+
+            <ui:Label name="lbl-error-unirse" text=""
+                class="text-dim" style="color: #c04040; -unity-text-align: middle-center;
+                margin-bottom: 8px; display: none;" />
+
+            <ui:Button name="btn-confirmar-unirse" text="UNIRSE →" class="btn btn--primary"
+                style="align-self: stretch; margin-bottom: 12px;" />
+
+            <ui:Button name="btn-cancelar-unirse" text="VOLVER" class="btn btn--ghost"
+                style="align-self: stretch;" />
+
+        </ui:VisualElement>
+
+        <!-- Panel de espera en sala -->
+        <ui:VisualElement name="panel-espera" class="panel lobby-container"
+            style="padding: 36px 40px; display: none; align-items: center;">
+
+            <ui:Label text="EN SALA" class="text-header" style="margin-bottom: 8px;" />
+
+            <ui:Label name="lbl-codigo-sala" text="----" class="text-code"
+                style="margin-bottom: 4px;" />
+
+            <ui:Label name="lbl-contador-jugadores" text="0 / 4"
+                class="badge badge--gold" style="margin-bottom: 20px;" />
+
+            <ui:VisualElement name="lista-jugadores"
+                style="align-self: stretch; margin-bottom: 20px;" />
+
+            <ui:Button name="btn-iniciar-partida" text="▶ INICIAR PARTIDA" class="btn btn--primary"
+                style="align-self: stretch; margin-bottom: 4px; display: none;" />
+
+            <ui:Label name="lbl-aviso-minimo" text="Se necesitan al menos 2 jugadores"
+                style="margin-bottom: 12px; display: none;" />
+
+            <ui:Button name="btn-abandonar-sala" text="ABANDONAR SALA" class="btn btn--danger"
+                style="align-self: stretch;" />
+
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,33 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../USS/FantasyTheme.uss" />
+
+    <!-- Panel de elección entre Ficha A y Ficha B -->
+    <ui:VisualElement name="ficha-root" style="
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        align-items: center; justify-content: flex-end;
+        padding-bottom: 110px;">
+
+        <ui:VisualElement name="ficha-panel" class="panel ficha-panel" style="
+            flex-direction: row; padding: 16px 24px; align-items: center;">
+
+            <ui:Label text="MOVER:" class="text-dim"
+                style="font-size: 12px; margin-right: 16px; letter-spacing: 2px;" />
+
+            <ui:Button name="btn-ficha-a" class="btn btn--secondary"
+                style="min-width: 140px; height: 56px; margin-right: 12px; margin-bottom: 0;">
+                <ui:Label text="FICHA A" style="font-size: 14px; -unity-font-style: bold;" />
+                <ui:Label name="info-ficha-a" text="Casilla 0"
+                    style="font-size: 11px; color: #8a7f6a;" />
+            </ui:Button>
+
+            <ui:Button name="btn-ficha-b" class="btn btn--ghost"
+                style="min-width: 140px; height: 56px; margin-bottom: 0;">
+                <ui:Label text="FICHA B" style="font-size: 14px; -unity-font-style: bold;" />
+                <ui:Label name="info-ficha-b" text="Casilla 0"
+                    style="font-size: 11px; color: #8a7f6a;" />
+            </ui:Button>
+
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>
