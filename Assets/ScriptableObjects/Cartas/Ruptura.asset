@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26a2f4cbb780e05478222c1d30324fcd, type: 3}
+  m_Name: Ruptura
+  m_EditorClassIdentifier: Assembly-CSharp::CartaDefinicion
+  nombreCarta: Ruptura
+  descripcion: Descarta 2 cartas al azar
+  icono: {fileID: 0}
+  costoEnergia: 1
+  tipo: 1
+  alcance: 1
+  tipoEfecto: 5
+  valor1: 2
+  valor2: 0
+  duracion: 0
+  puedeUsarseEnMano: 1
+  puedeUsarseEnCasilla: 1
