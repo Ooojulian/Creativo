@@ -11,8 +11,8 @@ public class EnergiaController : MonoBehaviour
     [SerializeField] private int energiaActual = 0;
 
     [Header("Eventos")]
-    public UnityEvent<int> OnEnergiaCambiada;
-    public UnityEvent<int> OnEnergiaInsuficiente;
+    public UnityEvent<int> OnEnergiaCambiada = new UnityEvent<int>();
+    public UnityEvent<int> OnEnergiaInsuficiente = new UnityEvent<int>();
 
     // Métodos públicos de consulta y modificación
     public int EnergiaActual => energiaActual;
