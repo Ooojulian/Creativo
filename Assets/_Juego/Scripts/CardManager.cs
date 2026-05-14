@@ -30,13 +30,13 @@ public class CardManager : MonoBehaviour
                 RivalDescarta(usuario, 2);
                 break;
             case CardType.Inspiracion:
-                usuario.GetComponent<PlayerInventory>().AddToHand(ObtenerCartaAleatoria()); // Simplificado
+                usuario.GetComponent<PlayerInventory>().AddToHand(ObtenerCartaAleatoria());
                 break;
             case CardType.Espionaje:
                 EspiarYRobar(usuario);
                 break;
             case CardType.Sprint:
-                usuario.Avanzar(2); // Debería ser inmediato sin esperar dado
+                usuario.Avanzar(2);
                 break;
         }
     }
@@ -55,14 +55,12 @@ public class CardManager : MonoBehaviour
             case CardType.LadronDeTurno:
                 if (rivalInvolucrado != null) 
                 {
-                    rivalInvolucrado.pierdeSiguienteTurno = true;
-                    // TODO: Cancelar acción especial
+                    RivalPierdeTurno(rivalInvolucrado);
                 }
                 break;
             case CardType.Olvido:
                 if (rivalInvolucrado != null)
                 {
-                    // TODO: Anular carta
                     RivalDescartaEspecifico(rivalInvolucrado, 2);
                 }
                 break;
@@ -80,11 +78,10 @@ public class CardManager : MonoBehaviour
         }
     }
 
-    // Métodos auxiliares (implementación básica por ahora)
+    // Métodos auxiliares
     
     private void RetrocederRival(MovimientoFicha usuario, int pasos)
     {
-        // Elige un rival al azar o el más cercano adelante
         MovimientoFicha rival = EncontrarRival(usuario);
         if (rival != null) RetrocederEspecifico(rival, pasos);
     }
@@ -92,18 +89,29 @@ public class CardManager : MonoBehaviour
     private void RetrocederEspecifico(MovimientoFicha rival, int pasos)
     {
         rival.indiceActual = Mathf.Max(0, rival.indiceActual - pasos);
-        rival.transform.position = rival.ruta.casillas[rival.indiceActual].position + Vector3.up * 0.5f;
+        rival.transform.position = gameManager.casillas[rival.indiceActual].position + Vector3.up * 0.5f;
     }
 
     private void IntercambiarConCualquiera(MovimientoFicha usuario)
     {
-        gameManager.IntercambiarConOtroJugador(usuario);
+        MovimientoFicha rival = EncontrarRival(usuario);
+        if (rival != null)
+        {
+            int tempIndice = usuario.indiceActual;
+            usuario.indiceActual = rival.indiceActual;
+            rival.indiceActual = tempIndice;
+            
+            usuario.transform.position = gameManager.casillas[usuario.indiceActual].position + Vector3.up * 0.5f;
+            rival.transform.position = gameManager.casillas[rival.indiceActual].position + Vector3.up * 0.5f;
+        }
     }
 
-    private void RivalPierdeTurno(MovimientoFicha usuario)
+    private void RivalPierdeTurno(MovimientoFicha rival)
     {
-        MovimientoFicha rival = EncontrarRival(usuario);
-        if (rival != null) rival.pierdeSiguienteTurno = true;
+        if (rival != null)
+        {
+            rival.ObtenerEstados().AplicarEstado(EstadosJugador.SILENCIO, 1);
+        }
     }
 
     private void RivalDescarta(MovimientoFicha usuario, int cantidad)
@@ -142,7 +150,6 @@ public class CardManager : MonoBehaviour
 
     private MovimientoFicha EncontrarRival(MovimientoFicha usuario)
     {
-        // Lógica simple: el primer jugador en la lista que no sea el usuario
         foreach (var j in gameManager.todosLosJugadores)
         {
             if (j != usuario && j.gameObject.activeSelf) return j;
@@ -152,8 +159,6 @@ public class CardManager : MonoBehaviour
 
     private CardSO ObtenerCartaAleatoria()
     {
-        // Esto debería venir de un DeckManager o similar
-        // Por ahora buscamos una en las casillas o algo así
         return null; 
     }
 }

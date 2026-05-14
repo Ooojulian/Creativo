@@ -24,21 +24,33 @@ public class PlayerHandUI : MonoBehaviour
 
         MovimientoFicha jugador = gameManager.JugadorActual; 
 
-        if (jugador == null || jugador.inventario == null) return;
+        if (jugador == null) return;
 
-        foreach (var card in jugador.inventario.hand)
+        var inventario = jugador.ObtenerInventario();
+        if (inventario == null) return;
+
+        // Obtener cartas en mano usando el getter público
+        List<CartaDefinicion> cartasEnMano = inventario.ObtenerMano();
+        
+        if (cartasEnMano != null)
         {
-            GameObject obj = Instantiate(prefabCarta, containerMano);
-            obj.GetComponent<Image>().sprite = card.artwork;
-            obj.GetComponent<Button>().onClick.AddListener(() => CardPlayUI.Instance.Mostrar(card, jugador));
+            foreach (var card in cartasEnMano)
+            {
+                GameObject obj = Instantiate(prefabCarta, containerMano);
+                
+                // Buscar componente Image y asignar sprite de la carta
+                Image imgComponent = obj.GetComponent<Image>();
+                if (imgComponent != null && card.icono != null)
+                    imgComponent.sprite = card.icono;
+                
+                // Agregar listener al botón
+                Button btnComponent = obj.GetComponent<Button>();
+                if (btnComponent != null)
+                    btnComponent.onClick.AddListener(() => CardPlayUI.Instance.Mostrar(card, jugador));
+            }
         }
 
-        foreach (var card in jugador.inventario.reserve)
-        {
-            GameObject obj = Instantiate(prefabCarta, containerReserva);
-            obj.GetComponent<Image>().sprite = card.artwork;
-            // Las de reserva no se pueden clickear para usar, se activan solas
-            obj.GetComponent<Button>().interactable = false; 
-        }
+        // Para reserva, por ahora no mostrar (no existe getter en InventarioCartas)
+        // TODO: Implementar sistema de cartas en reserva si es necesario
     }
 }
