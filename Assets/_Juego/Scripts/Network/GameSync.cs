@@ -81,8 +81,7 @@ public class GameSync : MonoBehaviourPunCallbacks
             Debug.Log($"[Red] dado.jugador = {gameManager.dado.jugador.name}");
         }
 
-        // Resetear estado de eleccion ficha al inicio del turno
-        gameManager.dado.jugador.moverFichaB = false;
+        
 
         // Solo cliente con turno ve el dado
         gameManager.dado.gameObject.SetActive(esMiTurno);
