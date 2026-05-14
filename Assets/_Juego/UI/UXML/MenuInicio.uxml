@@ -1,53 +1,40 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
-    <ui:Template name="MenuInicio" />
     <Style src="../USS/FantasyTheme.uss" />
 
-    <ui:VisualElement name="root" class="root-container" style="flex-direction: column;">
+    <ui:VisualElement name="root" class="fondo-aventura">
 
-        <!-- Fondo decorativo superior -->
-        <ui:VisualElement name="bg-top" style="
-            position: absolute; top: 0; left: 0; right: 0; height: 3px;
-            background-color: #c9952a;" />
+        <!-- Capas decorativas de fondo -->
+        <ui:VisualElement class="fondo-overlay" />
+        <ui:VisualElement class="franja-superior" />
+        <ui:VisualElement class="franja-inferior" />
 
-        <!-- Contenedor central -->
-        <ui:VisualElement name="center-wrap" style="
-            align-items: center; justify-content: center; flex-grow: 1;">
+        <!-- Contenedor principal — tablero de madera -->
+        <ui:VisualElement name="center-wrap" class="tablero-menu" style="width: 380px; align-items: center;">
 
-            <!-- Logo / Título -->
-            <ui:VisualElement name="logo-block" style="align-items: center; margin-bottom: 48px;">
-                <ui:Label name="title-label" text="CREATIVO" class="title-logo" />
-                <ui:Label name="subtitle-label" text="JUEGO DE MESA FANTASY" class="title-subtitle" />
+            <!-- Pernos metálicos -->
+            <ui:VisualElement class="bolt-tl" />
+            <ui:VisualElement class="bolt-tr" />
+            <ui:VisualElement class="bolt-bl" />
+            <ui:VisualElement class="bolt-br" />
 
-                <!-- Separador dorado decorativo -->
-                <ui:VisualElement style="
-                    width: 200px; height: 2px;
-                    background-color: #c9952a; opacity: 0.6;" />
-            </ui:VisualElement>
+            <!-- Título -->
+            <ui:Label name="title-label" text="RUTA AMORFA" class="titulo-juego" />
+            <ui:Label name="subtitle-label" text="JUEGO DE MESA" class="texto-secundario"
+                style="-unity-text-align: middle-center; margin-bottom: 30px; letter-spacing: 3px;" />
 
-            <!-- Panel de botones -->
-            <ui:VisualElement name="btn-panel" class="panel" style="
-                width: 320px; align-items: stretch; padding: 32px 40px;">
-
-                <ui:Button name="btn-jugar" text="JUGAR" class="btn btn--primary"
-                    style="margin-bottom: 14px;" />
-
-                <ui:Button name="btn-opciones" text="OPCIONES" class="btn btn--secondary"
-                    style="margin-bottom: 14px;" />
-
-                <ui:Button name="btn-salir" text="SALIR" class="btn btn--ghost" />
-
-            </ui:VisualElement>
-
-            <!-- Versión -->
-            <ui:Label name="version-label" text="v0.3  •  Alpha" class="text-dim"
-                style="margin-top: 24px;" />
+            <!-- Botones -->
+            <ui:Button name="btn-jugar"    text="JUGAR"    class="btn btn-primario"
+                style="align-self: stretch;" />
+            <ui:Button name="btn-opciones" text="OPCIONES" class="btn"
+                style="align-self: stretch;" />
+            <ui:Button name="btn-salir"    text="SALIR"    class="btn btn-destructivo"
+                style="align-self: stretch; margin-bottom: 0;" />
 
         </ui:VisualElement>
 
-        <!-- Borde inferior dorado -->
-        <ui:VisualElement style="
-            position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
-            background-color: #c9952a;" />
+        <!-- Versión -->
+        <ui:Label name="version-label" text="v0.3  •  Alpha" class="texto-secundario"
+            style="-unity-text-align: middle-center; margin-top: 16px;" />
 
     </ui:VisualElement>
 </ui:UXML>

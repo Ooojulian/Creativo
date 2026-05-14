@@ -223,7 +223,8 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
         _camPreview = camGO.AddComponent<Camera>();
 
         _camPreview.clearFlags      = CameraClearFlags.SolidColor;
-        _camPreview.backgroundColor = new Color(0.031f, 0.024f, 0.055f, 1f);
+        _camPreview.backgroundColor = Color.clear;
+
         // Fix Causa C: reset explícito a 0 antes de asignar para evitar que Unity
         // herede un cullingMask de otro componente o del prefab de cámara.
         _camPreview.cullingMask = 0;
