@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Representa una casilla que puede contener una carta (ventaja/desventaja/ninguna)
+/// Representa una casilla del tablero que puede contener una carta (ventaja/desventaja/ninguna)
 /// </summary>
 public class CasillaCarta : MonoBehaviour
 {
@@ -9,40 +9,74 @@ public class CasillaCarta : MonoBehaviour
     [SerializeField] private bool tieneCarta = false;
     [SerializeField] private bool esVentaja = false; // true=ventaja, false=desventaja
     
-    private int numeroCasilla; // 1-40 aprox
+    private int numeroCasilla; // 0-39 aprox
+    private Renderer rendererCasilla;
+    
+    void Awake()
+    {
+        rendererCasilla = GetComponent<Renderer>();
+    }
     
     public CartaDefinicion ObtenerCarta() => cartaAsociada;
     public bool TieneCarta() => tieneCarta;
     public bool EsVentaja() => esVentaja;
+    public int ObtenerNumeroCasilla() => numeroCasilla;
     
+    /// <summary>
+    /// Asigna una carta a esta casilla
+    /// </summary>
     public void AsignarCarta(CartaDefinicion carta, bool ventaja)
     {
+        if (carta == null)
+        {
+            LimpiarCarta();
+            return;
+        }
+        
         cartaAsociada = carta;
         tieneCarta = true;
         esVentaja = ventaja;
         
-        // Aquí puedes hacer visual: cambiar color, mostrar icono, etc
         ActualizarVisual();
+        Debug.Log($"[Casilla {numeroCasilla}] Carta asignada: {carta.nombreCarta} ({(ventaja ? "Ventaja" : "Desventaja")})");
     }
     
+    /// <summary>
+    /// Deja la casilla sin carta
+    /// </summary>
     public void LimpiarCarta()
     {
         cartaAsociada = null;
         tieneCarta = false;
+        esVentaja = false;
+        
+        ActualizarVisual();
+        Debug.Log($"[Casilla {numeroCasilla}] Casilla limpiada");
     }
     
+    /// <summary>
+    /// Actualiza el visual de la casilla según su estado
+    /// </summary>
     private void ActualizarVisual()
     {
-        // TODO: Cambiar color/icono según tipo de carta
-        if (tieneCarta)
+        if (rendererCasilla == null) return;
+        
+        if (!tieneCarta)
         {
-            if (esVentaja)
-                GetComponent<Renderer>().material.color = Color.green;
-            else
-                GetComponent<Renderer>().material.color = Color.red;
+            // Sin carta = gris neutro
+            rendererCasilla.material.color = Color.gray;
+        }
+        else if (esVentaja)
+        {
+            // Ventaja = verde
+            rendererCasilla.material.color = Color.green;
+        }
+        else
+        {
+            // Desventaja = rojo
+            rendererCasilla.material.color = Color.red;
         }
     }
     
     public void SetNumeroCasilla(int numero) => numeroCasilla = numero;
-    public int ObtenerNumeroCasilla() => numeroCasilla;
 }

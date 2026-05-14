@@ -26,10 +26,7 @@ public class GestorTurnos : MonoBehaviour
         Finalizando,
         Completado
     }
-    public void ContinuarDespuesDeSeleccion()
-    {
-        MostrarSeleccionCartas();
-    }
+    
     private EstadoTurno estadoActual = EstadoTurno.Esperando;
     private int turnoActual = 0;
     
@@ -92,6 +89,11 @@ public class GestorTurnos : MonoBehaviour
             // Si no hay panel, continuar directo a cartas
             MostrarSeleccionCartas();
         }
+    }
+    
+    public void ContinuarDespuesDeSeleccion()
+    {
+        MostrarSeleccionCartas();
     }
     
     private void MostrarSeleccionCartas()
@@ -240,6 +242,12 @@ public class GestorTurnos : MonoBehaviour
     {
         yield return new WaitForSeconds(1f);
         IniciarTurno();
+    }
+    
+    public void PrepararParaLanzar(MovimientoFicha jugador, Action<int> onLanzado)
+    {
+        if (dado != null)
+            dado.PrepararParaLanzar(jugador, onLanzado);
     }
     
     public void PasarTurno()

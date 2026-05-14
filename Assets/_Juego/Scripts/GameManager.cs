@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using TMPro;
+using Photon.Pun;
 
 public class GameManager : MonoBehaviour
 {
@@ -197,8 +198,8 @@ public class GameManager : MonoBehaviour
             Debug.LogError("[GameManager] GestorTurnos no asignado");
         }
 
-        // ✅ PHOTON: Sincronizar turno
-        if (PhotonNetwork.IsMasterClient)
+        // ✅ PHOTON: Sincronizar turno (verificar que exista)
+        if (PhotonNetwork.IsMasterClient && GameSync.Instance != null)
             GameSync.Instance.AnunciarTurno(turnoActual);
 
         if (OnTurnStarted != null)
@@ -273,4 +274,31 @@ public class GameManager : MonoBehaviour
         if (camaraMenu != null)  camaraMenu.gameObject.SetActive(true);
         if (panelMenu != null)   panelMenu.SetActive(true);
     }
+    // Agregar este método en GameManager, antes del cierre de la clase
+
+    public bool DetectarColision(MovimientoFicha ataque, MovimientoFicha defensa, 
+        out int idxDefensor, out bool esFichaB, out int actorDefensor)
+    {
+        idxDefensor = -1;
+        esFichaB = false;
+        actorDefensor = -1;
+        
+        if (ataque == null || todosLosJugadores == null) return false;
+        
+        // Buscar si hay otra ficha en la misma posición
+        foreach (var j in todosLosJugadores)
+        {
+            if (j == ataque) continue;
+            
+            // Verificar distancia cercana
+            if (Vector3.Distance(j.transform.position, ataque.transform.position) < 2f)
+            {
+                idxDefensor = todosLosJugadores.IndexOf(j);
+                actorDefensor = idxDefensor;
+                esFichaB = j.moverFichaB;
+                return true;
+            }
+        }
+        return false;
+}
 }

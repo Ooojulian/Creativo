@@ -30,7 +30,7 @@ public class MovimientoFicha : MonoBehaviour
     private bool enMovimiento = false;
     private CamaraDirectora camaraDirectora;
     private GameManager gm;
-    private bool dobleTiroPendiente = false;
+    public bool dobleTiroPendiente = false;
     
     // Eventos
     public event Action<int> OnMovimientoCompletado; // (índiceActual)
@@ -69,6 +69,7 @@ public class MovimientoFicha : MonoBehaviour
     
     public SistemaEnergia ObtenerEnergia() => sistemaEnergia;
     public InventarioCartas ObtenerInventario() => inventarioCartas;
+    public InventarioCartas ObtenerInventarioCartas() => inventarioCartas;
     public EstadosJugador ObtenerEstados() => estadosJugador;
     
     public void ElegirFicha(bool esB)
@@ -92,6 +93,13 @@ public class MovimientoFicha : MonoBehaviour
     }
 
     public List<Transform> ruta => GameObject.FindGameObjectWithTag("GameManager")?.GetComponent<GameManager>()?.casillas;
+    
+    public List<Transform> ObtenerCasillas() 
+    {
+        if (gameManager == null)
+            gameManager = FindAnyObjectByType<GameManager>();
+        return gameManager?.casillas;
+    }
     
     // ────────────────────────────────────────
     // MOVIMIENTO
@@ -252,8 +260,6 @@ public class MovimientoFicha : MonoBehaviour
         return gameManager.casillas[indice].position + Vector3.up * 0.5f;
     }
 
-    public void SetDobleTiroPendiente(bool valor)
-    {
-        dobleTiroPendiente = valor;
-    }
+    public bool GetDobleTiroPendiente() => dobleTiroPendiente;
+    public void SetDobleTiroPendiente(bool valor) => dobleTiroPendiente = valor;
 }
