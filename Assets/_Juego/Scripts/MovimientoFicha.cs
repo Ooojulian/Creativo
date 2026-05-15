@@ -142,6 +142,8 @@ public class MovimientoFicha : MonoBehaviour
 
         if (camaraDirectora != null) camaraDirectora.VolverAlTablero();
 
+        bool llegóAMeta = indiceActual >= ruta.casillas.Count - 1;
+
         // Detectar colisión con ficha enemiga → batalla PPS
         if (Photon.Pun.PhotonNetwork.IsMasterClient && BatallaPPS.Instance != null && gm != null)
         {
@@ -155,8 +157,6 @@ public class MovimientoFicha : MonoBehaviour
             }
         }
 
-        bool llegóAMeta = indiceActual >= ruta.casillas.Count - 1;
-
         // En red: solo host decide avance de turno y meta. Otros clientes solo animaron.
         bool soyAutoridad = GameSync.Instance == null || Photon.Pun.PhotonNetwork.IsMasterClient;
         if (!soyAutoridad)
@@ -165,34 +165,19 @@ public class MovimientoFicha : MonoBehaviour
             yield break;
         }
 
-        if (gm != null)
+        // Si hay una carta, el turno avanza DESPUÉS de cerrarla.
+        // Si no se reveló carta (ej: no hay CartaEnCasilla), avanzamos aquí.
+        if (!reveloCarta)
         {
-            if (llegóAMeta)
-            {
-                _animador?.SetVictoria();
-                gm.LlegarAMeta(this);
-            }
-            else
-            {
-                if (dobleTiroPendiente)
-                {
-                    dobleTiroPendiente = false;
-
-                    if (gm.dado != null)
-                        gm.dado.gameObject.SetActive(true);
-
-                    Debug.Log($"[Cartas] {name} repite turno por DobleTiro.");
-                }
-                else
-                {
-                    gm.SiguienteTurno();
-                }
-            }
+            ContinuarTurno(llegóAMeta);
         }
     }
 
+    private bool reveloCarta = false;
+
     IEnumerator RevelarYAñadirCarta()
     {
+        reveloCarta = false;
         if (ruta == null || ruta.casillas == null || ruta.casillas.Count == 0) yield break;
         if (indiceActual <= 0 || indiceActual >= ruta.casillas.Count) yield break;
 
@@ -202,6 +187,7 @@ public class MovimientoFicha : MonoBehaviour
         CartaEnCasilla comp = casilla.GetComponent<CartaEnCasilla>();
         if (comp == null)
         {
+            Debug.LogError($"[Atención] La casilla '{casilla.name}' NO TIENE el script 'CartaEnCasilla'. Por eso no te da ninguna carta. Revisa la advertencia de 'Missing Script' en el inspector de esta casilla.");
             if (gm != null && gm.uiCartas != null) gm.uiCartas.Limpiar();
             yield break;
         }
@@ -210,9 +196,12 @@ public class MovimientoFicha : MonoBehaviour
 
         if (card == null)
         {
+            Debug.LogWarning($"[Cartas] No se obtuvo ninguna carta en la casilla {indiceActual}. El pool puede estar vacío.");
             if (gm != null && gm.uiCartas != null) gm.uiCartas.Limpiar();
             yield break;
         }
+
+        Debug.Log($"[Cartas] Se reveló la carta {card.cardName}. Evaluando esMia...");
 
         // 1) Mostrar revelación SOLO SI ES MI FICHA (privado para el jugador local)
         bool esMia = true;
@@ -232,6 +221,8 @@ public class MovimientoFicha : MonoBehaviour
             esMia = (myIndex == fichaIndex);
         }
 
+        reveloCarta = true;
+
         if (esMia && gm != null && gm.uiCartas != null)
             gm.uiCartas.MostrarRevelacion(card);
 
@@ -239,20 +230,63 @@ public class MovimientoFicha : MonoBehaviour
         if (esMia)
             yield return new WaitForSeconds(tiempoRevelacion);
 
-        // 2) Añadir a mano
+        // 2) Añadir a la mano (si deciden usarla o guardarla, se removerá)
         if (inventario != null)
         {
-            inventario.AddToHand(card);
+            bool added = inventario.AddToHand(card);
+            Debug.Log($"[Cartas] Añadido a la mano: {added}. Total en mano: {inventario.hand.Count}");
             if (CardTriggerSystem.Instance != null)
                 CardTriggerSystem.Instance.CheckCardDrawn(this, card);
         }
 
-        // 3) Fade out de la revelación (solo jugador local)
+        // 3) Abrir panel Usar/Guardar SOLO para el jugador local
+        Debug.Log($"[Cartas] esMia = {esMia}, CardPlayUI.Instance = {(CardPlayUI.Instance != null)}");
+        if (esMia && CardPlayUI.Instance != null)
+        {
+            Debug.Log($"[Cartas] Mostrando UI de carta...");
+            CardPlayUI.Instance.Mostrar(card, this);
+            
+            // Esperar a que el jugador cierre el panel o use la carta
+            while (CardPlayUI.Instance.panel.activeSelf)
+            {
+                yield return null;
+            }
+        }
+
+        // 4) Fade out de la revelación DESPUÉS de haber tomado la decisión
         if (esMia && gm != null && gm.uiCartas != null)
             yield return StartCoroutine(gm.uiCartas.FadeOutYLimpiar(tiempoResultado));
 
-        // 4) Abrir panel Usar/Guardar SOLO para el jugador local, después del fade
-        if (esMia && CardPlayUI.Instance != null)
-            CardPlayUI.Instance.Mostrar(card, this);
+        bool llegóAMeta = indiceActual >= ruta.casillas.Count - 1;
+        bool soyAutoridad = GameSync.Instance == null || Photon.Pun.PhotonNetwork.IsMasterClient;
+        if (soyAutoridad)
+        {
+            ContinuarTurno(llegóAMeta);
+        }
+    }
+
+    public void ContinuarTurno(bool llegóAMeta)
+    {
+        if (gm != null)
+        {
+            if (llegóAMeta)
+            {
+                _animador?.SetVictoria();
+                gm.LlegarAMeta(this);
+            }
+            else
+            {
+                if (dobleTiroPendiente)
+                {
+                    dobleTiroPendiente = false;
+                    if (gm.dado != null) gm.dado.gameObject.SetActive(true);
+                    Debug.Log($"[Cartas] {name} repite turno por DobleTiro.");
+                }
+                else
+                {
+                    gm.SiguienteTurno();
+                }
+            }
+        }
     }
 }

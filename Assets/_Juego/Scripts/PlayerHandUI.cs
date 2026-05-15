@@ -14,39 +14,71 @@ public class PlayerHandUI : MonoBehaviour
 
     void Start()
     {
-        // Si no hay red (modo local), asumimos que la mano visible es la del jugador de turno
-        // o por defecto el jugador 0.
-        if (!PhotonNetwork.InRoom)
+        if (GameManager.Instance != null)
         {
-            if (gameManager.todosLosJugadores.Count > 0)
-                _jugadorLocal = gameManager.todosLosJugadores[0];
-            return;
+            GameManager.Instance.OnTurnStarted += OnTurnStarted;
         }
 
-        // Si hay red, buscamos cuál ficha nos corresponde
-        int myActor = PhotonNetwork.LocalPlayer.ActorNumber;
-        int myIndex = -1;
-        for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
+        // Si hay red, buscamos cuál ficha nos corresponde permanentemente
+        if (PhotonNetwork.InRoom)
         {
-            if (PhotonNetwork.PlayerList[i].ActorNumber == myActor)
+            int myActor = PhotonNetwork.LocalPlayer.ActorNumber;
+            int myIndex = -1;
+            for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
             {
-                myIndex = i;
-                break;
+                if (PhotonNetwork.PlayerList[i].ActorNumber == myActor)
+                {
+                    myIndex = i;
+                    break;
+                }
+            }
+
+            if (myIndex >= 0 && myIndex < gameManager.todosLosJugadores.Count)
+            {
+                SetJugadorLocal(gameManager.todosLosJugadores[myIndex]);
             }
         }
+    }
 
-        if (myIndex >= 0 && myIndex < gameManager.todosLosJugadores.Count)
+    private void SetJugadorLocal(MovimientoFicha jugador)
+    {
+        if (_jugadorLocal != null && _jugadorLocal.inventario != null)
         {
-            _jugadorLocal = gameManager.todosLosJugadores[myIndex];
+            _jugadorLocal.inventario.OnInventoryChanged -= ActualizarUI;
+        }
+
+        _jugadorLocal = jugador;
+
+        if (_jugadorLocal != null && _jugadorLocal.inventario != null)
+        {
+            _jugadorLocal.inventario.OnInventoryChanged += ActualizarUI;
+            ActualizarUI();
         }
     }
 
-    void Update()
+    void OnDestroy()
     {
-        // Solo actualizar si ya encontramos el jugador local
-        if (_jugadorLocal != null)
-            ActualizarUI();
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnTurnStarted -= OnTurnStarted;
+        }
+
+        if (_jugadorLocal != null && _jugadorLocal.inventario != null)
+        {
+            _jugadorLocal.inventario.OnInventoryChanged -= ActualizarUI;
+        }
     }
+
+    private void OnTurnStarted(MovimientoFicha jugadorActivo)
+    {
+        // En modo local, la mano visual cambia para coincidir con el jugador activo
+        if (!PhotonNetwork.InRoom)
+        {
+            SetJugadorLocal(jugadorActivo);
+        }
+    }
+
+
 
     public void ActualizarUI()
     {

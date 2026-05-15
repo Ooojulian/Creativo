@@ -147,6 +147,31 @@ public class GameSync : MonoBehaviourPunCallbacks
         ficha.Avanzar(pasos);
     }
 
+    // ─── EFECTOS DE CARTAS (TELETRANSPORTE/INTERCAMBIO) ──────────────────────
+
+    public void SincronizarPosicionFicha(int indiceFicha, int nuevaCasilla)
+    {
+        if (PhotonNetwork.InRoom)
+        {
+            photonView.RPC(nameof(RPC_SincronizarPosicionFicha), RpcTarget.All, indiceFicha, nuevaCasilla);
+        }
+    }
+
+    [PunRPC]
+    private void RPC_SincronizarPosicionFicha(int indiceFicha, int nuevaCasilla)
+    {
+        if (gameManager == null || gameManager.todosLosJugadores == null) return;
+        if (indiceFicha < 0 || indiceFicha >= gameManager.todosLosJugadores.Count) return;
+
+        MovimientoFicha ficha = gameManager.todosLosJugadores[indiceFicha];
+        if (ficha != null && gameManager.ruta != null && gameManager.ruta.casillas.Count > nuevaCasilla)
+        {
+            ficha.indiceActual = nuevaCasilla;
+            ficha.transform.position = gameManager.ruta.casillas[nuevaCasilla].position + Vector3.up * 0.5f;
+            Debug.Log($"[Red] Ficha {ficha.name} teletransportada a casilla {nuevaCasilla}");
+        }
+    }
+
     // ─── FIN DE TURNO ────────────────────────────────────────────────────────
 
     // Llamado por MovimientoFicha al terminar de moverse (solo el host decide siguiente turno)

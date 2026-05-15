@@ -163,7 +163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
-  modo: 3
+  modo: 0
   cartaEspecifica: {fileID: 0}
 --- !u!1 &6830980 stripped
 GameObject:
@@ -1438,7 +1438,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
-  modo: 3
+  modo: 0
   cartaEspecifica: {fileID: 0}
 --- !u!1001 &98621011
 PrefabInstance:
@@ -3991,6 +3991,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 348565418}
+  - component: {fileID: 348565419}
   m_Layer: 0
   m_Name: Tile17
   m_TagString: Untagged
@@ -4013,6 +4014,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &348565419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 348565417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  modo: 3
+  cartaEspecifica: {fileID: 0}
 --- !u!1 &362369747
 GameObject:
   m_ObjectHideFlags: 0
@@ -4022,6 +4037,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 362369748}
+  - component: {fileID: 362369749}
   m_Layer: 0
   m_Name: Tile06
   m_TagString: Untagged
@@ -4044,6 +4060,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &362369749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 362369747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  modo: 2
+  cartaEspecifica: {fileID: 0}
 --- !u!1001 &368735002
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4350,7 +4380,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
-  modo: 3
+  modo: 2
   cartaEspecifica: {fileID: 0}
 --- !u!1 &380311259
 GameObject:
@@ -4545,6 +4575,43 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4028275146152029892, guid: 948097c46b7b63e439261e925a602106, type: 3}
   m_PrefabInstance: {fileID: 1434698012}
   m_PrefabAsset: {fileID: 0}
+--- !u!84 &387716998
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 6
+  m_Width: 128
+  m_Height: 128
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 94
+  m_ColorFormat: 48
+  m_MipMap: 1
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_UseDynamicScaleExplicit: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 0
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1 &390882796
 GameObject:
   m_ObjectHideFlags: 0
@@ -5413,7 +5480,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
-  modo: 2
+  modo: 3
   cartaEspecifica: {fileID: 0}
 --- !u!1001 &458643387
 PrefabInstance:
@@ -5670,7 +5737,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
-  modo: 3
+  modo: 1
   cartaEspecifica: {fileID: 0}
 --- !u!1 &500446191
 GameObject:
@@ -6301,7 +6368,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
-  modo: 2
+  modo: 0
   cartaEspecifica: {fileID: 0}
 --- !u!1001 &551830369
 PrefabInstance:
@@ -6416,7 +6483,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
-  modo: 3
+  modo: 2
   cartaEspecifica: {fileID: 0}
 --- !u!1 &573067274
 GameObject:
@@ -6462,7 +6529,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
-  modo: 3
+  modo: 2
   cartaEspecifica: {fileID: 0}
 --- !u!1 &578562728
 GameObject:
@@ -6713,6 +6780,43 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 29b2975f358c02e47a2dad282074719a, type: 3}
   m_PrefabInstance: {fileID: 551830369}
   m_PrefabAsset: {fileID: 0}
+--- !u!84 &622302621
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 6
+  m_Width: 128
+  m_Height: 128
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 94
+  m_ColorFormat: 48
+  m_MipMap: 1
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_UseDynamicScaleExplicit: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 0
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1 &630704984
 GameObject:
   m_ObjectHideFlags: 0
@@ -9298,6 +9402,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 857076987}
+  - component: {fileID: 857076988}
   m_Layer: 0
   m_Name: Tile29
   m_TagString: Untagged
@@ -9320,6 +9425,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &857076988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 857076986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  modo: 2
+  cartaEspecifica: {fileID: 0}
 --- !u!1001 &868535440
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10417,43 +10536,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 954098596}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
---- !u!84 &961886789
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 128
-  m_Height: 128
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 94
-  m_ColorFormat: 48
-  m_MipMap: 1
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 0
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
 --- !u!1 &974623304
 GameObject:
   m_ObjectHideFlags: 0
@@ -11606,6 +11688,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1032644902}
+  - component: {fileID: 1032644903}
   m_Layer: 0
   m_Name: Tile08
   m_TagString: Untagged
@@ -11628,6 +11711,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1032644903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1032644901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  modo: 3
+  cartaEspecifica: {fileID: 0}
 --- !u!1001 &1033970008
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12006,6 +12103,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1083124130}
+  - component: {fileID: 1083124131}
   m_Layer: 0
   m_Name: Tile26
   m_TagString: Untagged
@@ -12028,6 +12126,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1083124131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1083124129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  modo: 2
+  cartaEspecifica: {fileID: 0}
 --- !u!1001 &1087525603
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12653,7 +12765,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
-  modo: 3
+  modo: 1
   cartaEspecifica: {fileID: 0}
 --- !u!1 &1170638330
 GameObject:
@@ -13719,7 +13831,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
-  modo: 3
+  modo: 0
   cartaEspecifica: {fileID: 0}
 --- !u!1001 &1275073734
 PrefabInstance:
@@ -15980,6 +16092,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1464204846}
+  - component: {fileID: 1464204847}
   m_Layer: 0
   m_Name: Tile14
   m_TagString: Untagged
@@ -16002,6 +16115,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1464204847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1464204845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  modo: 3
+  cartaEspecifica: {fileID: 0}
 --- !u!1001 &1474673694
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17896,6 +18023,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1719399331}
+  - component: {fileID: 1719399332}
   m_Layer: 0
   m_Name: Tile20
   m_TagString: Untagged
@@ -17918,6 +18046,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1719399332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1719399330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  modo: 2
+  cartaEspecifica: {fileID: 0}
 --- !u!1 &1723224475
 GameObject:
   m_ObjectHideFlags: 0
@@ -18815,6 +18957,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1800774371}
+  - component: {fileID: 1800774372}
   m_Layer: 0
   m_Name: Tile32
   m_TagString: Untagged
@@ -18837,6 +18980,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1800774372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800774370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  modo: 2
+  cartaEspecifica: {fileID: 0}
 --- !u!1 &1807363919
 GameObject:
   m_ObjectHideFlags: 0
@@ -20035,6 +20192,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1948328112}
+  - component: {fileID: 1948328113}
   m_Layer: 0
   m_Name: Tile23
   m_TagString: Untagged
@@ -20057,6 +20215,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 66313765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1948328113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1948328111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
+  modo: 2
+  cartaEspecifica: {fileID: 0}
 --- !u!1001 &1949058304
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20593,7 +20765,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
-  modo: 2
+  modo: 1
   cartaEspecifica: {fileID: 0}
 --- !u!1001 &1976007327
 PrefabInstance:
@@ -20922,7 +21094,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86c5721b0ab0195469a0577c3e897476, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
-  modo: 2
+  modo: 3
   cartaEspecifica: {fileID: 0}
 --- !u!1 &2004548735
 GameObject:
@@ -21480,43 +21652,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 756eac202e96e354baa790e605a11eb3, type: 3}
---- !u!84 &2082378531
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 128
-  m_Height: 128
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 94
-  m_ColorFormat: 48
-  m_MipMap: 1
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 0
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
 --- !u!1 &2083967942
 GameObject:
   m_ObjectHideFlags: 0

@@ -48,7 +48,7 @@ public class CardManager : MonoBehaviour
                 if (energia != null) energia.GanarEnergia(card.valor1 > 0 ? card.valor1 : 2);
                 break;
             case CardType.RoboArcano:
-                usuario.GetComponent<PlayerInventory>().AddToHand(ObtenerCartaAleatoria());
+                EspiarYRobar(usuario);
                 break;
             case CardType.VisionDelSabio:
                 var invVision = usuario.GetComponent<PlayerInventory>();
@@ -100,6 +100,8 @@ public class CardManager : MonoBehaviour
                 if (energia != null) energia.GanarEnergia(1);
                 break;
             case CardType.RoboArcano:
+                EspiarYRobar(usuario);
+                break;
             case CardType.VisionDelSabio:
                 var inv = usuario.GetComponent<PlayerInventory>();
                 inv.AddToHand(ObtenerCartaVentaja());
@@ -142,6 +144,12 @@ public class CardManager : MonoBehaviour
         }
         rival.indiceActual = Mathf.Max(0, rival.indiceActual - pasos);
         rival.transform.position = rival.ruta.casillas[rival.indiceActual].position + Vector3.up * 0.5f;
+
+        if (GameSync.Instance != null && gameManager != null)
+        {
+            int idxRival = gameManager.todosLosJugadores.IndexOf(rival);
+            GameSync.Instance.SincronizarPosicionFicha(idxRival, rival.indiceActual);
+        }
     }
 
     private void IntercambiarConCualquiera(MovimientoFicha usuario)
@@ -181,9 +189,28 @@ public class CardManager : MonoBehaviour
             return;
         }
         var inv = rival.GetComponent<PlayerInventory>();
+        int totalCartas = inv.hand.Count + inv.reserve.Count;
+
+        if (totalCartas == 0)
+        {
+            Debug.Log($"[Cartas] El rival {rival.name} no tiene cartas en mano ni en reserva. ¡Ruptura no hizo nada!");
+            return;
+        }
+        
         for (int i = 0; i < cantidad; i++)
         {
-            if (inv.hand.Count > 0) inv.hand.RemoveAt(Random.Range(0, inv.hand.Count));
+            if (inv.hand.Count > 0)
+            {
+                CardSO cartaRota = inv.hand[Random.Range(0, inv.hand.Count)];
+                inv.hand.Remove(cartaRota);
+                Debug.Log($"[Cartas] {rival.name} descartó {cartaRota.cardName} de su mano.");
+            }
+            else if (inv.reserve.Count > 0)
+            {
+                CardSO cartaRota = inv.reserve[Random.Range(0, inv.reserve.Count)];
+                inv.reserve.Remove(cartaRota);
+                Debug.Log($"[Cartas] {rival.name} descartó {cartaRota.cardName} de su reserva.");
+            }
         }
     }
 
@@ -195,14 +222,38 @@ public class CardManager : MonoBehaviour
 
     private void TomarCartaDeRival(MovimientoFicha usuario, MovimientoFicha rival)
     {
+        if (rival.escudoActivo)
+        {
+            Debug.Log($"[Escudo] {rival.name} bloqueó el robo de carta.");
+            rival.escudoActivo = false;
+            return;
+        }
+
         var invRival = rival.GetComponent<PlayerInventory>();
         var invUsuario = usuario.GetComponent<PlayerInventory>();
+        
+        int totalCartas = invRival.hand.Count + invRival.reserve.Count;
+        if (totalCartas == 0)
+        {
+            Debug.Log($"[Cartas] El rival {rival.name} no tiene cartas. No se pudo robar nada.");
+            return;
+        }
+
         if (invRival.hand.Count > 0)
         {
             int idx = Random.Range(0, invRival.hand.Count);
             CardSO card = invRival.hand[idx];
-            invRival.hand.RemoveAt(idx);
+            invRival.RemoveFromHand(card);
             invUsuario.AddToHand(card);
+            Debug.Log($"[Cartas] {usuario.name} le robó {card.cardName} de la mano a {rival.name}.");
+        }
+        else if (invRival.reserve.Count > 0)
+        {
+            int idx = Random.Range(0, invRival.reserve.Count);
+            CardSO card = invRival.reserve[idx];
+            invRival.RemoveFromReserve(card);
+            invUsuario.AddToHand(card);
+            Debug.Log($"[Cartas] {usuario.name} le robó {card.cardName} de la reserva a {rival.name}.");
         }
     }
 

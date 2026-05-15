@@ -303,6 +303,14 @@ public class GameManager : MonoBehaviour
         {
             jugador.transform.position = ruta.casillas[jugador.indiceActual].position + Vector3.up * 0.5f;
             otro.transform.position = ruta.casillas[otro.indiceActual].position + Vector3.up * 0.5f;
+
+            if (GameSync.Instance != null)
+            {
+                int idxJugador = todosLosJugadores.IndexOf(jugador);
+                int idxOtro = todosLosJugadores.IndexOf(otro);
+                GameSync.Instance.SincronizarPosicionFicha(idxJugador, jugador.indiceActual);
+                GameSync.Instance.SincronizarPosicionFicha(idxOtro, otro.indiceActual);
+            }
         }
 
         Debug.Log($"[Cartas] Intercambio: {jugador.name} <-> {otro.name}");

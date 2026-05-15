@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class PlayerInventory : MonoBehaviour
 {
@@ -10,11 +11,16 @@ public class PlayerInventory : MonoBehaviour
     public int maxReserveSize = 5;
     public int maxHandSize = 10; // Opcional
 
+    public event Action OnInventoryChanged;
+
     public bool AddToHand(CardSO card)
     {
+        if (card == null) return false;
+        
         if (hand.Count < maxHandSize)
         {
             hand.Add(card);
+            OnInventoryChanged?.Invoke();
             return true;
         }
         return false;
@@ -27,6 +33,7 @@ public class PlayerInventory : MonoBehaviour
             hand.Remove(card);
             reserve.Add(card);
             Debug.Log($"Carta {card.cardName} guardada en reserva.");
+            OnInventoryChanged?.Invoke();
             return true;
         }
         else
@@ -38,11 +45,17 @@ public class PlayerInventory : MonoBehaviour
 
     public void RemoveFromHand(CardSO card)
     {
-        hand.Remove(card);
+        if (hand.Remove(card))
+        {
+            OnInventoryChanged?.Invoke();
+        }
     }
 
     public void RemoveFromReserve(CardSO card)
     {
-        reserve.Remove(card);
+        if (reserve.Remove(card))
+        {
+            OnInventoryChanged?.Invoke();
+        }
     }
 }
