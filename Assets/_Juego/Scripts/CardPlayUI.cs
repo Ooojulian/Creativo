@@ -28,14 +28,24 @@ public class CardPlayUI : MonoBehaviour
         var energia = jugador.GetComponent<EnergiaController>();
         int energiaActual = energia != null ? energia.EnergiaActual : 0;
         
-        textoCarta.text = $"¿Qué deseas hacer con {card.cardName}?\n" +
-                          $"<size=80%>Costo: {card.costoEnergia} Energía (Tienes: {energiaActual})</size>";
-        
-        // Deshabilitar usar si no hay energía
-        botonUsar.interactable = energia != null && energia.TieneEnergia(card.costoEnergia);
-        
-        // Deshabilitar guardar si reserva llena
-        botonGuardar.interactable = jugador.inventario.reserve.Count < jugador.inventario.maxReserveSize;
+        // Deshabilitar todo si está silenciado
+        if (jugador.silencioActivo)
+        {
+            textoCarta.text = $"<color=red>¡ESTÁS SILENCIADO!</color>\nNo puedes usar cartas este turno.";
+            botonUsar.interactable = false;
+            botonGuardar.interactable = false;
+        }
+        else
+        {
+            textoCarta.text = $"¿Qué deseas hacer con {card.cardName}?\n" +
+                              $"<size=80%>Costo: {card.costoEnergia} Energía (Tienes: {energiaActual})</size>";
+            
+            // Deshabilitar usar si no hay energía
+            botonUsar.interactable = energia != null && energia.TieneEnergia(card.costoEnergia);
+            
+            // Deshabilitar guardar si reserva llena
+            botonGuardar.interactable = jugador.inventario.reserve.Count < jugador.inventario.maxReserveSize;
+        }
 
         panel.SetActive(true);
     }

@@ -183,6 +183,10 @@ public class GameManager : MonoBehaviour
         if (CardTriggerSystem.Instance != null)
             CardTriggerSystem.Instance.CheckTurnStart(j);
 
+        // RESET: Silencio (se limpia al empezar el turno para que no afecte este turno)
+        j.silencioActivo = false;
+        if (j.fichaB != null) j.fichaB.GetComponent<MovimientoFicha>().silencioActivo = false; // Por si acaso se hereda al script base
+
         // CARTA: PierdeTurno (saltar turno)
         if (j.pierdeSiguienteTurno)
         {

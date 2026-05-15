@@ -12,6 +12,8 @@ public class MovimientoFicha : MonoBehaviour
     public bool escudoActivo = false;
     public bool pierdeSiguienteTurno = false;
     public bool dobleTiroPendiente = false;
+    public bool silencioActivo = false;
+    public bool maldicionActiva = false;
 
     [Header("Cartas - UI timing")]
     public float tiempoRevelacion = 2f; // tiempo mostrando la carta antes de aplicar
@@ -212,8 +214,12 @@ public class MovimientoFicha : MonoBehaviour
             yield break;
         }
 
-        // 1) Mostrar revelación
-        if (gm != null && gm.uiCartas != null)
+        // 1) Mostrar revelación SOLO SI ES MI FICHA (Privado para el jugador local)
+        bool esMia = true;
+        var pv = GetComponent<Photon.Pun.PhotonView>();
+        if (pv != null) esMia = pv.IsMine;
+
+        if (esMia && gm != null && gm.uiCartas != null)
             gm.uiCartas.MostrarRevelacion(card);
 
         yield return new WaitForSeconds(tiempoRevelacion);

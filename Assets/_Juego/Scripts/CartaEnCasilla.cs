@@ -1,42 +1,38 @@
 using UnityEngine;
 
-public enum TipoCartaAleatoria { Cualquiera, Ventaja, Desventaja }
+public enum ModoCasilla { Ninguna, AleatoriaCualquiera, SoloVentaja, SoloDesventaja, CartaFija }
 
 public class CartaEnCasilla : MonoBehaviour
 {
-    [Header("Modo de carta")]
-    public bool aleatoria = true;
-    public TipoCartaAleatoria tipoAleatoria = TipoCartaAleatoria.Cualquiera;
+    [Header("Configuración de la Casilla")]
+    public ModoCasilla modo = ModoCasilla.AleatoriaCualquiera;
 
-    [Tooltip("Si aleatoria=false, se usa esta carta fija")]
-    public CardSO cartaFija;
-
-    [Header("Pool de cartas (si es Cualquiera)")]
-    public CardSO[] poolDeCartas;
+    [Tooltip("Solo se usa si el modo es CartaFija")]
+    public CardSO cartaEspecifica;
 
     public CardSO ObtenerCarta()
     {
-        if (!aleatoria) return cartaFija;
+        if (CardManager.Instance == null) return null;
 
-        if (tipoAleatoria == TipoCartaAleatoria.Ventaja && CardManager.Instance != null)
+        switch (modo)
         {
-            return CardManager.Instance.ObtenerCartaVentaja();
-        }
-        else if (tipoAleatoria == TipoCartaAleatoria.Desventaja && CardManager.Instance != null)
-        {
-            return CardManager.Instance.ObtenerCartaDesventaja();
-        }
+            case ModoCasilla.Ninguna:
+                return null;
 
-        if (poolDeCartas != null && poolDeCartas.Length > 0)
-        {
-            return poolDeCartas[Random.Range(0, poolDeCartas.Length)];
-        }
+            case ModoCasilla.AleatoriaCualquiera:
+                return CardManager.Instance.ObtenerCartaAleatoria();
 
-        if (CardManager.Instance != null)
-        {
-            return CardManager.Instance.ObtenerCartaAleatoria();
-        }
+            case ModoCasilla.SoloVentaja:
+                return CardManager.Instance.ObtenerCartaVentaja();
 
-        return null;
+            case ModoCasilla.SoloDesventaja:
+                return CardManager.Instance.ObtenerCartaDesventaja();
+
+            case ModoCasilla.CartaFija:
+                return cartaEspecifica;
+
+            default:
+                return null;
+        }
     }
 }

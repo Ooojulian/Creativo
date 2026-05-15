@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b74015686fa667744b24b547dfc84c41, type: 3}
+  m_Name: Ruptura Mental
+  m_EditorClassIdentifier: Assembly-CSharp::CardSO
+  type: 8
+  cardName: "Ruptura Mental\t"
+  immediateEffectDescription: "\"El rival pierde la concentraci\xF3n y descarta 2
+    cartas de su mano.\"\r\n"
+  savedConditionDescription: 
+  savedEffectDescription: 
+  artwork: {fileID: 21300000, guid: cea43a1c27bcf9f4f91568a588914973, type: 3}
+  costoEnergia: 1
+  valor1: 2

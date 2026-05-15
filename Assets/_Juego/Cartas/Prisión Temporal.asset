@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b74015686fa667744b24b547dfc84c41, type: 3}
+  m_Name: "Prisi\xF3n Temporal"
+  m_EditorClassIdentifier: Assembly-CSharp::CardSO
+  type: 3
+  cardName: "Prisi\xF3n Temporal\t"
+  immediateEffectDescription: "\"Congela al rival en el tiempo; pierde su pr\xF3ximo
+    turno.\"\r\n"
+  savedConditionDescription: 
+  savedEffectDescription: 
+  artwork: {fileID: 0}
+  costoEnergia: 2
+  valor1: 0

@@ -36,22 +36,34 @@ public class CardManager : MonoBehaviour
                 if (rival != null) rival.pierdeSiguienteTurno = true;
                 break;
             case CardType.Escudo:
+                usuario.escudoActivo = true;
+                break;
             case CardType.AuraMagica:
                 usuario.escudoActivo = true;
+                var energiaAura = usuario.GetComponent<EnergiaController>();
+                if (energiaAura != null) energiaAura.GanarEnergia(card.valor1 > 0 ? card.valor1 : 1);
                 break;
             case CardType.Recuperacion:
                 var energia = usuario.GetComponent<EnergiaController>();
                 if (energia != null) energia.GanarEnergia(card.valor1 > 0 ? card.valor1 : 2);
                 break;
-            case CardType.Fatiga:
+            case CardType.RoboArcano:
+                usuario.GetComponent<PlayerInventory>().AddToHand(ObtenerCartaAleatoria());
+                break;
+            case CardType.VisionDelSabio:
+                var invVision = usuario.GetComponent<PlayerInventory>();
+                for(int i=0; i < (card.valor1 > 0 ? card.valor1 : 2); i++)
+                    invVision.AddToHand(ObtenerCartaVentaja());
+                break;
+            case CardType.Maldicion:
                 if (rival != null)
                 {
                     var energiaRival = rival.GetComponent<EnergiaController>();
-                    if (energiaRival != null) energiaRival.GastarEnergia(card.valor1 != 0 ? Mathf.Abs(card.valor1) : 1);
+                    if (energiaRival != null) energiaRival.GastarEnergia(energiaRival.EnergiaActual);
                 }
                 break;
-            case CardType.RoboArcano:
-                usuario.GetComponent<PlayerInventory>().AddToHand(ObtenerCartaAleatoria());
+            case CardType.Silencio:
+                if (rival != null) rival.silencioActivo = true;
                 break;
             case CardType.Ruptura:
                 if (rival != null) RivalDescartaEspecifico(rival, card.valor1 > 0 ? card.valor1 : 2);
@@ -87,16 +99,20 @@ public class CardManager : MonoBehaviour
                 var energia = usuario.GetComponent<EnergiaController>();
                 if (energia != null) energia.GanarEnergia(1);
                 break;
-            case CardType.Fatiga:
+            case CardType.RoboArcano:
+            case CardType.VisionDelSabio:
+                var inv = usuario.GetComponent<PlayerInventory>();
+                inv.AddToHand(ObtenerCartaVentaja());
+                break;
+            case CardType.Maldicion:
                 if (rivalInvolucrado != null)
                 {
                     var eR = rivalInvolucrado.GetComponent<EnergiaController>();
-                    if (eR != null) eR.GastarEnergia(1);
+                    if (eR != null) eR.GastarEnergia(eR.EnergiaActual);
                 }
                 break;
-            case CardType.RoboArcano:
-                var inv = usuario.GetComponent<PlayerInventory>();
-                inv.AddToHand(ObtenerCartaAleatoria());
+            case CardType.Silencio:
+                if (rivalInvolucrado != null) rivalInvolucrado.silencioActivo = true;
                 break;
             case CardType.Ruptura:
                 if (rivalInvolucrado != null) RivalDescartaEspecifico(rivalInvolucrado, 1);
