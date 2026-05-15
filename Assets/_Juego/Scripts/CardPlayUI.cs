@@ -11,7 +11,7 @@ public class CardPlayUI : MonoBehaviour
     public Button botonUsar;
     public Button botonGuardar;
 
-    private CardSO cartaSeleccionada;
+    private CartaDefinicion cartaSeleccionada;
     private MovimientoFicha jugadorActual;
 
     void Awake()
@@ -20,29 +20,31 @@ public class CardPlayUI : MonoBehaviour
         panel.SetActive(false);
     }
 
-    public void Mostrar(CardSO card, MovimientoFicha jugador)
+    public void Mostrar(CartaDefinicion carta, MovimientoFicha jugador)
     {
-        cartaSeleccionada = card;
+        cartaSeleccionada = carta;
         jugadorActual = jugador;
-        textoCarta.text = $"¿Qué deseas hacer con {card.cardName}?";
+        textoCarta.text = $"¿Qué deseas hacer con {carta.nombreCarta}?";
         
-        // Deshabilitar guardar si reserva llena
-        botonGuardar.interactable = jugador.inventario.reserve.Count < jugador.inventario.maxReserveSize;
-
         panel.SetActive(true);
     }
 
     public void OnClickUsar()
     {
+        if (jugadorActual == null) return;
+        
         panel.SetActive(false);
-        jugadorActual.inventario.RemoveFromHand(cartaSeleccionada);
-        CardManager.Instance.EjecutarEfectoInmediato(cartaSeleccionada, jugadorActual);
+        var inventario = jugadorActual.ObtenerInventarioCartas();
+        if (inventario != null)
+        {
+            inventario.UsarCarta(cartaSeleccionada);
+        }
     }
 
     public void OnClickGuardar()
     {
         panel.SetActive(false);
-        jugadorActual.inventario.SaveToReserve(cartaSeleccionada);
+        // TODO: Implementar sistema de reserva si lo necesitas
     }
 
     public void OnClickCerrar()

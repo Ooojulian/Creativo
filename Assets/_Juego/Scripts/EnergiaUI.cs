@@ -11,10 +11,23 @@ public class EnergiaUI : MonoBehaviour
 
     void Start()
     {
-        if (textoEnergia != null) textoEnergia.gameObject.SetActive(false);
+        if (textoEnergia != null) 
+        {
+            textoEnergia.gameObject.SetActive(false);
+            Debug.Log("[EnergíaUI] Texto inicializado y oculto.");
+        }
 
         if (GameManager.Instance != null)
+        {
             GameManager.Instance.OnTurnStarted += ActualizarSuscripcion;
+            
+            // Si el juego ya inició (por ejemplo, al recargar escena o script), forzar actualización
+            if (GameManager.Instance.JugadorActual != null)
+            {
+                Debug.Log($"[EnergíaUI] Detectado jugador actual {GameManager.Instance.JugadorActual.name} al inicio.");
+                ActualizarSuscripcion(GameManager.Instance.JugadorActual);
+            }
+        }
     }
 
     private void OnDestroy()
@@ -28,6 +41,8 @@ public class EnergiaUI : MonoBehaviour
 
     private void ActualizarSuscripcion(MovimientoFicha jugador)
     {
+        if (jugador == null) return;
+
         // Desvincular anterior
         if (currentController != null)
             currentController.OnEnergiaCambiada.RemoveListener(RefrescarTexto);
@@ -37,11 +52,16 @@ public class EnergiaUI : MonoBehaviour
         if (currentController != null)
         {
             currentController.OnEnergiaCambiada.AddListener(RefrescarTexto);
-            if (textoEnergia != null) textoEnergia.gameObject.SetActive(true);
-            RefrescarTexto(currentController.EnergiaActual);
+            if (textoEnergia != null) 
+            {
+                textoEnergia.gameObject.SetActive(true);
+                RefrescarTexto(currentController.EnergiaActual);
+                Debug.Log($"[EnergíaUI] Mostrando energía para {jugador.name}: {currentController.EnergiaActual}");
+            }
         }
         else
         {
+            Debug.LogWarning($"[EnergíaUI] {jugador.name} no tiene EnergiaController.");
             if (textoEnergia != null) textoEnergia.gameObject.SetActive(false);
         }
     }

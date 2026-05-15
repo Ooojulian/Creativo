@@ -1,75 +1,137 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System;
 
+/// <summary>
+/// Maneja el MOVIMIENTO de fichas. Integrado con cartas, animaciones, Photon y batallas.
+/// </summary>
 public class MovimientoFicha : MonoBehaviour
 {
-    public GestorDeRuta ruta;
-    public int indiceActual = 0;
-    public float velocidad = 150f;
-    public GameManager gm;
-
-    [Header("Estado de cartas")]
-    public bool escudoActivo = false;
-    public bool pierdeSiguienteTurno = false;
-    public bool dobleTiroPendiente = false;
-
-    [Header("Cartas - UI timing")]
-    public float tiempoRevelacion = 2f; // tiempo mostrando la carta antes de aplicar
-    public float tiempoResultado = 1f;  // tiempo mostrando el efecto antes del fade out
-
-    private bool enMovimiento = false;
-    private CamaraDirectora camaraDirectora;
+    [Header("Referencias")]
+    private GameManager gameManager;
+    [SerializeField] private float velocidad = 150f;
+    
+    // Índice actual en la ruta
+    [HideInInspector] public int indiceActual = 0;
+    public FichaInversa fichaB; // Referencia a la ficha inversa
+    public bool moverFichaB = false; // true = mover FichaB, false = mover FichaA (esta)
+    
+    private SistemaEnergia sistemaEnergia;
+    private InventarioCartas inventarioCartas;
+    private EstadosJugador estadosJugador;
+    
+    // Animaciones y UI
     private PersonajeAnimador _animador;
-
-    [Header("Nuevo Sistema de Cartas")]
     public PlayerInventory inventario;
     public int cartasAlEmpezarTurno = 0;
-
-    [Header("Segunda Ficha")]
-    public FichaInversa fichaB;
-    public bool moverFichaB = false; // true = mover FichaB, false = mover FichaA (esta)
+    
+    // Control de movimiento
+    private bool enMovimiento = false;
+    private CamaraDirectora camaraDirectora;
+    private GameManager gm;
+    public bool dobleTiroPendiente = false;
+    
+    // Eventos
+    public event Action<int> OnMovimientoCompletado; // (índiceActual)
 
     void Awake()
     {
-        camaraDirectora = FindAnyObjectByType<CamaraDirectora>();
-        if (inventario == null) inventario = GetComponent<PlayerInventory>();
+        // Crear/obtener componentes del jugador
+        if (sistemaEnergia == null)
+            sistemaEnergia = GetComponent<SistemaEnergia>() ?? gameObject.AddComponent<SistemaEnergia>();
+            
+        if (inventarioCartas == null)
+            inventarioCartas = GetComponent<InventarioCartas>() ?? gameObject.AddComponent<InventarioCartas>();
+            
+        if (estadosJugador == null)
+            estadosJugador = GetComponent<EstadosJugador>() ?? gameObject.AddComponent<EstadosJugador>();
+        
+        if (inventario == null) 
+            inventario = GetComponent<PlayerInventory>();
+            
         _animador = GetComponentInChildren<PersonajeAnimador>();
+        camaraDirectora = FindAnyObjectByType<CamaraDirectora>();
+        gm = FindAnyObjectByType<GameManager>();
+    }
+    
+    void Start()
+    {
+        if (gameManager == null)
+            gameManager = FindAnyObjectByType<GameManager>();
+        if (gm == null)
+            gm = gameManager;
+    }
+    
+    // ────────────────────────────────────────
+    // ACCESO A COMPONENTES
+    // ────────────────────────────────────────
+    
+    public SistemaEnergia ObtenerEnergia() => sistemaEnergia;
+    public InventarioCartas ObtenerInventario() => inventarioCartas;
+    public InventarioCartas ObtenerInventarioCartas() => inventarioCartas;
+    public EstadosJugador ObtenerEstados() => estadosJugador;
+    
+    public void ElegirFicha(bool esB)
+    {
+        if (esB && fichaB != null)
+        {
+            Debug.Log($"[MovimientoFicha] Elegida Ficha B");
+            moverFichaB = true;
+        }
+        else
+        {
+            Debug.Log($"[MovimientoFicha] Elegida Ficha A");
+            moverFichaB = false;
+        }
+    }
+    
+    public void MoverFichaBPasos(int pasos)
+    {
+        if (fichaB != null)
+            fichaB.Avanzar(pasos);
     }
 
+    public List<Transform> ruta => GameObject.FindGameObjectWithTag("GameManager")?.GetComponent<GameManager>()?.casillas;
+    
+    public List<Transform> ObtenerCasillas() 
+    {
+        if (gameManager == null)
+            gameManager = FindAnyObjectByType<GameManager>();
+        return gameManager?.casillas;
+    }
+    
+    // ────────────────────────────────────────
+    // MOVIMIENTO
+    // ────────────────────────────────────────
+    
     public void Avanzar(int cantidadPasos)
     {
         if (enMovimiento) return;
-
-        // Si eligió mover la ficha B, delegar
-        if (moverFichaB && fichaB != null)
+        
+        if (gameManager == null)
+            gameManager = FindAnyObjectByType<GameManager>();
+        
+        if (gameManager == null || gameManager.casillas == null || gameManager.casillas.Count == 0)
         {
-            fichaB.Avanzar(cantidadPasos);
+            Debug.LogError("[MovimientoFicha] GameManager o casillas no están disponibles");
+            OnMovimientoCompletado?.Invoke(indiceActual);
             return;
         }
-
-        int casillasRestantes = ruta.casillas.Count - 1 - indiceActual;
-
-        if (CardTriggerSystem.Instance != null)
-            CardTriggerSystem.Instance.CheckNearGoal(this);
+        
+        // Validar que no se pase la meta
+        int casillasRestantes = gameManager.casillas.Count - 1 - indiceActual;
 
         if (cantidadPasos > casillasRestantes)
         {
-            Debug.Log($"[MovimientoFicha] {name}: necesita {casillasRestantes} o menos para avanzar, sacó {cantidadPasos}. Turno perdido.");
-            if (Photon.Pun.PhotonNetwork.IsMasterClient && gm != null) gm.SiguienteTurno();
-            else if (GameSync.Instance == null && gm != null) gm.SiguienteTurno();
+            Debug.Log($"[MovimientoFicha] {name}: no puede avanzar {cantidadPasos}, solo hay {casillasRestantes}");
+            OnMovimientoCompletado?.Invoke(indiceActual);
             return;
         }
-
+        
         StartCoroutine(MoverPorLasCasillas(cantidadPasos));
     }
-
-    // Llamado por la UI antes de tirar el dado
-    public void ElegirFicha(bool usarFichaB)
-    {
-        moverFichaB = usarFichaB;
-        Debug.Log($"[{name}] Ficha elegida: {(usarFichaB ? "B (inversa)" : "A (normal)")}");
-    }
-
+    
     IEnumerator MoverPorLasCasillas(int pasos)
     {
         enMovimiento = true;
@@ -79,10 +141,11 @@ public class MovimientoFicha : MonoBehaviour
         if (gm != null && gm.dado != null)
             gm.dado.gameObject.SetActive(false);
 
-        if (camaraDirectora != null) camaraDirectora.SeguirJugador(transform);
+        if (camaraDirectora != null) 
+            camaraDirectora.SeguirJugador(transform);
 
         // Validar referencias
-        if (ruta == null || ruta.casillas == null || ruta.casillas.Count == 0)
+        if (gameManager == null || gameManager.casillas == null || gameManager.casillas.Count == 0)
         {
             Debug.LogError($"[MovimientoFicha] {name}: ruta no asignada o sin casillas.");
             enMovimiento = false;
@@ -90,47 +153,33 @@ public class MovimientoFicha : MonoBehaviour
             yield break;
         }
 
-        int metaFinal = indiceActual + pasos;
-        if (metaFinal >= ruta.casillas.Count)
-            metaFinal = ruta.casillas.Count - 1;
-
+        int metaFinal = Mathf.Min(indiceActual + pasos, gameManager.casillas.Count - 1);
+        
         while (indiceActual < metaFinal)
         {
-            int indiceAnterior = indiceActual;
             indiceActual++;
-
-            if (ruta.casillas[indiceActual] == null)
+            
+            if (gameManager.casillas[indiceActual] == null)
             {
-                Debug.LogWarning($"[MovimientoFicha] casilla[{indiceActual}] es null, saltando.");
+                Debug.LogWarning($"[MovimientoFicha] casilla[{indiceActual}] es null");
                 continue;
             }
-
-            // CHECK: Overtake (Pisotón)
-            if (CardTriggerSystem.Instance != null)
-            {
-                foreach (var otro in gm.todosLosJugadores)
-                {
-                    if (otro != this && otro.indiceActual == indiceActual)
-                    {
-                        // Si yo paso a alguien que estaba en esta casilla
-                        CardTriggerSystem.Instance.CheckOvertake(otro, this);
-                    }
-                }
-            }
-
-            Vector3 destino = ruta.casillas[indiceActual].position + Vector3.up * 0.5f;
-
+            
+            Vector3 destino = gameManager.casillas[indiceActual].position + Vector3.up * 0.5f;
+            
             while (Vector3.Distance(transform.position, destino) > 0.05f)
             {
                 transform.position = Vector3.MoveTowards(
-                    transform.position, destino, velocidad * Time.deltaTime);
+                    transform.position,
+                    destino,
+                    velocidad * Time.deltaTime);
                 yield return null;
             }
-
+            
             transform.position = destino;
             yield return new WaitForSeconds(0.08f);
         }
-
+        
         enMovimiento = false;
         _animador?.SetMoviendo(false);
         Debug.Log($"[MovimientoFicha] {name} llegó a casilla {indiceActual}");
@@ -138,7 +187,8 @@ public class MovimientoFicha : MonoBehaviour
         // REVELAR -> AÑADIR A MANO
         yield return StartCoroutine(RevelarYAñadirCarta());
 
-        if (camaraDirectora != null) camaraDirectora.VolverAlTablero();
+        if (camaraDirectora != null) 
+            camaraDirectora.VolverAlTablero();
 
         // Detectar colisión con ficha enemiga → batalla PPS
         if (Photon.Pun.PhotonNetwork.IsMasterClient && BatallaPPS.Instance != null && gm != null)
@@ -153,13 +203,13 @@ public class MovimientoFicha : MonoBehaviour
             }
         }
 
-        bool llegóAMeta = indiceActual >= ruta.casillas.Count - 1;
+        bool llegóAMeta = indiceActual >= gameManager.casillas.Count - 1;
 
-        // En red: solo host decide avance de turno y meta. Otros clientes solo animaron.
+        // En red: solo host decide avance de turno y meta
         bool soyAutoridad = GameSync.Instance == null || Photon.Pun.PhotonNetwork.IsMasterClient;
         if (!soyAutoridad)
         {
-            Debug.Log($"[MovimientoFicha] {name} cliente termino animacion. Espera turno de host.");
+            Debug.Log($"[MovimientoFicha] {name} cliente terminó animación. Espera turno de host.");
             yield break;
         }
 
@@ -187,47 +237,29 @@ public class MovimientoFicha : MonoBehaviour
                 }
             }
         }
+
+        // Notificar evento
+        OnMovimientoCompletado?.Invoke(indiceActual);
     }
 
     IEnumerator RevelarYAñadirCarta()
     {
-        if (ruta == null || ruta.casillas == null || ruta.casillas.Count == 0) yield break;
-        if (indiceActual <= 0 || indiceActual >= ruta.casillas.Count) yield break;
-
-        Transform casilla = ruta.casillas[indiceActual];
-        if (casilla == null) yield break;
-
-        CartaEnCasilla comp = casilla.GetComponent<CartaEnCasilla>();
-        if (comp == null)
-        {
-            if (gm != null && gm.uiCartas != null) gm.uiCartas.Limpiar();
-            yield break;
-        }
-
-        CardSO card = comp.ObtenerCarta();
-
-        if (card == null)
-        {
-            if (gm != null && gm.uiCartas != null) gm.uiCartas.Limpiar();
-            yield break;
-        }
-
-        // 1) Mostrar revelación
-        if (gm != null && gm.uiCartas != null)
-            gm.uiCartas.MostrarRevelacion(card);
-
-        yield return new WaitForSeconds(tiempoRevelacion);
-
-        // 2) Añadir a mano
-        if (inventario != null)
-        {
-            inventario.AddToHand(card);
-            if (CardTriggerSystem.Instance != null)
-                CardTriggerSystem.Instance.CheckCardDrawn(this, card);
-        }
-
-        // 3) Limpiar UI
-        if (gm != null && gm.uiCartas != null)
-            yield return StartCoroutine(gm.uiCartas.FadeOutYLimpiar(tiempoResultado));
+        // Placeholder para revelar y añadir cartas
+        // Implementar según tu sistema de cartas
+        yield return null;
     }
+    
+    // ────────────────────────────────────────
+    // UTILIDADES
+    // ────────────────────────────────────────
+    
+    public Vector3 ObtenerPosicionCasilla(int indice)
+    {
+        if (gameManager == null || gameManager.casillas == null) return transform.position;
+        if (indice < 0 || indice >= gameManager.casillas.Count) return transform.position;
+        return gameManager.casillas[indice].position + Vector3.up * 0.5f;
+    }
+
+    public bool GetDobleTiroPendiente() => dobleTiroPendiente;
+    public void SetDobleTiroPendiente(bool valor) => dobleTiroPendiente = valor;
 }

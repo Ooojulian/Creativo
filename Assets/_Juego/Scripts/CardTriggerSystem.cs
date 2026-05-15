@@ -64,13 +64,16 @@ public class CardTriggerSystem : MonoBehaviour
     }
 
     // Llamado durante el movimiento
-    public void CheckNearGoal(MovimientoFicha jugador)
+    private void CheckNearGoal(MovimientoFicha jugador)
     {
-        int casillasRestantes = jugador.ruta.casillas.Count - 1 - jugador.indiceActual;
-        if (casillasRestantes <= 3)
-        {
-            TryTrigger(jugador, CardType.Sprint);
-        }
+    if (gameManager == null || gameManager.casillas == null)
+        return;
+        
+    int casillasRestantes = gameManager.casillas.Count - 1 - jugador.indiceActual;
+    if (casillasRestantes <= 3)
+    {
+        TryTrigger(jugador, CardType.Sprint);
+    }
     }
 
     private void TryTrigger(MovimientoFicha usuario, CardType type, MovimientoFicha rival = null)

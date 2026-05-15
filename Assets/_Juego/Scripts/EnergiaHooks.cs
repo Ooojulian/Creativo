@@ -69,10 +69,10 @@ public class EnergiaHooks : MonoBehaviour
 
         // 3. Ganar +3 si está en meta intermedia
         // Definimos "meta intermedia" como cualquier casilla tipo NodeType.Finish que NO sea la última de la ruta
-        // O si simplemente está en una casilla específica. Aquí usaremos el BoardNode.nodeType.
-        if (jugador.ruta != null && jugador.indiceActual > 0 && jugador.indiceActual < jugador.ruta.casillas.Count - 1)
+        var casillas = jugador.ObtenerCasillas();
+        if (casillas != null && casillas.Count > 0 && jugador.indiceActual > 0 && jugador.indiceActual < casillas.Count - 1)
         {
-            var node = jugador.ruta.casillas[jugador.indiceActual].GetComponent<BoardNode>();
+            var node = casillas[jugador.indiceActual].GetComponent<BoardNode>();
             if (node != null && node.nodeType == BoardNode.NodeType.Finish)
             {
                 ctrl.GanarEnergia(energiaPorMetaIntermedia);

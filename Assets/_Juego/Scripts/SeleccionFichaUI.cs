@@ -14,11 +14,13 @@ public class SeleccionFichaUI : MonoBehaviour
 
     public GameManager gameManager;
 
+    private MovimientoFicha jugadorActual;
+
     void Start()
     {
         if (panel != null) panel.SetActive(false);
-        if (botonFichaA != null) botonFichaA.onClick.AddListener(() => ElegirFicha(false));
-        if (botonFichaB != null) botonFichaB.onClick.AddListener(() => ElegirFicha(true));
+        if (botonFichaA != null) botonFichaA.onClick.AddListener(() => OnElegirFicha(false));
+        if (botonFichaB != null) botonFichaB.onClick.AddListener(() => OnElegirFicha(true));
     }
 
     public void MostrarSeleccion(MovimientoFicha jugador)
@@ -41,17 +43,20 @@ public class SeleccionFichaUI : MonoBehaviour
         if (panel != null) panel.SetActive(false);
     }
 
-    private MovimientoFicha jugadorActual;
-
-    private void ElegirFicha(bool esB)
+    private void OnElegirFicha(bool esB)
     {
         if (jugadorActual == null) return;
-        jugadorActual.ElegirFicha(esB);
-
+        
+        // Solo guardar cuál ficha se eligió, NO mover aún
+        jugadorActual.moverFichaB = esB;
+        
         if (panel != null) panel.SetActive(false);
-
-        // Ejecutar movimiento con resultado del dado ya tirado
-        if (gameManager != null && gameManager.dado != null)
-            gameManager.dado.EjecutarMovimiento();
+        
+        // Continuar el turno en GestorTurnos (cartas → dado → movimiento)
+        GestorTurnos gestorTurnos = FindAnyObjectByType<GestorTurnos>();
+        if (gestorTurnos != null)
+        {
+            gestorTurnos.ContinuarDespuesDeSeleccion();
+        }
     }
 }

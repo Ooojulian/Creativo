@@ -4,24 +4,35 @@ using System.Collections;
 // Ficha que va de meta -> inicio (dirección inversa al MovimientoFicha normal)
 public class FichaInversa : MonoBehaviour
 {
-    public GestorDeRuta ruta;
+    private GameManager gameManager;
     public int indiceActual;
     public float velocidad = 150f;
-    public GameManager gm;
 
     private bool enMovimiento = false;
     private CamaraDirectora camaraDirectora;
 
-    void Awake() { camaraDirectora = FindAnyObjectByType<CamaraDirectora>(); }
-    void Start() { Inicializar(); }
-    void OnEnable() { Inicializar(); }
+    void Awake() 
+    { 
+        camaraDirectora = FindAnyObjectByType<CamaraDirectora>(); 
+    }
+    
+    void Start() 
+    { 
+        gameManager = FindAnyObjectByType<GameManager>();
+        Inicializar(); 
+    }
+    
+    void OnEnable() 
+    { 
+        Inicializar(); 
+    }
 
     public void Inicializar()
     {
-        if (ruta != null && ruta.casillas.Count > 0)
+        if (gameManager != null && gameManager.casillas.Count > 0)
         {
-            indiceActual = ruta.casillas.Count - 1;
-            transform.position = ruta.casillas[indiceActual].position + Vector3.up * 0.5f;
+            indiceActual = gameManager.casillas.Count - 1;
+            transform.position = gameManager.casillas[indiceActual].position + Vector3.up * 0.5f;
         }
     }
 
@@ -34,8 +45,7 @@ public class FichaInversa : MonoBehaviour
         if (pasos > casillasRestantes)
         {
             Debug.Log($"[FichaInversa] {name}: necesita {casillasRestantes} o menos, sacó {pasos}. Turno perdido.");
-            bool soyAutoridadAvanza = GameSync.Instance == null || Photon.Pun.PhotonNetwork.IsMasterClient;
-            if (soyAutoridadAvanza && gm != null) gm.SiguienteTurno();
+            if (gameManager != null) gameManager.SiguienteTurno();
             return;
         }
 
@@ -46,7 +56,7 @@ public class FichaInversa : MonoBehaviour
     {
         enMovimiento = true;
 
-        if (gm != null && gm.dado != null) gm.dado.gameObject.SetActive(false);
+        if (gameManager != null && gameManager.dado != null) gameManager.dado.gameObject.SetActive(false);
         if (camaraDirectora != null) camaraDirectora.SeguirJugador(transform);
 
         int metaFinal = indiceActual - pasos;
@@ -56,7 +66,7 @@ public class FichaInversa : MonoBehaviour
         {
             indiceActual--;
 
-            Vector3 destino = ruta.casillas[indiceActual].position + Vector3.up * 0.5f;
+            Vector3 destino = gameManager.casillas[indiceActual].position + Vector3.up * 0.5f;
 
             while (Vector3.Distance(transform.position, destino) > 0.05f)
             {
@@ -72,29 +82,14 @@ public class FichaInversa : MonoBehaviour
         if (camaraDirectora != null) camaraDirectora.VolverAlTablero();
         Debug.Log($"[FichaInversa] {name} llegó a casilla {indiceActual}");
 
-        // Detectar colisión → batalla PPS
-        if (Photon.Pun.PhotonNetwork.IsMasterClient && BatallaPPS.Instance != null && gm != null)
-        {
-            if (gm.DetectarColision(null, this, out int idxDef, out bool esBDef, out int actorDef))
-            {
-                int idxAtk = -1;
-                for (int k = 0; k < gm.todosLosJugadores.Count; k++)
-                    if (gm.todosLosJugadores[k].fichaB == this) { idxAtk = k; break; }
-                int actorAtk = idxAtk >= 0 && idxAtk < Photon.Pun.PhotonNetwork.PlayerList.Length
-                    ? Photon.Pun.PhotonNetwork.PlayerList[idxAtk].ActorNumber : -1;
-                BatallaPPS.Instance.IniciarBatalla(actorAtk, actorDef, idxAtk, true, idxDef, esBDef);
-                yield break;
-            }
-        }
-
         bool llegóAlInicio = indiceActual <= 0;
         if (llegóAlInicio)
+        {
             Debug.Log($"[FichaInversa] {name} llegó al inicio.");
+        }
         else
         {
-            // Solo host avanza turno en red. Clientes solo animaron.
-            bool soyAutoridad = GameSync.Instance == null || Photon.Pun.PhotonNetwork.IsMasterClient;
-            if (soyAutoridad && gm != null) gm.SiguienteTurno();
+            if (gameManager != null) gameManager.SiguienteTurno();
         }
     }
 }
