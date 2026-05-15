@@ -2,13 +2,20 @@ using UnityEngine;
 
 public enum CardType
 {
-    Pisoton,
-    Desvio,
-    LadronDeTurno,
-    Olvido,
-    Inspiracion,
-    Espionaje,
-    Sprint
+    AvanceRapido,
+    Retroceso,
+    DobleTiro,
+    PierdeTurno,
+    Escudo,
+    Recuperacion,
+    Fatiga,
+    RoboArcano,
+    Ruptura,
+    Intercambio,
+    AuraMagica,
+    VisionDelSabio,
+    Maldicion,
+    Silencio
 }
 
 [CreateAssetMenu(fileName = "New Card", menuName = "Cartas/Nueva Carta")]
@@ -21,4 +28,5 @@ public class CardSO : ScriptableObject
     [TextArea] public string savedEffectDescription;
     public Sprite artwork;
     public int costoEnergia = 1;
+    public int valor1;
 }

@@ -14,29 +14,29 @@ public class CardTriggerSystem : MonoBehaviour
     // Llamado cuando un jugador es adelantado
     public void CheckOvertake(MovimientoFicha adelantado, MovimientoFicha adelantador)
     {
-        TryTrigger(adelantado, CardType.Pisoton, adelantador);
+        TryTrigger(adelantado, CardType.Retroceso, adelantador);
     }
 
     // Llamado al inicio del turno
     public void CheckTurnStart(MovimientoFicha jugador)
     {
-        TryTrigger(jugador, CardType.Desvio);
+        TryTrigger(jugador, CardType.Intercambio);
     }
 
     // Llamado cuando un rival hace algo "especial"
     public void CheckSpecialAction(MovimientoFicha rival)
     {
-        // Revisar todos los otros jugadores por LadronDeTurno
+        // Revisar todos los otros jugadores por PierdeTurno
         foreach (var j in gameManager.todosLosJugadores)
         {
-            if (j != rival) TryTrigger(j, CardType.LadronDeTurno, rival);
+            if (j != rival) TryTrigger(j, CardType.PierdeTurno, rival);
         }
     }
 
     // Llamado cuando alguien juega una carta contra otro
     public void CheckCardPlayedAgainst(MovimientoFicha objetivo, MovimientoFicha usuario)
     {
-        TryTrigger(objetivo, CardType.Olvido, usuario);
+        TryTrigger(objetivo, CardType.Ruptura, usuario);
     }
 
     // Llamado al final del turno
@@ -45,7 +45,7 @@ public class CardTriggerSystem : MonoBehaviour
         var inv = jugador.GetComponent<PlayerInventory>();
         if (inv.hand.Count < cartasAlEmpezar)
         {
-            TryTrigger(jugador, CardType.Inspiracion);
+            TryTrigger(jugador, CardType.RoboArcano);
         }
     }
 
@@ -58,7 +58,7 @@ public class CardTriggerSystem : MonoBehaviour
             {
                 var inv = jugador.GetComponent<PlayerInventory>();
                 if (inv.hand.Count >= 5) // O si la carta es especial
-                    TryTrigger(j, CardType.Espionaje, jugador);
+                    TryTrigger(j, CardType.Fatiga, jugador);
             }
         }
     }
@@ -69,7 +69,7 @@ public class CardTriggerSystem : MonoBehaviour
         int casillasRestantes = jugador.ruta.casillas.Count - 1 - jugador.indiceActual;
         if (casillasRestantes <= 3)
         {
-            TryTrigger(jugador, CardType.Sprint);
+            TryTrigger(jugador, CardType.AvanceRapido);
         }
     }
 

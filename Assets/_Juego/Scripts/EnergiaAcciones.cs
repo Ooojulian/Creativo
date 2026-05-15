@@ -1,27 +1,40 @@
 using UnityEngine;
+using TMPro;
 
 public class EnergiaAcciones : MonoBehaviour
 {
     public static EnergiaAcciones Instance;
 
     [Header("Costos")]
-    public int costoTiradaExtra = 3;
-    public int costoDobleMovimiento = 5;
+    public int costoBoostDado = 2;
+    public int costoDobleMovimiento = 4;
 
     void Awake() { Instance = this; }
 
-    // Relanza el dado después de ver el resultado. Solo disponible en estado esperandoConfirmacion.
-    public void UsarTiradaExtra()
+    // Añade +2 a la tirada del dado antes de lanzarlo o mientras espera confirmación.
+    public void UsarBoostDado()
     {
         var gm = GameManager.Instance;
         if (gm == null || gm.JugadorActual == null) return;
-        if (gm.dado == null || !gm.dado.EsperandoConfirmacion) return;
-
+        
+        // Se puede usar antes de tirar o si ya tiró y está esperando confirmación (si permites modificar post-tiro)
         var ctrl = gm.JugadorActual.GetComponent<EnergiaController>();
-        if (ctrl != null && ctrl.GastarEnergia(costoTiradaExtra))
+        if (ctrl != null && ctrl.GastarEnergia(costoBoostDado))
         {
-            gm.dado.RelanzarDado();
-            Debug.Log($"[Energia] Tirada extra usada por {gm.JugadorActual.name}");
+            if (gm.dado != null)
+            {
+                gm.dado.modificadorExterno += 2;
+                Debug.Log($"[Energia] Boost +2 aplicado al dado por {gm.JugadorActual.name}");
+                
+                // Si ya tiró, refrescar el resultado visualmente si es posible
+                if (gm.dado.EsperandoConfirmacion)
+                {
+                    gm.dado.resultadoActual += 2;
+                    // Forzar actualización de texto si el dado lo permite (aquí asumo que resultadoActual es público)
+                    if (gm.dado.textoResultado != null)
+                        gm.dado.textoResultado.text = $"Dado: {gm.dado.resultadoActual}";
+                }
+            }
         }
     }
 
@@ -29,7 +42,6 @@ public class EnergiaAcciones : MonoBehaviour
     {
         var gm = GameManager.Instance;
         if (gm == null || gm.JugadorActual == null) return;
-        if (gm.dado == null || !gm.dado.EsperandoConfirmacion) return;
 
         var ctrl = gm.JugadorActual.GetComponent<EnergiaController>();
         if (ctrl != null && ctrl.GastarEnergia(costoDobleMovimiento))

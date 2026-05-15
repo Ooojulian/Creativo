@@ -33,7 +33,7 @@ public class EnergiaHUDUI : MonoBehaviour
         _costoTirada   = _root.Q<Label>("costo-tirada");
         _costoDoble    = _root.Q<Label>("costo-doble");
 
-        _btnTiradaExtra?.RegisterCallback<ClickEvent>(_ => EnergiaAcciones.Instance?.UsarTiradaExtra());
+        _btnTiradaExtra?.RegisterCallback<ClickEvent>(_ => EnergiaAcciones.Instance?.UsarBoostDado());
         _btnDobleMov?.RegisterCallback<ClickEvent>(_ => EnergiaAcciones.Instance?.ComprarDobleMovimiento());
 
         ActualizarCostos();
@@ -63,8 +63,8 @@ public class EnergiaHUDUI : MonoBehaviour
         if (_lblValor != null)
             _lblValor.text = ctrl != null ? ctrl.EnergiaActual.ToString() : "0";
 
-        bool dadoListo = gm.dado.EsperandoConfirmacion;
-        if (!dadoListo) { SetBotonesInteractivos(false); return; }
+        bool puedeAccionar = !gm.dado.Lanzando;
+        if (!puedeAccionar) { SetBotonesInteractivos(false); return; }
 
         if (ctrl == null) { SetBotonesInteractivos(false); return; }
 
@@ -72,7 +72,7 @@ public class EnergiaHUDUI : MonoBehaviour
         if (acc == null) { SetBotonesInteractivos(false); return; }
 
         if (_btnTiradaExtra != null)
-            _btnTiradaExtra.SetEnabled(ctrl.TieneEnergia(acc.costoTiradaExtra));
+            _btnTiradaExtra.SetEnabled(ctrl.TieneEnergia(acc.costoBoostDado));
 
         bool yaComprado = gm.JugadorActual.dobleTiroPendiente;
         if (_btnDobleMov != null)
@@ -97,7 +97,7 @@ public class EnergiaHUDUI : MonoBehaviour
     {
         var acc = EnergiaAcciones.Instance;
         if (acc == null) return;
-        if (_costoTirada != null) _costoTirada.text = $"({acc.costoTiradaExtra}⚡)";
+        if (_costoTirada != null) _costoTirada.text = $"({acc.costoBoostDado}⚡)";
         if (_costoDoble  != null) _costoDoble.text  = $"({acc.costoDobleMovimiento}⚡)";
     }
 }

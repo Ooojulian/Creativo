@@ -54,6 +54,9 @@ public class GameSync : MonoBehaviourPunCallbacks
         {
             if (ui != null) ui.OcultarPanel();
         }
+
+        // Lanzar el evento de inicio de turno en todos los clientes
+        gameManager.DispararOnTurnStarted(jugador);
     }
 
     public void AnunciarTurno(int indiceTurno)
@@ -87,6 +90,12 @@ public class GameSync : MonoBehaviourPunCallbacks
         // Solo cliente con turno ve el dado
         gameManager.dado.gameObject.SetActive(esMiTurno);
         Debug.Log($"[Red] dado.activeSelf despues SetActive: {gameManager.dado.gameObject.activeSelf}");
+
+        // Lanzar el evento de inicio de turno en todos los clientes
+        if (indiceTurno < gameManager.todosLosJugadores.Count)
+        {
+            gameManager.DispararOnTurnStarted(gameManager.todosLosJugadores[indiceTurno]);
+        }
     }
 
     public bool EsMiTurno => actorNumeroTurnoActual == PhotonNetwork.LocalPlayer.ActorNumber;

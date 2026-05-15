@@ -48,7 +48,9 @@ public class EnergiaHUD : MonoBehaviour
         if (!juegoActivo) return;
 
         bool dadoListo = gm.dado.EsperandoConfirmacion;
-        if (!dadoListo)
+        bool puedeAccionar = !gm.dado.Lanzando; // Se puede usar antes de tirar o esperando confirmación
+
+        if (!puedeAccionar)
         {
             SetBotonesActivos(false);
             return;
@@ -61,7 +63,7 @@ public class EnergiaHUD : MonoBehaviour
         if (acciones == null) { SetBotonesActivos(false); return; }
 
         if (botonTiradaExtra != null)
-            botonTiradaExtra.interactable = ctrl.TieneEnergia(acciones.costoTiradaExtra);
+            botonTiradaExtra.interactable = ctrl.TieneEnergia(acciones.costoBoostDado);
 
         bool yaComprado = gm.JugadorActual.dobleTiroPendiente;
         if (botonDobleMovimiento != null)
@@ -78,7 +80,7 @@ public class EnergiaHUD : MonoBehaviour
 
     void OnTiradaExtra()
     {
-        EnergiaAcciones.Instance?.UsarTiradaExtra();
+        EnergiaAcciones.Instance?.UsarBoostDado();
     }
 
     void OnDobleMovimiento()
@@ -98,7 +100,7 @@ public class EnergiaHUD : MonoBehaviour
         if (acciones == null) return;
 
         if (textoCostoTiradaExtra != null)
-            textoCostoTiradaExtra.text = $"{acciones.costoTiradaExtra} ⚡";
+            textoCostoTiradaExtra.text = $"{acciones.costoBoostDado} ⚡";
         if (textoCostoDobleMovimiento != null)
             textoCostoDobleMovimiento.text = $"{acciones.costoDobleMovimiento} ⚡";
     }

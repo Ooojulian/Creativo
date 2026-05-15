@@ -24,7 +24,15 @@ public class CardPlayUI : MonoBehaviour
     {
         cartaSeleccionada = card;
         jugadorActual = jugador;
-        textoCarta.text = $"¿Qué deseas hacer con {card.cardName}?";
+        
+        var energia = jugador.GetComponent<EnergiaController>();
+        int energiaActual = energia != null ? energia.EnergiaActual : 0;
+        
+        textoCarta.text = $"¿Qué deseas hacer con {card.cardName}?\n" +
+                          $"<size=80%>Costo: {card.costoEnergia} Energía (Tienes: {energiaActual})</size>";
+        
+        // Deshabilitar usar si no hay energía
+        botonUsar.interactable = energia != null && energia.TieneEnergia(card.costoEnergia);
         
         // Deshabilitar guardar si reserva llena
         botonGuardar.interactable = jugador.inventario.reserve.Count < jugador.inventario.maxReserveSize;
@@ -34,9 +42,19 @@ public class CardPlayUI : MonoBehaviour
 
     public void OnClickUsar()
     {
-        panel.SetActive(false);
-        jugadorActual.inventario.RemoveFromHand(cartaSeleccionada);
-        CardManager.Instance.EjecutarEfectoInmediato(cartaSeleccionada, jugadorActual);
+        var energia = jugadorActual.GetComponent<EnergiaController>();
+        if (energia != null && energia.GastarEnergia(cartaSeleccionada.costoEnergia))
+        {
+            panel.SetActive(false);
+            jugadorActual.inventario.RemoveFromHand(cartaSeleccionada);
+            CardManager.Instance.EjecutarEfectoInmediato(cartaSeleccionada, jugadorActual);
+        }
+        else
+        {
+            Debug.Log("No tienes suficiente energía.");
+            // Opcionalmente cerrar el panel o mostrar feedback
+            panel.SetActive(false);
+        }
     }
 
     public void OnClickGuardar()

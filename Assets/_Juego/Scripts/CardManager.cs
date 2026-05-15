@@ -7,6 +7,10 @@ public class CardManager : MonoBehaviour
 
     public GameManager gameManager;
 
+    [Header("Pools de Cartas Globales")]
+    public List<CardSO> poolCartasVentaja;
+    public List<CardSO> poolCartasDesventaja;
+
     void Awake()
     {
         Instance = this;
@@ -15,28 +19,45 @@ public class CardManager : MonoBehaviour
     public void EjecutarEfectoInmediato(CardSO card, MovimientoFicha usuario)
     {
         Debug.Log($"Ejecutando efecto inmediato de {card.cardName}");
+        MovimientoFicha rival = EncontrarRival(usuario);
+
         switch (card.type)
         {
-            case CardType.Pisoton:
-                RetrocederRival(usuario, 3);
+            case CardType.AvanceRapido:
+                usuario.Avanzar(card.valor1 > 0 ? card.valor1 : 2);
                 break;
-            case CardType.Desvio:
+            case CardType.Retroceso:
+                if (rival != null) RetrocederEspecifico(rival, card.valor1 != 0 ? Mathf.Abs(card.valor1) : 3);
+                break;
+            case CardType.DobleTiro:
+                usuario.dobleTiroPendiente = true;
+                break;
+            case CardType.PierdeTurno:
+                if (rival != null) rival.pierdeSiguienteTurno = true;
+                break;
+            case CardType.Escudo:
+            case CardType.AuraMagica:
+                usuario.escudoActivo = true;
+                break;
+            case CardType.Recuperacion:
+                var energia = usuario.GetComponent<EnergiaController>();
+                if (energia != null) energia.GanarEnergia(card.valor1 > 0 ? card.valor1 : 2);
+                break;
+            case CardType.Fatiga:
+                if (rival != null)
+                {
+                    var energiaRival = rival.GetComponent<EnergiaController>();
+                    if (energiaRival != null) energiaRival.GastarEnergia(card.valor1 != 0 ? Mathf.Abs(card.valor1) : 1);
+                }
+                break;
+            case CardType.RoboArcano:
+                usuario.GetComponent<PlayerInventory>().AddToHand(ObtenerCartaAleatoria());
+                break;
+            case CardType.Ruptura:
+                if (rival != null) RivalDescartaEspecifico(rival, card.valor1 > 0 ? card.valor1 : 2);
+                break;
+            case CardType.Intercambio:
                 IntercambiarConCualquiera(usuario);
-                break;
-            case CardType.LadronDeTurno:
-                RivalPierdeTurno(usuario);
-                break;
-            case CardType.Olvido:
-                RivalDescarta(usuario, 2);
-                break;
-            case CardType.Inspiracion:
-                usuario.GetComponent<PlayerInventory>().AddToHand(ObtenerCartaAleatoria()); // Simplificado
-                break;
-            case CardType.Espionaje:
-                EspiarYRobar(usuario);
-                break;
-            case CardType.Sprint:
-                usuario.Avanzar(2); // Debería ser inmediato sin esperar dado
                 break;
         }
     }
@@ -46,36 +67,42 @@ public class CardManager : MonoBehaviour
         Debug.Log($"Ejecutando efecto de reserva de {card.cardName}");
         switch (card.type)
         {
-            case CardType.Pisoton:
+            case CardType.AvanceRapido:
+                usuario.Avanzar(card.valor1 > 0 ? card.valor1 : 3);
+                break;
+            case CardType.Retroceso:
                 if (rivalInvolucrado != null) RetrocederEspecifico(rivalInvolucrado, 3);
                 break;
-            case CardType.Desvio:
-                IntercambiarConCualquiera(usuario);
+            case CardType.DobleTiro:
+                usuario.dobleTiroPendiente = true;
                 break;
-            case CardType.LadronDeTurno:
-                if (rivalInvolucrado != null) 
-                {
-                    rivalInvolucrado.pierdeSiguienteTurno = true;
-                    // TODO: Cancelar acción especial
-                }
+            case CardType.PierdeTurno:
+                if (rivalInvolucrado != null) rivalInvolucrado.pierdeSiguienteTurno = true;
                 break;
-            case CardType.Olvido:
+            case CardType.Escudo:
+            case CardType.AuraMagica:
+                usuario.escudoActivo = true;
+                break;
+            case CardType.Recuperacion:
+                var energia = usuario.GetComponent<EnergiaController>();
+                if (energia != null) energia.GanarEnergia(1);
+                break;
+            case CardType.Fatiga:
                 if (rivalInvolucrado != null)
                 {
-                    // TODO: Anular carta
-                    RivalDescartaEspecifico(rivalInvolucrado, 2);
+                    var eR = rivalInvolucrado.GetComponent<EnergiaController>();
+                    if (eR != null) eR.GastarEnergia(1);
                 }
                 break;
-            case CardType.Inspiracion:
+            case CardType.RoboArcano:
                 var inv = usuario.GetComponent<PlayerInventory>();
                 inv.AddToHand(ObtenerCartaAleatoria());
-                inv.AddToHand(ObtenerCartaAleatoria());
                 break;
-            case CardType.Espionaje:
-                if (rivalInvolucrado != null) TomarCartaDeRival(usuario, rivalInvolucrado);
+            case CardType.Ruptura:
+                if (rivalInvolucrado != null) RivalDescartaEspecifico(rivalInvolucrado, 1);
                 break;
-            case CardType.Sprint:
-                usuario.Avanzar(3);
+            case CardType.Intercambio:
+                IntercambiarConCualquiera(usuario);
                 break;
         }
     }
@@ -91,19 +118,36 @@ public class CardManager : MonoBehaviour
 
     private void RetrocederEspecifico(MovimientoFicha rival, int pasos)
     {
+        if (rival.escudoActivo)
+        {
+            Debug.Log($"[Escudo] {rival.name} bloqueó el retroceso.");
+            rival.escudoActivo = false;
+            return;
+        }
         rival.indiceActual = Mathf.Max(0, rival.indiceActual - pasos);
         rival.transform.position = rival.ruta.casillas[rival.indiceActual].position + Vector3.up * 0.5f;
     }
 
     private void IntercambiarConCualquiera(MovimientoFicha usuario)
     {
+        // En intercambio, ¿el escudo protege? Generalmente sí en estos juegos.
+        // Pero para no complicar, lo dejamos así o buscamos un rival sin escudo.
         gameManager.IntercambiarConOtroJugador(usuario);
     }
 
     private void RivalPierdeTurno(MovimientoFicha usuario)
     {
         MovimientoFicha rival = EncontrarRival(usuario);
-        if (rival != null) rival.pierdeSiguienteTurno = true;
+        if (rival != null)
+        {
+            if (rival.escudoActivo)
+            {
+                Debug.Log($"[Escudo] {rival.name} bloqueó perder turno.");
+                rival.escudoActivo = false;
+                return;
+            }
+            rival.pierdeSiguienteTurno = true;
+        }
     }
 
     private void RivalDescarta(MovimientoFicha usuario, int cantidad)
@@ -114,6 +158,12 @@ public class CardManager : MonoBehaviour
 
     private void RivalDescartaEspecifico(MovimientoFicha rival, int cantidad)
     {
+        if (rival.escudoActivo)
+        {
+            Debug.Log($"[Escudo] {rival.name} bloqueó el descarte.");
+            rival.escudoActivo = false;
+            return;
+        }
         var inv = rival.GetComponent<PlayerInventory>();
         for (int i = 0; i < cantidad; i++)
         {
@@ -150,10 +200,30 @@ public class CardManager : MonoBehaviour
         return null;
     }
 
-    private CardSO ObtenerCartaAleatoria()
+    public CardSO ObtenerCartaAleatoria()
     {
-        // Esto debería venir de un DeckManager o similar
-        // Por ahora buscamos una en las casillas o algo así
-        return null; 
+        bool sacarVentaja = Random.value > 0.5f;
+        if (sacarVentaja && poolCartasVentaja != null && poolCartasVentaja.Count > 0)
+        {
+            return ObtenerCartaVentaja();
+        }
+        else if (poolCartasDesventaja != null && poolCartasDesventaja.Count > 0)
+        {
+            return ObtenerCartaDesventaja();
+        }
+
+        return null;
+    }
+
+    public CardSO ObtenerCartaVentaja()
+    {
+        if (poolCartasVentaja == null || poolCartasVentaja.Count == 0) return null;
+        return poolCartasVentaja[Random.Range(0, poolCartasVentaja.Count)];
+    }
+
+    public CardSO ObtenerCartaDesventaja()
+    {
+        if (poolCartasDesventaja == null || poolCartasDesventaja.Count == 0) return null;
+        return poolCartasDesventaja[Random.Range(0, poolCartasDesventaja.Count)];
     }
 }

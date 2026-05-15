@@ -29,8 +29,8 @@ public class DadoLogico : MonoBehaviour
     public int modificadorExterno = 0;
     private bool lanzando = false;
     private bool esperandoConfirmacion = false;
-
     public bool EsperandoConfirmacion => esperandoConfirmacion;
+    public bool Lanzando => lanzando;
     private Rigidbody rb;
     private Vector3 ejeRotacion;
     private CamaraDirectora camaraDirectora;

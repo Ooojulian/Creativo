@@ -202,16 +202,20 @@ public class GameManager : MonoBehaviour
             textoTurno.text = $"Turno: Jugador {turnoActual + 1}";
 
         // Sin red: activar dado directo
-        if (GameSync.Instance == null)
+        if (GameSync.Instance == null || !PhotonNetwork.InRoom)
         {
             dado.gameObject.SetActive(true);
+            DispararOnTurnStarted(j);
             return;
         }
 
         // Con red: host avisa quién juega, cliente correcto activa dado
         if (PhotonNetwork.IsMasterClient)
             GameSync.Instance.AnunciarTurno(turnoActual);
+    }
 
+    public void DispararOnTurnStarted(MovimientoFicha j)
+    {
         if (OnTurnStarted != null)
             OnTurnStarted.Invoke(j);
     }
@@ -275,6 +279,13 @@ public class GameManager : MonoBehaviour
         if (candidatos.Count == 0) return;
 
         MovimientoFicha otro = candidatos[Random.Range(0, candidatos.Count)];
+
+        if (otro.escudoActivo)
+        {
+            Debug.Log($"[Escudo] {otro.name} bloqueó el intercambio.");
+            otro.escudoActivo = false;
+            return;
+        }
 
         // Intercambiar índices
         int a = jugador.indiceActual;
