@@ -13,6 +13,11 @@ public class MenuInicioUI : MonoBehaviour
     private Button _btnOpciones;
     private Button _btnSalir;
 
+    private VisualElement _panelOpciones;
+    private TextField _inputNombre;
+    private Button _btnGuardarNombre;
+    private Button _btnCerrarOpciones;
+
     void Awake()
     {
         _doc = GetComponent<UIDocument>();
@@ -26,9 +31,17 @@ public class MenuInicioUI : MonoBehaviour
         _btnOpciones = root.Q<Button>("btn-opciones");
         _btnSalir    = root.Q<Button>("btn-salir");
 
+        _panelOpciones    = root.Q<VisualElement>("panel-opciones");
+        _inputNombre      = root.Q<TextField>("input-nombre");
+        _btnGuardarNombre = root.Q<Button>("btn-guardar-nombre");
+        _btnCerrarOpciones = root.Q<Button>("btn-cerrar-opciones");
+
         _btnJugar?.RegisterCallback<ClickEvent>(_ => IrASeleccion());
         _btnOpciones?.RegisterCallback<ClickEvent>(_ => AbrirOpciones());
         _btnSalir?.RegisterCallback<ClickEvent>(_ => Salir());
+
+        _btnGuardarNombre?.RegisterCallback<ClickEvent>(_ => GuardarNombre());
+        _btnCerrarOpciones?.RegisterCallback<ClickEvent>(_ => CerrarOpciones());
     }
 
     void OnDisable()
@@ -36,6 +49,8 @@ public class MenuInicioUI : MonoBehaviour
         _btnJugar?.UnregisterCallback<ClickEvent>(_ => IrASeleccion());
         _btnOpciones?.UnregisterCallback<ClickEvent>(_ => AbrirOpciones());
         _btnSalir?.UnregisterCallback<ClickEvent>(_ => Salir());
+        _btnGuardarNombre?.UnregisterCallback<ClickEvent>(_ => GuardarNombre());
+        _btnCerrarOpciones?.UnregisterCallback<ClickEvent>(_ => CerrarOpciones());
     }
 
     private void IrASeleccion()
@@ -45,8 +60,28 @@ public class MenuInicioUI : MonoBehaviour
 
     private void AbrirOpciones()
     {
-        // Placeholder — implementar pantalla de opciones si se requiere
-        Debug.Log("[MenuInicio] Opciones (no implementado).");
+        if (_inputNombre != null)
+            _inputNombre.value = PlayerPrefs.GetString("NombreJugador", "");
+
+        _panelOpciones?.RemoveFromClassList("panel-oculto");
+        _panelOpciones?.AddToClassList("panel-activo");
+    }
+
+    private void GuardarNombre()
+    {
+        string nombre = _inputNombre?.value.Trim() ?? "";
+        if (!string.IsNullOrEmpty(nombre))
+        {
+            PlayerPrefs.SetString("NombreJugador", nombre);
+            PlayerPrefs.Save();
+        }
+        CerrarOpciones();
+    }
+
+    private void CerrarOpciones()
+    {
+        _panelOpciones?.RemoveFromClassList("panel-activo");
+        _panelOpciones?.AddToClassList("panel-oculto");
     }
 
     private void Salir()

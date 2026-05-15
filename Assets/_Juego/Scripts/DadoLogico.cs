@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using System;
@@ -11,6 +12,9 @@ public class DadoLogico : MonoBehaviour
     public MovimientoFicha jugador;
     public TextMeshProUGUI textoResultado;
     public TextMeshProUGUI textoInstruccion;
+
+    [Header("Botón táctil")]
+    [SerializeField] private Button _btnTirarDado;
 
     [Header("Posición fija en el tablero (visible desde GameCamera)")]
     public Vector3 posicionFija = new Vector3(650f, 100f, 250f);
@@ -74,6 +78,20 @@ public class DadoLogico : MonoBehaviour
             textoInstruccion.text = "ESPACIO — Tirar el dado";
             textoInstruccion.gameObject.SetActive(true);
         }
+
+        // Buscar botón si no está asignado en el Inspector
+        if (_btnTirarDado == null)
+        {
+            var go = GameObject.Find("BtnTirarDado");
+            if (go != null) _btnTirarDado = go.GetComponent<Button>();
+        }
+        if (_btnTirarDado != null)
+        {
+            _btnTirarDado.onClick.RemoveListener(OnBotonTirarDado);
+            _btnTirarDado.onClick.AddListener(OnBotonTirarDado);
+            _btnTirarDado.gameObject.SetActive(true);
+            _btnTirarDado.interactable = true;
+        }
     }
 
     void Update()
@@ -83,11 +101,39 @@ public class DadoLogico : MonoBehaviour
 
         if (Keyboard.current == null) return;
 
-        if (!lanzando && !esperandoConfirmacion && Keyboard.current.spaceKey.wasPressedThisFrame)
-            Lanzar();
+        // Teclado solo funciona cuando es el turno del jugador local
+        if (EsMiTurno())
+        {
+            if (!lanzando && !esperandoConfirmacion && Keyboard.current.spaceKey.wasPressedThisFrame)
+                Lanzar();
 
-        if (esperandoConfirmacion && Keyboard.current.spaceKey.wasPressedThisFrame)
+            if (esperandoConfirmacion && Keyboard.current.spaceKey.wasPressedThisFrame)
+                ConfirmarMovimiento();
+        }
+    }
+
+    private bool EsMiTurno()
+    {
+        // Sin red: siempre es el turno del jugador local
+        if (!Photon.Pun.PhotonNetwork.IsConnected) return true;
+        // Con red: solo si el jugador asignado al dado es el jugador local
+        if (jugador == null) return false;
+        var photonView = jugador.GetComponent<Photon.Pun.PhotonView>();
+        return photonView != null && photonView.IsMine;
+    }
+
+    private void OnBotonTirarDado()
+    {
+        if (!lanzando && !esperandoConfirmacion)
+            Lanzar();
+        else if (esperandoConfirmacion)
             ConfirmarMovimiento();
+    }
+
+    void OnDisable()
+    {
+        if (_btnTirarDado != null)
+            _btnTirarDado.gameObject.SetActive(false);
     }
 
     void SnapAPosicion()

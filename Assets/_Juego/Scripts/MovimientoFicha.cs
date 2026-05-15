@@ -31,6 +31,7 @@ public class MovimientoFicha : MonoBehaviour
     private CamaraDirectora camaraDirectora;
     private GameManager gm;
     public bool dobleTiroPendiente = false;
+    [HideInInspector] public bool pierdeSiguienteTurno = false;
     
     // Eventos
     public event Action<int> OnMovimientoCompletado; // (índiceActual)

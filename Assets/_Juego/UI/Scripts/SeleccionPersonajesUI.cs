@@ -244,6 +244,28 @@ public class SeleccionPersonajesUI : MonoBehaviourPunCallbacks
         // Posición inicial alejada del tablero mientras no hay modelo
         camGO.transform.position = new Vector3(0f, -180f, -5f);
 
+        // Luz principal — direccional cálida desde arriba-frontal
+        GameObject luzGO = new GameObject("LuzPreview");
+        Light luz = luzGO.AddComponent<Light>();
+        luz.type      = LightType.Directional;
+        luz.color     = new Color(1f, 0.95f, 0.85f);
+        luz.intensity = 1.4f;
+        luz.shadows   = LightShadows.None;
+        luz.cullingMask = 1 << LAYER_PREVIEW;
+        luzGO.transform.rotation = Quaternion.Euler(45f, -30f, 0f);
+        luzGO.transform.SetParent(_camPreview.transform);
+
+        // Luz de relleno — suave desde abajo-atrás para suavizar sombras
+        GameObject luzRelleno = new GameObject("LuzRellenoPreview");
+        Light luzR = luzRelleno.AddComponent<Light>();
+        luzR.type       = LightType.Directional;
+        luzR.color      = new Color(0.4f, 0.5f, 0.6f);
+        luzR.intensity  = 0.5f;
+        luzR.shadows    = LightShadows.None;
+        luzR.cullingMask = 1 << LAYER_PREVIEW;
+        luzRelleno.transform.rotation = Quaternion.Euler(-30f, 150f, 0f);
+        luzRelleno.transform.SetParent(_camPreview.transform);
+
         Debug.Log($"[Preview] Infraestructura creada. RT={RT_SIZE}×{RT_SIZE}, layer={LAYER_PREVIEW}, depth={_camPreview.depth}, cullingMask={_camPreview.cullingMask}");
     }
 
