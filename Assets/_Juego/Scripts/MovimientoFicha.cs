@@ -16,8 +16,8 @@ public class MovimientoFicha : MonoBehaviour
     public bool maldicionActiva = false;
 
     [Header("Cartas - UI timing")]
-    public float tiempoRevelacion = 2f; // tiempo mostrando la carta antes de aplicar
-    public float tiempoResultado = 1f;  // tiempo mostrando el efecto antes del fade out
+    public float tiempoRevelacion = 1f; // tiempo mostrando la carta antes de aplicar (1 seg)
+    public float tiempoResultado = 0f;  // delay antes del fade out (0 = fade inmediato)
 
     private bool enMovimiento = false;
     private CamaraDirectora camaraDirectora;
@@ -214,15 +214,30 @@ public class MovimientoFicha : MonoBehaviour
             yield break;
         }
 
-        // 1) Mostrar revelación SOLO SI ES MI FICHA (Privado para el jugador local)
+        // 1) Mostrar revelación SOLO SI ES MI FICHA (privado para el jugador local)
         bool esMia = true;
-        var pv = GetComponent<Photon.Pun.PhotonView>();
-        if (pv != null) esMia = pv.IsMine;
+        if (Photon.Pun.PhotonNetwork.InRoom)
+        {
+            int myActor = Photon.Pun.PhotonNetwork.LocalPlayer.ActorNumber;
+            int myIndex = -1;
+            for (int i = 0; i < Photon.Pun.PhotonNetwork.PlayerList.Length; i++)
+            {
+                if (Photon.Pun.PhotonNetwork.PlayerList[i].ActorNumber == myActor)
+                {
+                    myIndex = i;
+                    break;
+                }
+            }
+            int fichaIndex = gm.todosLosJugadores.IndexOf(this);
+            esMia = (myIndex == fichaIndex);
+        }
 
         if (esMia && gm != null && gm.uiCartas != null)
             gm.uiCartas.MostrarRevelacion(card);
 
-        yield return new WaitForSeconds(tiempoRevelacion);
+        // Esperar solo en el cliente que posee esta ficha
+        if (esMia)
+            yield return new WaitForSeconds(tiempoRevelacion);
 
         // 2) Añadir a mano
         if (inventario != null)
@@ -232,8 +247,12 @@ public class MovimientoFicha : MonoBehaviour
                 CardTriggerSystem.Instance.CheckCardDrawn(this, card);
         }
 
-        // 3) Limpiar UI
-        if (gm != null && gm.uiCartas != null)
+        // 3) Fade out de la revelación (solo jugador local)
+        if (esMia && gm != null && gm.uiCartas != null)
             yield return StartCoroutine(gm.uiCartas.FadeOutYLimpiar(tiempoResultado));
+
+        // 4) Abrir panel Usar/Guardar SOLO para el jugador local, después del fade
+        if (esMia && CardPlayUI.Instance != null)
+            CardPlayUI.Instance.Mostrar(card, this);
     }
 }
