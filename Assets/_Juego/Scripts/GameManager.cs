@@ -27,7 +27,10 @@ public class GameManager : MonoBehaviour
     [Header("Elementos del Juego")]
     public DadoLogico dado;
     public List<MovimientoFicha> todosLosJugadores;
-    public GestorDeRuta ruta;
+    public GestorDeRutas ruta;
+    public SistemaCartas sistemaCartas;
+
+    public List<Transform> casillas => ruta != null ? ruta.casillas : null;
 
     [Header("Pantalla de Fin")]
     public GameObject panelFin;
@@ -63,7 +66,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         if (ruta == null)
-            ruta = FindAnyObjectByType<GestorDeRuta>();
+            ruta = FindAnyObjectByType<GestorDeRutas>();
 
         dado.gameObject.SetActive(false);
 
@@ -373,4 +376,12 @@ public class GameManager : MonoBehaviour
 
         SceneManager.LoadScene("MenuInicio");
     }
+
+    // ── Accesores para sistemas externos ──────────────────────────────────────
+
+    public SistemaCartas ObtenerSistemaCartas() => sistemaCartas;
+
+    public CartasUIVisual ObtenerUICartas() => uiCartas;
+
+    public List<MovimientoFicha> ObtenerJugadoresActivos() => new List<MovimientoFicha>(jugadoresActivos);
 }

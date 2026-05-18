@@ -4,26 +4,37 @@ using System.Collections;
 // Ficha que va de meta -> inicio (dirección inversa al MovimientoFicha normal)
 public class FichaInversa : MonoBehaviour
 {
-    public GestorDeRuta ruta;
+    private GameManager gameManager;
     public int indiceActual;
     public float velocidad = 150f;
-    public GameManager gm;
 
     public MovimientoFicha fichaPrincipal;
 
     private bool enMovimiento = false;
     private CamaraDirectora camaraDirectora;
 
-    void Awake() { camaraDirectora = FindAnyObjectByType<CamaraDirectora>(); }
-    void Start() { Inicializar(); }
-    void OnEnable() { Inicializar(); }
+    void Awake() 
+    { 
+        camaraDirectora = FindAnyObjectByType<CamaraDirectora>(); 
+    }
+    
+    void Start() 
+    { 
+        gameManager = FindAnyObjectByType<GameManager>();
+        Inicializar(); 
+    }
+    
+    void OnEnable() 
+    { 
+        Inicializar(); 
+    }
 
     public void Inicializar()
     {
-        if (ruta != null && ruta.casillas.Count > 0)
+        if (gameManager != null && gameManager.casillas.Count > 0)
         {
-            indiceActual = ruta.casillas.Count - 1;
-            transform.position = ruta.casillas[indiceActual].position + Vector3.up * 0.5f;
+            indiceActual = gameManager.casillas.Count - 1;
+            transform.position = gameManager.casillas[indiceActual].position + Vector3.up * 0.5f;
         }
     }
 
@@ -36,8 +47,7 @@ public class FichaInversa : MonoBehaviour
         if (pasos > casillasRestantes)
         {
             Debug.Log($"[FichaInversa] {name}: necesita {casillasRestantes} o menos, sacó {pasos}. Turno perdido.");
-            bool soyAutoridadAvanza = GameSync.Instance == null || Photon.Pun.PhotonNetwork.IsMasterClient;
-            if (soyAutoridadAvanza && gm != null) gm.SiguienteTurno();
+            if (gameManager != null) gameManager.SiguienteTurno();
             return;
         }
 
@@ -48,7 +58,7 @@ public class FichaInversa : MonoBehaviour
     {
         enMovimiento = true;
 
-        if (gm != null && gm.dado != null) gm.dado.gameObject.SetActive(false);
+        if (gameManager != null && gameManager.dado != null) gameManager.dado.gameObject.SetActive(false);
         if (camaraDirectora != null) camaraDirectora.SeguirJugador(transform);
 
         int metaFinal = indiceActual - pasos;
@@ -58,7 +68,7 @@ public class FichaInversa : MonoBehaviour
         {
             indiceActual--;
 
-            Vector3 destino = ruta.casillas[indiceActual].position + Vector3.up * 0.5f;
+            Vector3 destino = gameManager.casillas[indiceActual].position + Vector3.up * 0.5f;
 
             while (Vector3.Distance(transform.position, destino) > 0.05f)
             {
@@ -92,14 +102,15 @@ public class FichaInversa : MonoBehaviour
             }
         }
 
+
         bool llegóAlInicio = indiceActual <= 0;
         if (llegóAlInicio)
+        {
             Debug.Log($"[FichaInversa] {name} llegó al inicio.");
+        }
         else
         {
-            // Solo host avanza turno en red. Clientes solo animaron.
-            bool soyAutoridad = GameSync.Instance == null || Photon.Pun.PhotonNetwork.IsMasterClient;
-            if (soyAutoridad && gm != null) gm.SiguienteTurno();
+            if (gameManager != null) gameManager.SiguienteTurno();
         }
     }
 
@@ -117,7 +128,6 @@ public class FichaInversa : MonoBehaviour
         CardSO card = comp.ObtenerCarta();
         if (card == null) yield break;
 
-        // 1) Mostrar revelación SOLO SI ES MI FICHA (Privado)
         bool esMia = true;
         var pv = fichaPrincipal != null ? fichaPrincipal.GetComponent<Photon.Pun.PhotonView>() : GetComponent<Photon.Pun.PhotonView>();
         if (pv != null) esMia = pv.IsMine;
@@ -127,7 +137,6 @@ public class FichaInversa : MonoBehaviour
 
         yield return new WaitForSeconds(fichaPrincipal != null ? fichaPrincipal.tiempoRevelacion : 2f);
 
-        // 2) Añadir a mano del jugador principal
         if (fichaPrincipal != null && fichaPrincipal.inventario != null)
         {
             fichaPrincipal.inventario.AddToHand(card);
@@ -135,7 +144,6 @@ public class FichaInversa : MonoBehaviour
                 CardTriggerSystem.Instance.CheckCardDrawn(fichaPrincipal, card);
         }
 
-        // 3) Limpiar UI
         if (gm != null && gm.uiCartas != null)
             yield return StartCoroutine(gm.uiCartas.FadeOutYLimpiar(fichaPrincipal != null ? fichaPrincipal.tiempoResultado : 1f));
     }

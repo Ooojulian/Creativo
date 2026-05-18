@@ -36,5 +36,15 @@
         <ui:Label name="version-label" text="v0.3  •  Alpha" class="texto-secundario"
             style="-unity-text-align: middle-center; margin-top: 16px;" />
 
+        <!-- Panel de Opciones — nombre del jugador -->
+        <ui:VisualElement name="panel-opciones" class="panel-oculto overlay-aviso">
+            <ui:VisualElement class="tablero-menu grupo-contenido">
+                <ui:Label text="NOMBRE DEL JUGADOR" class="titulo-panel" />
+                <ui:TextField name="input-nombre" max-length="16" class="input-campo" />
+                <ui:Button name="btn-guardar-nombre" text="GUARDAR" class="btn btn-primario" />
+                <ui:Button name="btn-cerrar-opciones" text="CERRAR" class="btn" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
     </ui:VisualElement>
 </ui:UXML>
