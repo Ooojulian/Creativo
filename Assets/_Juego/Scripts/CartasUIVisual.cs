@@ -17,20 +17,6 @@ public class CartasUIVisual : MonoBehaviour
             canvasGroup = GetComponent<CanvasGroup>();
     }
     
-    /// <summary>
-    /// Muestra la revelación de una carta con fade in
-    /// </summary>
-    public void MostrarRevelacion(CartaDefinicion carta)
-    {
-        if (imagenCarta == null || carta == null) return;
-
-        imagenCarta.sprite = carta.icono;
-        imagenCarta.gameObject.SetActive(true);
-
-        if (canvasGroup != null)
-            StartCoroutine(FadeIn());
-    }
-
     public void MostrarRevelacion(CardSO carta)
     {
         if (imagenCarta == null || carta == null) return;

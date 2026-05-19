@@ -282,20 +282,6 @@ public class MovimientoFicha : MonoBehaviour
         return e;
     }
 
-    public SistemaEnergia ObtenerEnergia()
-    {
-        var e = GetComponent<SistemaEnergia>();
-        if (e == null) e = gameObject.AddComponent<SistemaEnergia>();
-        return e;
-    }
-
-    public InventarioCartas ObtenerInventario()
-    {
-        var e = GetComponent<InventarioCartas>();
-        if (e == null) e = gameObject.AddComponent<InventarioCartas>();
-        return e;
-    }
-
     public System.Collections.Generic.List<Transform> ObtenerCasillas()
     {
         if (gm == null) gm = FindAnyObjectByType<GameManager>();

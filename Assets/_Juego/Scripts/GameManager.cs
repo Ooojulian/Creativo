@@ -28,7 +28,6 @@ public class GameManager : MonoBehaviour
     public DadoLogico dado;
     public List<MovimientoFicha> todosLosJugadores;
     public GestorDeRutas ruta;
-    public SistemaCartas sistemaCartas;
 
     public List<Transform> casillas => ruta != null ? ruta.casillas : null;
 
@@ -379,8 +378,6 @@ public class GameManager : MonoBehaviour
     }
 
     // ── Accesores para sistemas externos ──────────────────────────────────────
-
-    public SistemaCartas ObtenerSistemaCartas() => sistemaCartas;
 
     public CartasUIVisual ObtenerUICartas() => uiCartas;
 
