@@ -3,7 +3,6 @@ using System.Collections;
 
 public class MovimientoFicha : MonoBehaviour
 {
-    public GestorDeRuta ruta;
     public int indiceActual = 0;
     public float velocidad = 150f;
     public GameManager gm;
