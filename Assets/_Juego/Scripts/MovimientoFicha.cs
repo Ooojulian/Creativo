@@ -271,4 +271,17 @@ public class MovimientoFicha : MonoBehaviour
         }
         // Los demás clientes no hacen nada aquí; el RPC se encarga de su AddToHand.
     }
+
+    public System.Collections.Generic.List<Transform> ObtenerCasillas()
+    {
+        if (gm == null) gm = FindAnyObjectByType<GameManager>();
+        return gm?.casillas;
+    }
+
+    public EstadosJugador ObtenerEstados()
+    {
+        var e = GetComponent<EstadosJugador>();
+        if (e == null) e = gameObject.AddComponent<EstadosJugador>();
+        return e;
+    }
 }
