@@ -148,10 +148,11 @@ public class GameSync : MonoBehaviourPunCallbacks
         if (indiceFicha < 0 || indiceFicha >= gameManager.todosLosJugadores.Count) return;
 
         MovimientoFicha ficha = gameManager.todosLosJugadores[indiceFicha];
-        if (ficha != null && gameManager.ruta != null && gameManager.ruta.casillas.Count > nuevaCasilla)
+        var casillas = gameManager.casillas;
+        if (ficha != null && casillas != null && casillas.Count > nuevaCasilla)
         {
             ficha.indiceActual = nuevaCasilla;
-            ficha.transform.position = gameManager.ruta.casillas[nuevaCasilla].position + Vector3.up * 0.5f;
+            ficha.transform.position = casillas[nuevaCasilla].position + Vector3.up * 0.5f;
         }
     }
 

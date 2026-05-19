@@ -105,15 +105,7 @@ public class FichaInversa : MonoBehaviour
         }
 
 
-        bool llegóAlInicio = indiceActual <= 0;
-        if (llegóAlInicio)
-        {
-            Debug.Log($"[FichaInversa] {name} llegó al inicio.");
-        }
-        else
-        {
-            if (gameManager != null) gameManager.SiguienteTurno();
-        }
+        if (gameManager != null) gameManager.SiguienteTurno();
     }
 
     IEnumerator RevelarYAñadirCarta()
@@ -146,7 +138,15 @@ public class FichaInversa : MonoBehaviour
                 CardTriggerSystem.Instance.CheckCardDrawn(fichaPrincipal, card);
         }
 
-        if (gameManager != null && gameManager.uiCartas != null)
+        // Abrir panel Usar/Guardar para el jugador local (igual que MovimientoFicha)
+        if (esMia && CardPlayUI.Instance != null)
+        {
+            CardPlayUI.Instance.Mostrar(card, fichaPrincipal);
+            while (CardPlayUI.Instance.panel.activeSelf)
+                yield return null;
+        }
+
+        if (esMia && gameManager != null && gameManager.uiCartas != null)
             yield return StartCoroutine(gameManager.uiCartas.FadeOutYLimpiar(fichaPrincipal != null ? fichaPrincipal.tiempoResultado : 1f));
     }
 }

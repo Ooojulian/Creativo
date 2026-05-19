@@ -150,11 +150,13 @@ public class GameManager : MonoBehaviour
 
     public void SiguienteTurno()
     {
-        // NUEVO: Trigger "Inspiración" al final del turno
-        if (CardTriggerSystem.Instance != null && turnoActual < jugadoresActivos.Count)
+        if (turnoActual < jugadoresActivos.Count)
         {
             MovimientoFicha j = jugadoresActivos[turnoActual];
-            CardTriggerSystem.Instance.CheckTurnEnd(j, j.cartasAlEmpezarTurno);
+            // Decrementar estados del jugador que acaba de jugar
+            j.GetComponent<EstadosJugador>()?.DecrementarTodosLosEstados();
+            // Trigger "Inspiración" al final del turno
+            CardTriggerSystem.Instance?.CheckTurnEnd(j, j.cartasAlEmpezarTurno);
         }
 
         if (OnTurnEnded != null)
@@ -187,9 +189,8 @@ public class GameManager : MonoBehaviour
         if (CardTriggerSystem.Instance != null)
             CardTriggerSystem.Instance.CheckTurnStart(j);
 
-        // RESET: Silencio (se limpia al empezar el turno para que no afecte este turno)
+        // Silencio se limpia al empezar el turno (EstadosJugador lo decrementa al final del anterior)
         j.silencioActivo = false;
-        if (j.fichaB != null) j.fichaB.GetComponent<MovimientoFicha>().silencioActivo = false; // Por si acaso se hereda al script base
 
         // CARTA: PierdeTurno (saltar turno)
         if (j.pierdeSiguienteTurno)

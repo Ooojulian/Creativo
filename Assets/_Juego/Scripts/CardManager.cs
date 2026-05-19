@@ -143,7 +143,9 @@ public class CardManager : MonoBehaviour
             return;
         }
         rival.indiceActual = Mathf.Max(0, rival.indiceActual - pasos);
-        rival.transform.position = rival.ruta.casillas[rival.indiceActual].position + Vector3.up * 0.5f;
+        var casillas = gameManager.casillas;
+        if (casillas != null && rival.indiceActual < casillas.Count)
+            rival.transform.position = casillas[rival.indiceActual].position + Vector3.up * 0.5f;
 
         if (GameSync.Instance != null && gameManager != null)
         {

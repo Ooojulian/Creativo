@@ -66,7 +66,9 @@ public class CardTriggerSystem : MonoBehaviour
     // Llamado durante el movimiento
     public void CheckNearGoal(MovimientoFicha jugador)
     {
-        int casillasRestantes = jugador.ruta.casillas.Count - 1 - jugador.indiceActual;
+        var casillas = jugador.ObtenerCasillas();
+        if (casillas == null) return;
+        int casillasRestantes = casillas.Count - 1 - jugador.indiceActual;
         if (casillasRestantes <= 3)
         {
             TryTrigger(jugador, CardType.AvanceRapido);
