@@ -48,12 +48,53 @@ public class FichaInversa : MonoBehaviour
 
         if (pasos > casillasRestantes)
         {
-            Debug.Log($"[FichaInversa] {name}: necesita {casillasRestantes} o menos, sacó {pasos}. Turno perdido.");
-            if (gameManager != null) gameManager.SiguienteTurno();
+            bool soyAutoridad = GameSync.Instance == null || Photon.Pun.PhotonNetwork.IsMasterClient;
+            if (soyAutoridad && gameManager != null) gameManager.SiguienteTurno();
             return;
         }
 
         StartCoroutine(MoverHaciaInicio(pasos));
+    }
+
+    // Llamado por CardManager cuando una carta de retroceso afecta la FichaB
+    public void Retroceder(int pasos)
+    {
+        if (enMovimiento) return;
+        var casillas = gameManager?.casillas;
+        if (casillas == null || casillas.Count == 0) return;
+
+        int nuevoIndice = Mathf.Min(casillas.Count - 1, indiceActual + pasos);
+        if (nuevoIndice == indiceActual) return;
+
+        StartCoroutine(MoverHaciaFinal(pasos));
+    }
+
+    IEnumerator MoverHaciaFinal(int pasos)
+    {
+        enMovimiento = true;
+
+        if (camaraDirectora != null) camaraDirectora.SeguirJugador(transform);
+
+        var casillas = gameManager?.casillas;
+        if (casillas == null) { enMovimiento = false; yield break; }
+
+        int metaFinal = Mathf.Min(casillas.Count - 1, indiceActual + pasos);
+
+        while (indiceActual < metaFinal)
+        {
+            indiceActual++;
+            Vector3 destino = casillas[indiceActual].position + Vector3.up * 0.5f;
+            while (Vector3.Distance(transform.position, destino) > 0.05f)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, destino, velocidad * Time.deltaTime);
+                yield return null;
+            }
+            transform.position = destino;
+            yield return new WaitForSeconds(0.08f);
+        }
+
+        enMovimiento = false;
+        if (camaraDirectora != null) camaraDirectora.VolverAlTablero();
     }
 
     IEnumerator MoverHaciaInicio(int pasos)
@@ -63,30 +104,27 @@ public class FichaInversa : MonoBehaviour
         if (gameManager != null && gameManager.dado != null) gameManager.dado.gameObject.SetActive(false);
         if (camaraDirectora != null) camaraDirectora.SeguirJugador(transform);
 
-        int metaFinal = indiceActual - pasos;
-        if (metaFinal < 0) metaFinal = 0;
+        var casillas = gameManager?.casillas;
+        if (casillas == null) { enMovimiento = false; yield break; }
+
+        int metaFinal = Mathf.Max(0, indiceActual - pasos);
 
         while (indiceActual > metaFinal)
         {
             indiceActual--;
-
-            Vector3 destino = gameManager.casillas[indiceActual].position + Vector3.up * 0.5f;
-
+            Vector3 destino = casillas[indiceActual].position + Vector3.up * 0.5f;
             while (Vector3.Distance(transform.position, destino) > 0.05f)
             {
                 transform.position = Vector3.MoveTowards(transform.position, destino, velocidad * Time.deltaTime);
                 yield return null;
             }
-
             transform.position = destino;
             yield return new WaitForSeconds(0.08f);
         }
 
         enMovimiento = false;
         if (camaraDirectora != null) camaraDirectora.VolverAlTablero();
-        Debug.Log($"[FichaInversa] {name} llegó a casilla {indiceActual}");
 
-        // REVELAR -> AÑADIR A MANO (Usando el inventario de la ficha principal)
         yield return StartCoroutine(RevelarYAñadirCarta());
 
         // Detectar colisión → batalla PPS
@@ -104,16 +142,17 @@ public class FichaInversa : MonoBehaviour
             }
         }
 
-
-        if (gameManager != null) gameManager.SiguienteTurno();
+        bool soyAutoridad = GameSync.Instance == null || Photon.Pun.PhotonNetwork.IsMasterClient;
+        if (soyAutoridad && gameManager != null) gameManager.SiguienteTurno();
     }
 
     IEnumerator RevelarYAñadirCarta()
     {
-        if (gameManager == null || gameManager.casillas == null || gameManager.casillas.Count == 0) yield break;
-        if (indiceActual < 0 || indiceActual >= gameManager.casillas.Count) yield break;
+        var casillas = gameManager?.casillas;
+        if (casillas == null || casillas.Count == 0) yield break;
+        if (indiceActual < 0 || indiceActual >= casillas.Count) yield break;
 
-        Transform casilla = gameManager.casillas[indiceActual];
+        Transform casilla = casillas[indiceActual];
         if (casilla == null) yield break;
 
         CartaEnCasilla comp = casilla.GetComponent<CartaEnCasilla>();
@@ -122,6 +161,7 @@ public class FichaInversa : MonoBehaviour
         CardSO card = comp.ObtenerCarta();
         if (card == null) yield break;
 
+        // GameSync.EsMiTurno es la fuente correcta (fichas de escena, no instanciadas por red)
         bool esMia = true;
         if (Photon.Pun.PhotonNetwork.InRoom)
             esMia = GameSync.Instance != null && GameSync.Instance.EsMiTurno;
@@ -138,7 +178,6 @@ public class FichaInversa : MonoBehaviour
                 CardTriggerSystem.Instance.CheckCardDrawn(fichaPrincipal, card);
         }
 
-        // Abrir panel Usar/Guardar para el jugador local (igual que MovimientoFicha)
         if (esMia && CardPlayUI.Instance != null)
         {
             CardPlayUI.Instance.Mostrar(card, fichaPrincipal);

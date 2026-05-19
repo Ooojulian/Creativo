@@ -168,7 +168,7 @@ public class GameManager : MonoBehaviour
         PrepararTurno();
     }
 
-    private void PrepararTurno()
+    public void PrepararTurno()
     {
         // Saltar jugadores que ya llegaron a la meta
         int intentos = 0;
@@ -279,14 +279,23 @@ public class GameManager : MonoBehaviour
     // =========================
     // CARTA: INTERCAMBIO
     // =========================
-    public void IntercambiarConOtroJugador(MovimientoFicha jugador)
+    public void IntercambiarConOtroJugador(MovimientoFicha jugador, int randRivalIdx = -1)
     {
         // Elegir otro jugador activo (distinto al actual)
-        var candidatos = new List<MovimientoFicha>(jugadoresActivos);
-        candidatos.Remove(jugador);
-        if (candidatos.Count == 0) return;
+        MovimientoFicha otro = null;
+        if (randRivalIdx >= 0 && randRivalIdx < todosLosJugadores.Count)
+        {
+            otro = todosLosJugadores[randRivalIdx];
+        }
+        else
+        {
+            var candidatos = new List<MovimientoFicha>(jugadoresActivos);
+            candidatos.Remove(jugador);
+            if (candidatos.Count == 0) return;
+            otro = candidatos[Random.Range(0, candidatos.Count)];
+        }
 
-        MovimientoFicha otro = candidatos[Random.Range(0, candidatos.Count)];
+        if (otro == null) return;
 
         if (otro.escudoActivo)
         {
