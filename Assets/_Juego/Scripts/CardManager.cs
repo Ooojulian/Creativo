@@ -16,10 +16,12 @@ public class CardManager : MonoBehaviour
         Instance = this;
     }
 
-    public void EjecutarEfectoInmediato(CardSO card, MovimientoFicha usuario)
+    public void EjecutarEfectoInmediato(CardSO card, MovimientoFicha usuario, MovimientoFicha rivalEspecifico = null, bool esFichaB = false, int randVal1 = -1, int randVal2 = -1)
     {
-        Debug.Log($"Ejecutando efecto inmediato de {card.cardName}");
-        MovimientoFicha rival = EncontrarRival(usuario);
+        Debug.Log($"Ejecutando efecto inmediato de {card.cardName} | fichaB={esFichaB} | randVal1={randVal1} | randVal2={randVal2}");
+        // Si se pasó un rival específico (desde el selector de objetivos), usarlo.
+        // Si no, caer al comportamiento por defecto (primer rival activo).
+        MovimientoFicha rival = rivalEspecifico ?? EncontrarRival(usuario);
 
         switch (card.type)
         {
@@ -27,7 +29,7 @@ public class CardManager : MonoBehaviour
                 usuario.Avanzar(card.valor1 > 0 ? card.valor1 : 2);
                 break;
             case CardType.Retroceso:
-                if (rival != null) RetrocederEspecifico(rival, card.valor1 != 0 ? Mathf.Abs(card.valor1) : 3);
+                if (rival != null) RetrocederEspecifico(rival, card.valor1 != 0 ? Mathf.Abs(card.valor1) : 3, esFichaB);
                 break;
             case CardType.DobleTiro:
                 usuario.dobleTiroPendiente = true;
@@ -48,12 +50,30 @@ public class CardManager : MonoBehaviour
                 if (energia != null) energia.GanarEnergia(card.valor1 > 0 ? card.valor1 : 2);
                 break;
             case CardType.RoboArcano:
-                usuario.GetComponent<PlayerInventory>().AddToHand(ObtenerCartaAleatoria());
+                CardSO cartaRobada = (randVal1 >= 0) ? ObtenerCartaPorTipo((CardType)randVal1) : ObtenerCartaAleatoria();
+                if (cartaRobada != null)
+                    usuario.GetComponent<PlayerInventory>().AddToHand(cartaRobada);
                 break;
             case CardType.VisionDelSabio:
                 var invVision = usuario.GetComponent<PlayerInventory>();
-                for(int i=0; i < (card.valor1 > 0 ? card.valor1 : 2); i++)
+                if (randVal1 >= 0)
+                {
+                    CardSO c1 = ObtenerCartaPorTipo((CardType)randVal1);
+                    if (c1 != null) invVision.AddToHand(c1);
+                }
+                else
+                {
                     invVision.AddToHand(ObtenerCartaVentaja());
+                }
+                if (randVal2 >= 0)
+                {
+                    CardSO c2 = ObtenerCartaPorTipo((CardType)randVal2);
+                    if (c2 != null) invVision.AddToHand(c2);
+                }
+                else
+                {
+                    invVision.AddToHand(ObtenerCartaVentaja());
+                }
                 break;
             case CardType.Maldicion:
                 if (rival != null)
@@ -66,17 +86,17 @@ public class CardManager : MonoBehaviour
                 if (rival != null) rival.silencioActivo = true;
                 break;
             case CardType.Ruptura:
-                if (rival != null) RivalDescartaEspecifico(rival, card.valor1 > 0 ? card.valor1 : 2);
+                if (rival != null) RivalDescartaEspecificoDeterministic(rival, randVal1, randVal2);
                 break;
             case CardType.Intercambio:
-                IntercambiarConCualquiera(usuario);
+                IntercambiarConCualquieraDeterministic(usuario, randVal1);
                 break;
         }
     }
 
-    public void EjecutarEfectoReserva(CardSO card, MovimientoFicha usuario, MovimientoFicha rivalInvolucrado = null)
+    public void EjecutarEfectoReserva(CardSO card, MovimientoFicha usuario, MovimientoFicha rivalInvolucrado = null, int randVal1 = -1, int randVal2 = -1)
     {
-        Debug.Log($"Ejecutando efecto de reserva de {card.cardName}");
+        Debug.Log($"Ejecutando efecto de reserva de {card.cardName} | randVal1={randVal1} | randVal2={randVal2}");
         switch (card.type)
         {
             case CardType.AvanceRapido:
@@ -102,7 +122,15 @@ public class CardManager : MonoBehaviour
             case CardType.RoboArcano:
             case CardType.VisionDelSabio:
                 var inv = usuario.GetComponent<PlayerInventory>();
-                inv.AddToHand(ObtenerCartaVentaja());
+                if (randVal1 >= 0)
+                {
+                    CardSO c = ObtenerCartaPorTipo((CardType)randVal1);
+                    if (c != null) inv.AddToHand(c);
+                }
+                else
+                {
+                    inv.AddToHand(ObtenerCartaVentaja());
+                }
                 break;
             case CardType.Maldicion:
                 if (rivalInvolucrado != null)
@@ -115,10 +143,10 @@ public class CardManager : MonoBehaviour
                 if (rivalInvolucrado != null) rivalInvolucrado.silencioActivo = true;
                 break;
             case CardType.Ruptura:
-                if (rivalInvolucrado != null) RivalDescartaEspecifico(rivalInvolucrado, 1);
+                if (rivalInvolucrado != null) RivalDescartaEspecificoDeterministic(rivalInvolucrado, randVal1, randVal2);
                 break;
             case CardType.Intercambio:
-                IntercambiarConCualquiera(usuario);
+                IntercambiarConCualquieraDeterministic(usuario, randVal1);
                 break;
         }
     }
@@ -132,23 +160,33 @@ public class CardManager : MonoBehaviour
         if (rival != null) RetrocederEspecifico(rival, pasos);
     }
 
-    private void RetrocederEspecifico(MovimientoFicha rival, int pasos)
+    private void RetrocederEspecifico(MovimientoFicha rival, int pasos, bool esFichaB = false)
     {
         if (rival.escudoActivo)
         {
-            Debug.Log($"[Escudo] {rival.name} bloqueó el retroceso.");
+            Debug.Log($"[Escudo] {rival.name} bloquó el retroceso.");
             rival.escudoActivo = false;
             return;
         }
-        rival.indiceActual = Mathf.Max(0, rival.indiceActual - pasos);
-        rival.transform.position = rival.ruta.casillas[rival.indiceActual].position + Vector3.up * 0.5f;
+
+        if (esFichaB && rival.fichaB != null)
+        {
+            // Delegar en el método animado de FichaInversa
+            rival.fichaB.Retroceder(pasos);
+            Debug.Log($"[Retroceso] Llamando Retroceder({pasos}) en FichaB de {rival.name}");
+        }
+        else
+        {
+            // Ficha A (normal): retroceder = disminuir el índice
+            rival.indiceActual = Mathf.Max(0, rival.indiceActual - pasos);
+            rival.transform.position = rival.ruta.casillas[rival.indiceActual].position + Vector3.up * 0.5f;
+            Debug.Log($"[Retroceso] FichaA de {rival.name} retrocedió {pasos} casillas -> idx {rival.indiceActual}");
+        }
     }
 
-    private void IntercambiarConCualquiera(MovimientoFicha usuario)
+    private void IntercambiarConCualquieraDeterministic(MovimientoFicha usuario, int randRivalIdx)
     {
-        // En intercambio, ¿el escudo protege? Generalmente sí en estos juegos.
-        // Pero para no complicar, lo dejamos así o buscamos un rival sin escudo.
-        gameManager.IntercambiarConOtroJugador(usuario);
+        gameManager.IntercambiarConOtroJugador(usuario, randRivalIdx);
     }
 
     private void RivalPierdeTurno(MovimientoFicha usuario)
@@ -166,13 +204,7 @@ public class CardManager : MonoBehaviour
         }
     }
 
-    private void RivalDescarta(MovimientoFicha usuario, int cantidad)
-    {
-        MovimientoFicha rival = EncontrarRival(usuario);
-        if (rival != null) RivalDescartaEspecifico(rival, cantidad);
-    }
-
-    private void RivalDescartaEspecifico(MovimientoFicha rival, int cantidad)
+    private void RivalDescartaEspecificoDeterministic(MovimientoFicha rival, int idx1, int idx2)
     {
         if (rival.escudoActivo)
         {
@@ -181,9 +213,20 @@ public class CardManager : MonoBehaviour
             return;
         }
         var inv = rival.GetComponent<PlayerInventory>();
-        for (int i = 0; i < cantidad; i++)
+        if (inv == null || inv.hand.Count == 0) return;
+
+        var indices = new List<int>();
+        if (idx1 >= 0 && idx1 < inv.hand.Count) indices.Add(idx1);
+        if (idx2 >= 0 && idx2 < inv.hand.Count && idx2 != idx1) indices.Add(idx2);
+
+        indices.Sort((a, b) => b.CompareTo(a)); // ordenar de mayor a menor
+        foreach (int index in indices)
         {
-            if (inv.hand.Count > 0) inv.hand.RemoveAt(Random.Range(0, inv.hand.Count));
+            if (index >= 0 && index < inv.hand.Count)
+            {
+                Debug.Log($"[Cartas] Ruptura descarta índice {index} ({inv.hand[index].cardName}) de J{gameManager.todosLosJugadores.IndexOf(rival) + 1}");
+                inv.hand.RemoveAt(index);
+            }
         }
     }
 
@@ -241,5 +284,23 @@ public class CardManager : MonoBehaviour
     {
         if (poolCartasDesventaja == null || poolCartasDesventaja.Count == 0) return null;
         return poolCartasDesventaja[Random.Range(0, poolCartasDesventaja.Count)];
+    }
+
+    /// <summary>
+    /// Busca un CardSO por su tipo en los pools del juego.
+    /// Se usa en los RPCs de red para reconstruir la carta exacta desde un entero.
+    /// </summary>
+    public CardSO ObtenerCartaPorTipo(CardType tipo)
+    {
+        if (poolCartasVentaja != null)
+            foreach (var c in poolCartasVentaja)
+                if (c != null && c.type == tipo) return c;
+
+        if (poolCartasDesventaja != null)
+            foreach (var c in poolCartasDesventaja)
+                if (c != null && c.type == tipo) return c;
+
+        Debug.LogWarning($"[CardManager] No se encontró carta de tipo {tipo} en ningún pool.");
+        return null;
     }
 }

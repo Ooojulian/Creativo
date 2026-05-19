@@ -44,9 +44,55 @@ public class FichaInversa : MonoBehaviour
         StartCoroutine(MoverHaciaInicio(pasos));
     }
 
+    public void Retroceder(int pasos)
+    {
+        if (enMovimiento) { Debug.Log($"[FichaInversa] {name}: en movimiento, ignorando retroceso."); return; }
+        if (ruta == null || ruta.casillas == null || ruta.casillas.Count == 0) return;
+
+        int nuevoIndice = Mathf.Min(ruta.casillas.Count - 1, indiceActual + pasos);
+        if (nuevoIndice == indiceActual)
+        {
+            Debug.Log($"[FichaInversa] {name}: ya está en el límite, no puede retroceder más.");
+            return;
+        }
+
+        Debug.Log($"[FichaInversa] {name}: retrocediendo {pasos} casillas desde idx {indiceActual} → {nuevoIndice}");
+        StartCoroutine(MoverHaciaFinal(pasos));
+    }
+
+    IEnumerator MoverHaciaFinal(int pasos)
+    {
+        enMovimiento = true;
+
+        if (camaraDirectora != null) camaraDirectora.SeguirJugador(transform);
+
+        int metaFinal = Mathf.Min(ruta.casillas.Count - 1, indiceActual + pasos);
+
+        while (indiceActual < metaFinal)
+        {
+            indiceActual++;
+
+            Vector3 destino = ruta.casillas[indiceActual].position + Vector3.up * 0.5f;
+
+            while (Vector3.Distance(transform.position, destino) > 0.05f)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, destino, velocidad * Time.deltaTime);
+                yield return null;
+            }
+
+            transform.position = destino;
+            yield return new WaitForSeconds(0.08f);
+        }
+
+        enMovimiento = false;
+        if (camaraDirectora != null) camaraDirectora.VolverAlTablero();
+        Debug.Log($"[FichaInversa] {name} retrocedió animado hasta casilla {indiceActual}");
+    }
+
     IEnumerator MoverHaciaInicio(int pasos)
     {
         enMovimiento = true;
+
 
         if (gm != null && gm.dado != null) gm.dado.gameObject.SetActive(false);
         if (camaraDirectora != null) camaraDirectora.SeguirJugador(transform);

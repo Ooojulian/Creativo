@@ -192,4 +192,147 @@ public class GameSync : MonoBehaviourPunCallbacks
         Debug.Log($"[Red] {otherPlayer.NickName} salió.");
         // Si era el host, Photon transfiere el MasterClient automáticamente
     }
+
+    // ─── CARTAS ──────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Sincroniza el robo de una carta: todos los clientes agregan la misma
+    /// carta al inventario del jugador indicado.
+    /// </summary>
+    public void SincronizarCartaRobada(int indexJugador, int cardTypeInt)
+    {
+        photonView.RPC(nameof(RPC_CartaRobada), RpcTarget.All, indexJugador, cardTypeInt);
+    }
+
+    [PunRPC]
+    private void RPC_CartaRobada(int indexJugador, int cardTypeInt)
+    {
+        if (gameManager == null) return;
+        if (indexJugador < 0 || indexJugador >= gameManager.todosLosJugadores.Count) return;
+
+        CardType tipo = (CardType)cardTypeInt;
+        CardSO carta = CardManager.Instance?.ObtenerCartaPorTipo(tipo);
+        if (carta == null)
+        {
+            Debug.LogWarning($"[Red] RPC_CartaRobada: no se encontró carta de tipo {tipo}");
+            return;
+        }
+
+        var jugador = gameManager.todosLosJugadores[indexJugador];
+        jugador.inventario?.AddToHand(carta);
+        Debug.Log($"[Red] RPC_CartaRobada: J{indexJugador + 1} recibió {carta.cardName}");
+    }
+
+    /// <summary>
+    /// Sincroniza el uso inmediato de una carta: en todos los clientes se
+    /// descuenta la energía, se elimina de la mano y se ejecuta su efecto.
+    /// </summary>
+    /// <param name="indexRival">Índice del rival objetivo en todosLosJugadores. -1 = sin objetivo específico.</param>
+    /// <param name="esFichaB">true si el efecto debe aplicarse sobre la Ficha B (inversa) del rival.</param>
+    public void SincronizarUsarCarta(int indexJugador, int cardTypeInt, int indexRival = -1, bool esFichaB = false, int randVal1 = -1, int randVal2 = -1)
+    {
+        photonView.RPC(nameof(RPC_UsarCarta), RpcTarget.All, indexJugador, cardTypeInt, indexRival, esFichaB, randVal1, randVal2);
+    }
+
+    [PunRPC]
+    private void RPC_UsarCarta(int indexJugador, int cardTypeInt, int indexRival, bool esFichaB, int randVal1, int randVal2)
+    {
+        if (gameManager == null) return;
+        if (indexJugador < 0 || indexJugador >= gameManager.todosLosJugadores.Count) return;
+
+        CardType tipo = (CardType)cardTypeInt;
+        var jugador = gameManager.todosLosJugadores[indexJugador];
+
+        // Buscar por tipo dentro de la mano real del jugador
+        CardSO carta = jugador.inventario?.hand.Find(c => c != null && c.type == tipo);
+        if (carta == null)
+        {
+            Debug.LogWarning($"[Red] RPC_UsarCarta: no hay carta de tipo {tipo} en la mano de J{indexJugador + 1}");
+            return;
+        }
+
+        // Gastar energía
+        var energia = jugador.GetComponent<EnergiaController>();
+        if (energia != null) energia.GastarEnergia(carta.costoEnergia);
+
+        // Eliminar carta de la mano
+        jugador.inventario.RemoveFromHand(carta);
+
+        // Resolver rival objetivo
+        MovimientoFicha rivalObjetivo = null;
+        if (indexRival >= 0 && indexRival < gameManager.todosLosJugadores.Count)
+            rivalObjetivo = gameManager.todosLosJugadores[indexRival];
+
+        // Ejecutar efecto pasando qué token afectar y valores deterministas
+        CardManager.Instance?.EjecutarEfectoInmediato(carta, jugador, rivalObjetivo, esFichaB, randVal1, randVal2);
+        Debug.Log($"[Red] RPC_UsarCarta: J{indexJugador + 1} usó {carta.cardName} contra J{indexRival + 1} ficha{(esFichaB ? 'B' : 'A')}");
+    }
+
+    /// <summary>
+    /// Sincroniza guardar una carta en la reserva: en todos los clientes se
+    /// mueve la carta de la mano a la reserva del jugador.
+    /// </summary>
+    public void SincronizarGuardarCarta(int indexJugador, int cardTypeInt)
+    {
+        photonView.RPC(nameof(RPC_GuardarCarta), RpcTarget.All, indexJugador, cardTypeInt);
+    }
+
+    [PunRPC]
+    private void RPC_GuardarCarta(int indexJugador, int cardTypeInt)
+    {
+        if (gameManager == null) return;
+        if (indexJugador < 0 || indexJugador >= gameManager.todosLosJugadores.Count) return;
+
+        CardType tipo = (CardType)cardTypeInt;
+        var jugador = gameManager.todosLosJugadores[indexJugador];
+
+        // ¡IMPORTANTE! Buscar por tipo dentro de la mano real del jugador,
+        // no en el pool, para que Remove() encuentre la referencia exacta.
+        CardSO carta = jugador.inventario?.hand.Find(c => c != null && c.type == tipo);
+        if (carta == null)
+        {
+            Debug.LogWarning($"[Red] RPC_GuardarCarta: no hay carta de tipo {tipo} en la mano de J{indexJugador + 1}");
+            return;
+        }
+
+        jugador.inventario.SaveToReserve(carta);
+        Debug.Log($"[Red] RPC_GuardarCarta: J{indexJugador + 1} guardó {carta.cardName} en reserva");
+    }
+
+    /// <summary>
+    /// Sincroniza el uso de una carta que estaba guardada en la RESERVA.
+    /// Busca en la reserva (no en la mano) y ejecuta el efecto en todos los clientes.
+    /// </summary>
+    /// <param name="indexRival">Índice del rival objetivo en todosLosJugadores. -1 = sin objetivo específico.</param>
+    /// <param name="esFichaB">true si el efecto debe aplicarse sobre la Ficha B (inversa) del rival.</param>
+    public void SincronizarUsarCartaDeReserva(int indexJugador, int cardTypeInt, int indexRival = -1, bool esFichaB = false, int randVal1 = -1, int randVal2 = -1)
+    {
+        photonView.RPC(nameof(RPC_UsarCartaDeReserva), RpcTarget.All, indexJugador, cardTypeInt, indexRival, esFichaB, randVal1, randVal2);
+    }
+
+    [PunRPC]
+    private void RPC_UsarCartaDeReserva(int indexJugador, int cardTypeInt, int indexRival, bool esFichaB, int randVal1, int randVal2)
+    {
+        if (gameManager == null) return;
+        if (indexJugador < 0 || indexJugador >= gameManager.todosLosJugadores.Count) return;
+
+        CardType tipo = (CardType)cardTypeInt;
+        var jugador = gameManager.todosLosJugadores[indexJugador];
+
+        CardSO carta = jugador.inventario?.reserve.Find(c => c != null && c.type == tipo);
+        if (carta == null)
+        {
+            Debug.LogWarning($"[Red] RPC_UsarCartaDeReserva: no hay carta de tipo {tipo} en la reserva de J{indexJugador + 1}");
+            return;
+        }
+
+        MovimientoFicha rivalObjetivo = null;
+        if (indexRival >= 0 && indexRival < gameManager.todosLosJugadores.Count)
+            rivalObjetivo = gameManager.todosLosJugadores[indexRival];
+
+        jugador.inventario.RemoveFromReserve(carta);
+        CardManager.Instance?.EjecutarEfectoInmediato(carta, jugador, rivalObjetivo, esFichaB, randVal1, randVal2);
+        Debug.Log($"[Red] RPC_UsarCartaDeReserva: J{indexJugador + 1} jugó {carta.cardName} desde reserva contra J{indexRival + 1} ficha{(esFichaB ? 'B' : 'A')}");
+    }
 }
+

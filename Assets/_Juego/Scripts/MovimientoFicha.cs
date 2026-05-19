@@ -16,8 +16,8 @@ public class MovimientoFicha : MonoBehaviour
     public bool maldicionActiva = false;
 
     [Header("Cartas - UI timing")]
-    public float tiempoRevelacion = 2f; // tiempo mostrando la carta antes de aplicar
-    public float tiempoResultado = 1f;  // tiempo mostrando el efecto antes del fade out
+    public float tiempoRevelacion = 1f; // tiempo mostrando la carta antes de aplicar (1 seg)
+    public float tiempoResultado = 0f;  // delay antes del fade out (0 = fade inmediato)
 
     private bool enMovimiento = false;
     private CamaraDirectora camaraDirectora;
@@ -177,11 +177,8 @@ public class MovimientoFicha : MonoBehaviour
                 if (dobleTiroPendiente)
                 {
                     dobleTiroPendiente = false;
-
-                    if (gm.dado != null)
-                        gm.dado.gameObject.SetActive(true);
-
                     Debug.Log($"[Cartas] {name} repite turno por DobleTiro.");
+                    gm.PrepararTurno();
                 }
                 else
                 {
@@ -206,34 +203,95 @@ public class MovimientoFicha : MonoBehaviour
             yield break;
         }
 
-        CardSO card = comp.ObtenerCarta();
-
-        if (card == null)
+        // ─── Determinar si esta ficha es del jugador local ───────────────────
+        bool esMia = true;
+        int fichaIndex = -1;
+        if (Photon.Pun.PhotonNetwork.InRoom)
         {
-            if (gm != null && gm.uiCartas != null) gm.uiCartas.Limpiar();
+            int myActor = Photon.Pun.PhotonNetwork.LocalPlayer.ActorNumber;
+            int myIndex = -1;
+            for (int i = 0; i < Photon.Pun.PhotonNetwork.PlayerList.Length; i++)
+            {
+                if (Photon.Pun.PhotonNetwork.PlayerList[i].ActorNumber == myActor)
+                {
+                    myIndex = i;
+                    break;
+                }
+            }
+            fichaIndex = gm.todosLosJugadores.IndexOf(this);
+            esMia = (myIndex == fichaIndex);
+        }
+        else
+        {
+            fichaIndex = gm.todosLosJugadores.IndexOf(this);
+        }
+
+        // ─── Sin red: comportamiento local original ───────────────────────────
+        if (!Photon.Pun.PhotonNetwork.InRoom)
+        {
+            CardSO card = comp.ObtenerCarta();
+            if (card == null)
+            {
+                if (gm != null && gm.uiCartas != null) gm.uiCartas.Limpiar();
+                yield break;
+            }
+
+            if (gm != null && gm.uiCartas != null)
+                gm.uiCartas.MostrarRevelacion(card);
+
+            yield return new WaitForSeconds(tiempoRevelacion);
+
+            if (inventario != null)
+            {
+                inventario.AddToHand(card);
+                if (CardTriggerSystem.Instance != null)
+                    CardTriggerSystem.Instance.CheckCardDrawn(this, card);
+            }
+
+            if (gm != null && gm.uiCartas != null)
+                yield return StartCoroutine(gm.uiCartas.FadeOutYLimpiar(tiempoResultado));
+
+            if (CardPlayUI.Instance != null)
+                CardPlayUI.Instance.Mostrar(card, this);
+
             yield break;
         }
 
-        // 1) Mostrar revelación SOLO SI ES MI FICHA (Privado para el jugador local)
-        bool esMia = true;
-        var pv = GetComponent<Photon.Pun.PhotonView>();
-        if (pv != null) esMia = pv.IsMine;
+        // ─── Con red: solo el dueño decide la carta y la sincroniza ──────────
+        CardSO cartaElegida = null;
 
-        if (esMia && gm != null && gm.uiCartas != null)
-            gm.uiCartas.MostrarRevelacion(card);
-
-        yield return new WaitForSeconds(tiempoRevelacion);
-
-        // 2) Añadir a mano
-        if (inventario != null)
+        if (esMia)
         {
-            inventario.AddToHand(card);
-            if (CardTriggerSystem.Instance != null)
-                CardTriggerSystem.Instance.CheckCardDrawn(this, card);
-        }
+            cartaElegida = comp.ObtenerCarta();
 
-        // 3) Limpiar UI
-        if (gm != null && gm.uiCartas != null)
-            yield return StartCoroutine(gm.uiCartas.FadeOutYLimpiar(tiempoResultado));
+            if (cartaElegida == null)
+            {
+                if (gm != null && gm.uiCartas != null) gm.uiCartas.Limpiar();
+                yield break;
+            }
+
+            // Mostrar revelación solo en mi pantalla
+            if (gm != null && gm.uiCartas != null)
+                gm.uiCartas.MostrarRevelacion(cartaElegida);
+
+            yield return new WaitForSeconds(tiempoRevelacion);
+
+            // Sincronizar con todos los clientes (el RPC hace el AddToHand en todos)
+            if (GameSync.Instance != null && fichaIndex >= 0)
+                GameSync.Instance.SincronizarCartaRobada(fichaIndex, (int)cartaElegida.type);
+
+            // Trigger de CheckCardDrawn solo local (efecto de reserva si aplica)
+            if (CardTriggerSystem.Instance != null)
+                CardTriggerSystem.Instance.CheckCardDrawn(this, cartaElegida);
+
+            // Fade out solo en mi pantalla
+            if (gm != null && gm.uiCartas != null)
+                yield return StartCoroutine(gm.uiCartas.FadeOutYLimpiar(tiempoResultado));
+
+            // Abrir panel Usar/Guardar solo en mi pantalla
+            if (CardPlayUI.Instance != null)
+                CardPlayUI.Instance.Mostrar(cartaElegida, this);
+        }
+        // Los demás clientes no hacen nada aquí; el RPC se encarga de su AddToHand.
     }
 }

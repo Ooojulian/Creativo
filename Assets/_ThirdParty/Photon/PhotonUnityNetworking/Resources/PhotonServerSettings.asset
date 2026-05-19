@@ -20,7 +20,7 @@ MonoBehaviour:
     AppVersion: 
     UseNameServer: 1
     FixedRegion: sa
-    Server:
+    Server: 
     Port: 0
     ProxyServer: 
     Protocol: 0
@@ -48,6 +48,10 @@ MonoBehaviour:
   - RPC_FichaAlInicio
   - RPC_IniciarBatalla
   - RPC_RecibirEleccion
+  - RPC_CartaRobada
+  - RPC_GuardarCarta
+  - RPC_UsarCarta
+  - RPC_UsarCartaDeReserva
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
