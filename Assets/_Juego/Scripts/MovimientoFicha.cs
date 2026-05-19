@@ -190,22 +190,12 @@ public class MovimientoFicha : MonoBehaviour
             yield break;
         }
 
-        // 1) Mostrar revelación SOLO SI ES MI FICHA (privado para el jugador local)
+        // 1) Mostrar revelación SOLO SI ES MI FICHA
         bool esMia = true;
         if (Photon.Pun.PhotonNetwork.InRoom)
         {
-            int myActor = Photon.Pun.PhotonNetwork.LocalPlayer.ActorNumber;
-            int myIndex = -1;
-            for (int i = 0; i < Photon.Pun.PhotonNetwork.PlayerList.Length; i++)
-            {
-                if (Photon.Pun.PhotonNetwork.PlayerList[i].ActorNumber == myActor)
-                {
-                    myIndex = i;
-                    break;
-                }
-            }
-            int fichaIndex = gm.todosLosJugadores.IndexOf(this);
-            esMia = (myIndex == fichaIndex);
+            var pv = GetComponent<Photon.Pun.PhotonView>();
+            esMia = pv != null && pv.IsMine;
         }
 
         reveloCarta = true;
