@@ -14,26 +14,32 @@ public class SeleccionFichaUI : MonoBehaviour
 
     public GameManager gameManager;
 
+    private MovimientoFicha jugadorActual;
+    private int pasosActuales;
+
     void Start()
     {
         if (panel != null) panel.SetActive(false);
-        if (botonFichaA != null) botonFichaA.onClick.AddListener(() => ElegirFicha(false));
-        if (botonFichaB != null) botonFichaB.onClick.AddListener(() => ElegirFicha(true));
+        if (botonFichaA != null) botonFichaA.onClick.AddListener(() => OnElegirFicha(false));
+        if (botonFichaB != null) botonFichaB.onClick.AddListener(() => OnElegirFicha(true));
     }
 
     public void MostrarSeleccion(MovimientoFicha jugador)
     {
-        if (panel != null) panel.SetActive(true);
+        MostrarSeleccionConPasos(jugador, 0);
+    }
 
-        // Mostrar info de cada ficha
+    public void MostrarSeleccionConPasos(MovimientoFicha jugador, int pasos)
+    {
+        jugadorActual = jugador;
+        pasosActuales = pasos;
+
         if (textoFichaA != null)
             textoFichaA.text = $"Ficha A\nCasilla: {jugador.indiceActual}";
-
         if (textoFichaB != null && jugador.fichaB != null)
             textoFichaB.text = $"Ficha B\nCasilla: {jugador.fichaB.indiceActual}";
 
-        // Guardar referencia para cuando elija
-        jugadorActual = jugador;
+        if (panel != null) panel.SetActive(true);
     }
 
     public void OcultarPanel()
@@ -41,17 +47,12 @@ public class SeleccionFichaUI : MonoBehaviour
         if (panel != null) panel.SetActive(false);
     }
 
-    private MovimientoFicha jugadorActual;
-
-    private void ElegirFicha(bool esB)
+    private void OnElegirFicha(bool esB)
     {
         if (jugadorActual == null) return;
-        jugadorActual.ElegirFicha(esB);
-
         if (panel != null) panel.SetActive(false);
 
-        // Ejecutar movimiento con resultado del dado ya tirado
-        if (gameManager != null && gameManager.dado != null)
-            gameManager.dado.EjecutarMovimiento();
+        // Mover con los pasos del dado via RPC a todos los clientes
+        DadoLogico.MoverViaRPC(jugadorActual, pasosActuales, esB);
     }
 }

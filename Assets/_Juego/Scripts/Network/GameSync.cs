@@ -36,27 +36,22 @@ public class GameSync : MonoBehaviourPunCallbacks
     {
         actorNumeroTurnoActual = actorNumber;
         bool esMiTurno = actorNumber == PhotonNetwork.LocalPlayer.ActorNumber;
-        Debug.Log($"[Red] Turno actor {actorNumber}. ¿Es mi turno? {esMiTurno}");
 
         if (gameManager == null) return;
+        if (gameManager.dado != null) gameManager.dado.gameObject.SetActive(false);
 
         var jugador = gameManager.todosLosJugadores.Count > indiceTurno
             ? gameManager.todosLosJugadores[indiceTurno] : null;
         if (jugador == null) return;
 
-        var ui = FindAnyObjectByType<SeleccionFichaUI>();
-        if (esMiTurno)
-        {
-            if (ui != null) ui.MostrarSeleccion(jugador);
-            else if (gameManager.dado != null) gameManager.dado.gameObject.SetActive(true);
-        }
-        else
-        {
-            if (ui != null) ui.OcultarPanel();
-        }
-
-        // Lanzar el evento de inicio de turno en todos los clientes
+        // Lanzar evento de turno en todos los clientes (energía, UI, etc.)
         gameManager.DispararOnTurnStarted(jugador);
+
+        if (!esMiTurno) return;
+
+        // Es mi turno: activar dado siempre — selección de ficha viene DESPUÉS de tirar
+        if (gameManager.dado != null)
+            gameManager.dado.gameObject.SetActive(true);
     }
 
     public void AnunciarTurno(int indiceTurno)
@@ -72,24 +67,14 @@ public class GameSync : MonoBehaviourPunCallbacks
     {
         actorNumeroTurnoActual = actorNumber;
         bool esMiTurno = actorNumber == PhotonNetwork.LocalPlayer.ActorNumber;
-        Debug.Log($"[Red] RPC_RecibirTurno actor={actorNumber} idx={indiceTurno} miActor={PhotonNetwork.LocalPlayer.ActorNumber} miTurno={esMiTurno}");
 
         if (gameManager == null) { Debug.LogError("[Red] gameManager null"); return; }
         if (gameManager.dado == null) { Debug.LogError("[Red] dado null"); return; }
 
-        // Asignar jugador al dado en todos los clientes
         if (indiceTurno < gameManager.todosLosJugadores.Count)
-        {
             gameManager.dado.jugador = gameManager.todosLosJugadores[indiceTurno];
-            Debug.Log($"[Red] dado.jugador = {gameManager.dado.jugador.name}");
-        }
 
-        // Resetear estado de eleccion ficha al inicio del turno
-        gameManager.dado.jugador.moverFichaB = false;
-
-        // Solo cliente con turno ve el dado
         gameManager.dado.gameObject.SetActive(esMiTurno);
-        Debug.Log($"[Red] dado.activeSelf despues SetActive: {gameManager.dado.gameObject.activeSelf}");
 
         // Lanzar el evento de inicio de turno en todos los clientes
         if (indiceTurno < gameManager.todosLosJugadores.Count)
@@ -127,7 +112,6 @@ public class GameSync : MonoBehaviourPunCallbacks
     [PunRPC]
     private void RPC_RecibirMovimiento(int pasos, int indiceFicha, bool esFichaB)
     {
-        Debug.Log($"[Red] RPC_RecibirMovimiento ficha={indiceFicha} pasos={pasos} fichaB={esFichaB} master={PhotonNetwork.IsMasterClient}");
         if (gameManager == null) { Debug.LogError("[Red] gameManager null en GameSync"); return; }
         if (gameManager.todosLosJugadores == null) { Debug.LogError("[Red] todosLosJugadores null"); return; }
         if (indiceFicha < 0 || indiceFicha >= gameManager.todosLosJugadores.Count)
@@ -145,6 +129,31 @@ public class GameSync : MonoBehaviourPunCallbacks
         }
         ficha.ElegirFicha(esFichaB);
         ficha.Avanzar(pasos);
+    }
+
+    // ─── EFECTOS DE CARTAS (TELETRANSPORTE/INTERCAMBIO) ──────────────────────
+
+    public void SincronizarPosicionFicha(int indiceFicha, int nuevaCasilla)
+    {
+        if (PhotonNetwork.InRoom)
+        {
+            photonView.RPC(nameof(RPC_SincronizarPosicionFicha), RpcTarget.All, indiceFicha, nuevaCasilla);
+        }
+    }
+
+    [PunRPC]
+    private void RPC_SincronizarPosicionFicha(int indiceFicha, int nuevaCasilla)
+    {
+        if (gameManager == null || gameManager.todosLosJugadores == null) return;
+        if (indiceFicha < 0 || indiceFicha >= gameManager.todosLosJugadores.Count) return;
+
+        MovimientoFicha ficha = gameManager.todosLosJugadores[indiceFicha];
+        var casillas = gameManager.casillas;
+        if (ficha != null && casillas != null && casillas.Count > nuevaCasilla)
+        {
+            ficha.indiceActual = nuevaCasilla;
+            ficha.transform.position = casillas[nuevaCasilla].position + Vector3.up * 0.5f;
+        }
     }
 
     // ─── FIN DE TURNO ────────────────────────────────────────────────────────

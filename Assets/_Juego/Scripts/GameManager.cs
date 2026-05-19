@@ -27,7 +27,9 @@ public class GameManager : MonoBehaviour
     [Header("Elementos del Juego")]
     public DadoLogico dado;
     public List<MovimientoFicha> todosLosJugadores;
-    public GestorDeRuta ruta;
+    public GestorDeRutas ruta;
+
+    public List<Transform> casillas => ruta != null ? ruta.casillas : null;
 
     [Header("Pantalla de Fin")]
     public GameObject panelFin;
@@ -63,7 +65,8 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         if (ruta == null)
-            ruta = FindAnyObjectByType<GestorDeRuta>();
+            ruta = FindAnyObjectByType<GestorDeRutas>();
+
 
         dado.gameObject.SetActive(false);
 
@@ -133,12 +136,13 @@ public class GameManager : MonoBehaviour
             {
                 jugador.fichaB.gameObject.SetActive(true);
                 jugador.fichaB.Inicializar();
-                Vector3 posMeta = ruta.casillas[ruta.casillas.Count - 1].position + Vector3.up * 0.5f;
-                jugador.fichaB.transform.position = posMeta + offsetsInicio[i];
+                if (ruta != null && ruta.casillas != null && ruta.casillas.Count > 0)
+                {
+                    Vector3 posMeta = ruta.casillas[ruta.casillas.Count - 1].position + Vector3.up * 0.5f;
+                    jugador.fichaB.transform.position = posMeta + offsetsInicio[i];
+                }
             }
         }
-
-        Debug.Log($"Partida iniciada con {cantidad} jugadores. Posición inicio: {posInicio}");
 
         turnoActual = 0;
         PrepararTurno();
@@ -146,11 +150,13 @@ public class GameManager : MonoBehaviour
 
     public void SiguienteTurno()
     {
-        // NUEVO: Trigger "Inspiración" al final del turno
-        if (CardTriggerSystem.Instance != null && turnoActual < jugadoresActivos.Count)
+        if (turnoActual < jugadoresActivos.Count)
         {
             MovimientoFicha j = jugadoresActivos[turnoActual];
-            CardTriggerSystem.Instance.CheckTurnEnd(j, j.cartasAlEmpezarTurno);
+            // Decrementar estados del jugador que acaba de jugar
+            j.GetComponent<EstadosJugador>()?.DecrementarTodosLosEstados();
+            // Trigger "Inspiración" al final del turno
+            CardTriggerSystem.Instance?.CheckTurnEnd(j, j.cartasAlEmpezarTurno);
         }
 
         if (OnTurnEnded != null)
@@ -183,9 +189,8 @@ public class GameManager : MonoBehaviour
         if (CardTriggerSystem.Instance != null)
             CardTriggerSystem.Instance.CheckTurnStart(j);
 
-        // RESET: Silencio (se limpia al empezar el turno para que no afecte este turno)
+        // Silencio se limpia al empezar el turno (EstadosJugador lo decrementa al final del anterior)
         j.silencioActivo = false;
-        if (j.fichaB != null) j.fichaB.GetComponent<MovimientoFicha>().silencioActivo = false; // Por si acaso se hereda al script base
 
         // CARTA: PierdeTurno (saltar turno)
         if (j.pierdeSiguienteTurno)
@@ -196,7 +201,6 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        Debug.Log($"Turno del Jugador {turnoActual + 1}");
         dado.jugador = j;
 
         if (dado.gameObject.activeSelf)
@@ -213,9 +217,9 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // Con red: host avisa quién juega, cliente correcto activa dado
+        // Con red: host avisa quién juega, incluye lógica de panel selección ficha
         if (PhotonNetwork.IsMasterClient)
-            GameSync.Instance.AnunciarTurno(turnoActual);
+            GameSync.Instance.AnunciarTurnoConPanel(turnoActual);
     }
 
     public void DispararOnTurnStarted(MovimientoFicha j)
@@ -312,6 +316,14 @@ public class GameManager : MonoBehaviour
         {
             jugador.transform.position = ruta.casillas[jugador.indiceActual].position + Vector3.up * 0.5f;
             otro.transform.position = ruta.casillas[otro.indiceActual].position + Vector3.up * 0.5f;
+
+            if (GameSync.Instance != null)
+            {
+                int idxJugador = todosLosJugadores.IndexOf(jugador);
+                int idxOtro = todosLosJugadores.IndexOf(otro);
+                GameSync.Instance.SincronizarPosicionFicha(idxJugador, jugador.indiceActual);
+                GameSync.Instance.SincronizarPosicionFicha(idxOtro, otro.indiceActual);
+            }
         }
 
         Debug.Log($"[Cartas] Intercambio: {jugador.name} <-> {otro.name}");
@@ -374,4 +386,10 @@ public class GameManager : MonoBehaviour
 
         SceneManager.LoadScene("MenuInicio");
     }
+
+    // ── Accesores para sistemas externos ──────────────────────────────────────
+
+    public CartasUIVisual ObtenerUICartas() => uiCartas;
+
+    public List<MovimientoFicha> ObtenerJugadoresActivos() => new List<MovimientoFicha>(jugadoresActivos);
 }

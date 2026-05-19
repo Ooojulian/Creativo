@@ -1,7 +1,10 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using System;
+using Random = UnityEngine.Random;
 
 public class DadoLogico : MonoBehaviour
 {
@@ -9,6 +12,9 @@ public class DadoLogico : MonoBehaviour
     public MovimientoFicha jugador;
     public TextMeshProUGUI textoResultado;
     public TextMeshProUGUI textoInstruccion;
+
+    [Header("Botón táctil")]
+    [SerializeField] private Button _btnTirarDado;
 
     [Header("Posición fija en el tablero (visible desde GameCamera)")]
     public Vector3 posicionFija = new Vector3(650f, 100f, 250f);
@@ -29,12 +35,12 @@ public class DadoLogico : MonoBehaviour
     public int modificadorExterno = 0;
     private bool lanzando = false;
     private bool esperandoConfirmacion = false;
-    public bool EsperandoConfirmacion => esperandoConfirmacion;
     public bool Lanzando => lanzando;
     private Rigidbody rb;
     private Vector3 ejeRotacion;
     private CamaraDirectora camaraDirectora;
     private Vector3 escalaOriginal;
+    private Action<int> onDadoLanzado;
 
     // -------------------------------------------------
     void Awake()
@@ -47,8 +53,6 @@ public class DadoLogico : MonoBehaviour
             rb.useGravity = false;
         }
 
-        // Guardar la escala configurada en el prefab/escena para restaurarla en OnEnable
-        // escalaDado actúa como multiplicador: si es 1 usa la escala del prefab tal cual
         escalaOriginal = escalaDado > 0
             ? transform.localScale / escalaDado
             : transform.localScale;
@@ -56,14 +60,12 @@ public class DadoLogico : MonoBehaviour
 
     void OnEnable()
     {
-        // Solo auto-posicionar si la posición actual es el origen (no ha sido configurada)
         if (posicionFija == Vector3.zero && camaraDirectora != null && camaraDirectora.puntoVistaTablero != null)
         {
             Vector3 centro = camaraDirectora.puntoVistaTablero.position;
             posicionFija = new Vector3(centro.x + 150f, 100f, centro.z - 150f);
         }
 
-        // Cada vez que el dado se activa se reinicia a su posición fija
         lanzando = false;
         esperandoConfirmacion = false;
         ejeRotacion = Vector3.up;
@@ -75,24 +77,65 @@ public class DadoLogico : MonoBehaviour
             textoResultado.gameObject.SetActive(false);
         if (textoInstruccion != null)
         {
-            textoInstruccion.text = "ESPACIO \u2014 Tirar el dado";
+            textoInstruccion.text = "ESPACIO — Tirar el dado";
             textoInstruccion.gameObject.SetActive(true);
+        }
+
+        // Buscar botón si no está asignado en el Inspector
+        if (_btnTirarDado == null)
+        {
+            var go = GameObject.Find("BtnTirarDado");
+            if (go != null) _btnTirarDado = go.GetComponent<Button>();
+        }
+        if (_btnTirarDado != null)
+        {
+            _btnTirarDado.onClick.RemoveListener(OnBotonTirarDado);
+            _btnTirarDado.onClick.AddListener(OnBotonTirarDado);
+            _btnTirarDado.gameObject.SetActive(true);
+            _btnTirarDado.interactable = true;
         }
     }
 
     void Update()
     {
-        // Mantener posición fija mientras no lanza
         if (!lanzando && !esperandoConfirmacion)
             SnapAPosicion();
 
         if (Keyboard.current == null) return;
 
-        if (!lanzando && !esperandoConfirmacion && Keyboard.current.spaceKey.wasPressedThisFrame)
-            Lanzar();
+        // Teclado solo funciona cuando es el turno del jugador local
+        if (EsMiTurno())
+        {
+            if (!lanzando && !esperandoConfirmacion && Keyboard.current.spaceKey.wasPressedThisFrame)
+                Lanzar();
 
-        if (esperandoConfirmacion && Keyboard.current.spaceKey.wasPressedThisFrame)
+            if (esperandoConfirmacion && Keyboard.current.spaceKey.wasPressedThisFrame)
+                ConfirmarMovimiento();
+        }
+    }
+
+    private bool EsMiTurno()
+    {
+        if (!Photon.Pun.PhotonNetwork.IsConnected) return true;
+        var gameSync = GameSync.Instance;
+        if (gameSync != null) return gameSync.EsMiTurno;
+        if (jugador == null) return false;
+        var photonView = jugador.GetComponent<Photon.Pun.PhotonView>();
+        return photonView != null && photonView.IsMine;
+    }
+
+    private void OnBotonTirarDado()
+    {
+        if (!lanzando && !esperandoConfirmacion)
+            Lanzar();
+        else if (esperandoConfirmacion)
             ConfirmarMovimiento();
+    }
+
+    void OnDisable()
+    {
+        if (_btnTirarDado != null)
+            _btnTirarDado.gameObject.SetActive(false);
     }
 
     void SnapAPosicion()
@@ -111,23 +154,20 @@ public class DadoLogico : MonoBehaviour
     {
         lanzando = true;
 
-        if (textoResultado != null)   textoResultado.gameObject.SetActive(false);
+        if (textoResultado != null) textoResultado.gameObject.SetActive(false);
         if (textoInstruccion != null) textoInstruccion.gameObject.SetActive(false);
 
-        // Enfocar el dado mientras gira (ahora es no-op en CamaraDirectora para mantener vista general)
         if (camaraDirectora != null) camaraDirectora.EnfocarDado();
 
-        // Resultado elegido al inicio (sin física)
-        resultadoActual = Random.Range(1, 7);
+        resultadoActual = Random.Range(1, 7) + modificadorExterno;
+        modificadorExterno = 0;
 
-        // Eje de rotación aleatorio diferente cada lanzamiento
         ejeRotacion = new Vector3(
             Random.Range(-1f, 1f),
             Random.Range(-1f, 1f),
             Random.Range(-1f, 1f)
         ).normalized;
 
-        // Segunda rotación secundaria para mayor caos visual
         Vector3 ejeSec = new Vector3(
             Random.Range(-1f, 1f),
             Random.Range(-1f, 1f),
@@ -140,32 +180,20 @@ public class DadoLogico : MonoBehaviour
             tiempo += Time.deltaTime;
             float t = tiempo / duracionLanzamiento;
 
-            // Giro principal que desacelera, más rotación secundaria constante
             float vel = velocidadGiro * (1f - t * t);
             transform.Rotate(ejeRotacion, vel * Time.deltaTime, Space.Self);
             transform.Rotate(ejeSec, vel * 0.4f * Time.deltaTime, Space.Self);
 
-            // Pequeño salto al inicio de la animación
             float salto = Mathf.Sin(t * Mathf.PI * 3f) * alturaSalto * (1f - t);
             transform.position = posicionFija + Vector3.up * salto;
 
             yield return null;
         }
 
-        // Posición y rotación final según resultado
         transform.position = posicionFija;
         transform.rotation = RotacionParaResultado(resultadoActual);
 
-        // lanzando permanece true hasta que el jugador confirme con SPACE
-        // para evitar que se pueda tirar de nuevo durante la pausa
-
-        // Aplicar modificadores de energía/cartas
-        if (modificadorExterno != 0)
-        {
-            Debug.Log($"[Dado] Aplicando modificador de {modificadorExterno} al resultado {resultadoActual}");
-            resultadoActual += modificadorExterno;
-            modificadorExterno = 0; // Resetear tras uso
-        }
+        Debug.Log($"Resultado del dado: {resultadoActual}");
 
         if (textoResultado != null)
         {
@@ -173,19 +201,13 @@ public class DadoLogico : MonoBehaviour
             textoResultado.gameObject.SetActive(true);
         }
 
-        // Sincronizar resultado a otros clientes
-        if (GameSync.Instance != null)
-            GameSync.Instance.SincronizarResultadoDado(resultadoActual);
-
-        // Pausa para visualizar el resultado
         yield return new WaitForSeconds(pausaResultado);
 
-        // Pedir confirmación para mover la ficha
         lanzando = false;
         esperandoConfirmacion = true;
         if (textoInstruccion != null)
         {
-            textoInstruccion.text = "ESPACIO \u2014 Mover ficha";
+            textoInstruccion.text = "ESPACIO — Mover ficha";
             textoInstruccion.gameObject.SetActive(true);
         }
     }
@@ -197,41 +219,23 @@ public class DadoLogico : MonoBehaviour
         if (textoInstruccion != null)
             textoInstruccion.gameObject.SetActive(false);
 
-        if (jugador == null) { Debug.LogWarning("No hay jugador asignado al dado."); return; }
+        if (jugador == null) { Debug.LogWarning("[Dado] No hay jugador asignado."); return; }
 
-        // Ocultar dado mientras elige ficha
-        gameObject.SetActive(false);
-
-        // Mostrar panel selección ficha A/B
-        var ui = FindAnyObjectByType<SeleccionFichaUI>();
-        if (ui != null) ui.MostrarSeleccion(jugador);
-        else EjecutarMovimiento(); // fallback si no hay UI
-    }
-
-    public void EjecutarMovimiento()
-    {
-        if (GameSync.Instance != null)
+        // Si hay ficha B, mostrar panel de selección antes de mover
+        if (jugador.fichaB != null)
         {
-            int indiceFicha = FindAnyObjectByType<GameManager>().todosLosJugadores.IndexOf(jugador);
-            GameSync.Instance.EnviarResultadoDado(resultadoActual, indiceFicha, jugador.moverFichaB);
+            var seleccionUI = UnityEngine.Object.FindAnyObjectByType<SeleccionFichaUI>();
+            if (seleccionUI != null)
+            {
+                seleccionUI.MostrarSeleccionConPasos(jugador, resultadoActual);
+                return;
+            }
         }
-        else
-        {
-            jugador.Avanzar(resultadoActual);
-        }
+
+        // Sin ficha B: mover via RPC directo
+        MoverViaRPC(jugador, resultadoActual, false);
     }
 
-    // Cancela la confirmación actual y lanza el dado de nuevo (tirada extra por energía).
-    public void RelanzarDado()
-    {
-        if (!esperandoConfirmacion) return;
-        esperandoConfirmacion = false;
-        if (textoResultado != null) textoResultado.gameObject.SetActive(false);
-        if (textoInstruccion != null) textoInstruccion.gameObject.SetActive(false);
-        Lanzar();
-    }
-
-    // Mapeo original del script: up=5, -up=2, forward=6, -forward=1, right=3, -right=4
     Quaternion RotacionParaResultado(int resultado)
     {
         switch (resultado)
@@ -243,6 +247,52 @@ public class DadoLogico : MonoBehaviour
             case 3: return Quaternion.Euler(0, 0, 90);
             case 4: return Quaternion.Euler(0, 0, -90);
             default: return Quaternion.identity;
+        }
+    }
+
+    public void PrepararParaLanzar(MovimientoFicha nuevoJugador, Action<int> onLanzado)
+    {
+        jugador = nuevoJugador;
+        onDadoLanzado = onLanzado;
+        
+        if (textoInstruccion != null)
+        {
+            textoInstruccion.text = "ESPACIO — Tirar el dado";
+            textoInstruccion.gameObject.SetActive(true);
+        }
+    }
+
+    // -------------------------------------------------
+    // PROPIEDADES Y MÉTODOS PÚBLICOS
+    // -------------------------------------------------
+
+    public bool EsperandoConfirmacion => esperandoConfirmacion;
+
+    public void RelanzarDado()
+    {
+        if (!lanzando && esperandoConfirmacion)
+        {
+            esperandoConfirmacion = false;
+            Lanzar();
+        }
+    }
+
+    public void EjecutarMovimiento()
+    {
+        ConfirmarMovimiento();
+    }
+
+    public static void MoverViaRPC(MovimientoFicha jugador, int pasos, bool esFichaB)
+    {
+        if (GameSync.Instance != null && Photon.Pun.PhotonNetwork.IsConnected)
+        {
+            int indiceFicha = GameManager.Instance.todosLosJugadores.IndexOf(jugador);
+            GameSync.Instance.EnviarResultadoDado(pasos, indiceFicha, esFichaB);
+        }
+        else
+        {
+            jugador.moverFichaB = esFichaB;
+            jugador.Avanzar(pasos);
         }
     }
 }
