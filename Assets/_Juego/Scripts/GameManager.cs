@@ -68,6 +68,7 @@ public class GameManager : MonoBehaviour
         if (ruta == null)
             ruta = FindAnyObjectByType<GestorDeRutas>();
 
+
         dado.gameObject.SetActive(false);
 
         if (panelHUD != null)    panelHUD.SetActive(false);
@@ -136,12 +137,13 @@ public class GameManager : MonoBehaviour
             {
                 jugador.fichaB.gameObject.SetActive(true);
                 jugador.fichaB.Inicializar();
-                Vector3 posMeta = ruta.casillas[ruta.casillas.Count - 1].position + Vector3.up * 0.5f;
-                jugador.fichaB.transform.position = posMeta + offsetsInicio[i];
+                if (ruta != null && ruta.casillas != null && ruta.casillas.Count > 0)
+                {
+                    Vector3 posMeta = ruta.casillas[ruta.casillas.Count - 1].position + Vector3.up * 0.5f;
+                    jugador.fichaB.transform.position = posMeta + offsetsInicio[i];
+                }
             }
         }
-
-        Debug.Log($"Partida iniciada con {cantidad} jugadores. Posición inicio: {posInicio}");
 
         turnoActual = 0;
         PrepararTurno();
@@ -199,7 +201,6 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        Debug.Log($"Turno del Jugador {turnoActual + 1}");
         dado.jugador = j;
 
         if (dado.gameObject.activeSelf)
@@ -216,9 +217,9 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // Con red: host avisa quién juega, cliente correcto activa dado
+        // Con red: host avisa quién juega, incluye lógica de panel selección ficha
         if (PhotonNetwork.IsMasterClient)
-            GameSync.Instance.AnunciarTurno(turnoActual);
+            GameSync.Instance.AnunciarTurnoConPanel(turnoActual);
     }
 
     public void DispararOnTurnStarted(MovimientoFicha j)

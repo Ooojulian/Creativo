@@ -32,8 +32,10 @@ public class DadoLogico : MonoBehaviour
     public float alturaSalto = 40f;
 
     public int resultadoActual;
+    public int modificadorExterno = 0;
     private bool lanzando = false;
     private bool esperandoConfirmacion = false;
+    public bool Lanzando => lanzando;
     private Rigidbody rb;
     private Vector3 ejeRotacion;
     private CamaraDirectora camaraDirectora;
@@ -114,9 +116,9 @@ public class DadoLogico : MonoBehaviour
 
     private bool EsMiTurno()
     {
-        // Sin red: siempre es el turno del jugador local
         if (!Photon.Pun.PhotonNetwork.IsConnected) return true;
-        // Con red: solo si el jugador asignado al dado es el jugador local
+        var gameSync = GameSync.Instance;
+        if (gameSync != null) return gameSync.EsMiTurno;
         if (jugador == null) return false;
         var photonView = jugador.GetComponent<Photon.Pun.PhotonView>();
         return photonView != null && photonView.IsMine;
@@ -157,7 +159,8 @@ public class DadoLogico : MonoBehaviour
 
         if (camaraDirectora != null) camaraDirectora.EnfocarDado();
 
-        resultadoActual = Random.Range(1, 7);
+        resultadoActual = Random.Range(1, 7) + modificadorExterno;
+        modificadorExterno = 0;
 
         ejeRotacion = new Vector3(
             Random.Range(-1f, 1f),
@@ -216,18 +219,21 @@ public class DadoLogico : MonoBehaviour
         if (textoInstruccion != null)
             textoInstruccion.gameObject.SetActive(false);
 
-        if (onDadoLanzado != null)
+        if (jugador == null) { Debug.LogWarning("[Dado] No hay jugador asignado."); return; }
+
+        // Si hay ficha B, mostrar panel de selección antes de mover
+        if (jugador.fichaB != null)
         {
-            onDadoLanzado?.Invoke(resultadoActual);
+            var seleccionUI = UnityEngine.Object.FindAnyObjectByType<SeleccionFichaUI>();
+            if (seleccionUI != null)
+            {
+                seleccionUI.MostrarSeleccionConPasos(jugador, resultadoActual);
+                return;
+            }
         }
-        else if (jugador != null)
-        {
-            jugador.Avanzar(resultadoActual);
-        }
-        else
-        {
-            Debug.LogWarning("No hay jugador asignado al dado.");
-        }
+
+        // Sin ficha B: mover via RPC directo
+        MoverViaRPC(jugador, resultadoActual, false);
     }
 
     Quaternion RotacionParaResultado(int resultado)
@@ -274,5 +280,19 @@ public class DadoLogico : MonoBehaviour
     public void EjecutarMovimiento()
     {
         ConfirmarMovimiento();
+    }
+
+    public static void MoverViaRPC(MovimientoFicha jugador, int pasos, bool esFichaB)
+    {
+        if (GameSync.Instance != null && Photon.Pun.PhotonNetwork.IsConnected)
+        {
+            int indiceFicha = GameManager.Instance.todosLosJugadores.IndexOf(jugador);
+            GameSync.Instance.EnviarResultadoDado(pasos, indiceFicha, esFichaB);
+        }
+        else
+        {
+            jugador.moverFichaB = esFichaB;
+            jugador.Avanzar(pasos);
+        }
     }
 }

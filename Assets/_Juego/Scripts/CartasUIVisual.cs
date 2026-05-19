@@ -23,10 +23,21 @@ public class CartasUIVisual : MonoBehaviour
     public void MostrarRevelacion(CartaDefinicion carta)
     {
         if (imagenCarta == null || carta == null) return;
-        
+
         imagenCarta.sprite = carta.icono;
         imagenCarta.gameObject.SetActive(true);
-        
+
+        if (canvasGroup != null)
+            StartCoroutine(FadeIn());
+    }
+
+    public void MostrarRevelacion(CardSO carta)
+    {
+        if (imagenCarta == null || carta == null) return;
+
+        imagenCarta.sprite = carta.artwork;
+        imagenCarta.gameObject.SetActive(true);
+
         if (canvasGroup != null)
             StartCoroutine(FadeIn());
     }

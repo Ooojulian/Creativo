@@ -13,25 +13,27 @@ public class FichaInversa : MonoBehaviour
     private bool enMovimiento = false;
     private CamaraDirectora camaraDirectora;
 
-    void Awake() 
-    { 
-        camaraDirectora = FindAnyObjectByType<CamaraDirectora>(); 
-    }
-    
-    void Start() 
-    { 
+    void Awake()
+    {
+        camaraDirectora = FindAnyObjectByType<CamaraDirectora>();
         gameManager = FindAnyObjectByType<GameManager>();
-        Inicializar(); 
     }
-    
-    void OnEnable() 
-    { 
-        Inicializar(); 
+
+    void Start()
+    {
+        if (gameManager == null) gameManager = FindAnyObjectByType<GameManager>();
+        Inicializar();
+    }
+
+    void OnEnable()
+    {
+        if (gameManager != null) Inicializar();
     }
 
     public void Inicializar()
     {
-        if (gameManager != null && gameManager.casillas.Count > 0)
+        if (gameManager == null) gameManager = FindAnyObjectByType<GameManager>();
+        if (gameManager != null && gameManager.casillas != null && gameManager.casillas.Count > 0)
         {
             indiceActual = gameManager.casillas.Count - 1;
             transform.position = gameManager.casillas[indiceActual].position + Vector3.up * 0.5f;
@@ -88,13 +90,13 @@ public class FichaInversa : MonoBehaviour
         yield return StartCoroutine(RevelarYAñadirCarta());
 
         // Detectar colisión → batalla PPS
-        if (Photon.Pun.PhotonNetwork.IsMasterClient && BatallaPPS.Instance != null && gm != null)
+        if (Photon.Pun.PhotonNetwork.IsMasterClient && BatallaPPS.Instance != null && gameManager != null)
         {
-            if (gm.DetectarColision(null, this, out int idxDef, out bool esBDef, out int actorDef))
+            if (gameManager.DetectarColision(null, this, out int idxDef, out bool esBDef, out int actorDef))
             {
                 int idxAtk = -1;
-                for (int k = 0; k < gm.todosLosJugadores.Count; k++)
-                    if (gm.todosLosJugadores[k].fichaB == this) { idxAtk = k; break; }
+                for (int k = 0; k < gameManager.todosLosJugadores.Count; k++)
+                    if (gameManager.todosLosJugadores[k].fichaB == this) { idxAtk = k; break; }
                 int actorAtk = idxAtk >= 0 && idxAtk < Photon.Pun.PhotonNetwork.PlayerList.Length
                     ? Photon.Pun.PhotonNetwork.PlayerList[idxAtk].ActorNumber : -1;
                 BatallaPPS.Instance.IniciarBatalla(actorAtk, actorDef, idxAtk, true, idxDef, esBDef);
@@ -116,10 +118,10 @@ public class FichaInversa : MonoBehaviour
 
     IEnumerator RevelarYAñadirCarta()
     {
-        if (ruta == null || ruta.casillas == null || ruta.casillas.Count == 0) yield break;
-        if (indiceActual < 0 || indiceActual >= ruta.casillas.Count) yield break;
+        if (gameManager == null || gameManager.casillas == null || gameManager.casillas.Count == 0) yield break;
+        if (indiceActual < 0 || indiceActual >= gameManager.casillas.Count) yield break;
 
-        Transform casilla = ruta.casillas[indiceActual];
+        Transform casilla = gameManager.casillas[indiceActual];
         if (casilla == null) yield break;
 
         CartaEnCasilla comp = casilla.GetComponent<CartaEnCasilla>();
@@ -132,8 +134,8 @@ public class FichaInversa : MonoBehaviour
         var pv = fichaPrincipal != null ? fichaPrincipal.GetComponent<Photon.Pun.PhotonView>() : GetComponent<Photon.Pun.PhotonView>();
         if (pv != null) esMia = pv.IsMine;
 
-        if (esMia && gm != null && gm.uiCartas != null)
-            gm.uiCartas.MostrarRevelacion(card);
+        if (esMia && gameManager != null && gameManager.uiCartas != null)
+            gameManager.uiCartas.MostrarRevelacion(card);
 
         yield return new WaitForSeconds(fichaPrincipal != null ? fichaPrincipal.tiempoRevelacion : 2f);
 
@@ -144,7 +146,7 @@ public class FichaInversa : MonoBehaviour
                 CardTriggerSystem.Instance.CheckCardDrawn(fichaPrincipal, card);
         }
 
-        if (gm != null && gm.uiCartas != null)
-            yield return StartCoroutine(gm.uiCartas.FadeOutYLimpiar(fichaPrincipal != null ? fichaPrincipal.tiempoResultado : 1f));
+        if (gameManager != null && gameManager.uiCartas != null)
+            yield return StartCoroutine(gameManager.uiCartas.FadeOutYLimpiar(fichaPrincipal != null ? fichaPrincipal.tiempoResultado : 1f));
     }
 }

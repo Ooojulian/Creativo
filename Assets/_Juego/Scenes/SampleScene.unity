@@ -185,6 +185,7 @@ MonoBehaviour:
   jugador: {fileID: 0}
   textoResultado: {fileID: 0}
   textoInstruccion: {fileID: 0}
+  _btnTirarDado: {fileID: 0}
   posicionFija: {x: 500, y: 60, z: 500}
   escalaDado: 5
   duracionLanzamiento: 1
@@ -1135,7 +1136,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 66313764}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbc54570e3f27ac3fb87bcb4e9d4d575, type: 3}
+  m_Script: {fileID: 11500000, guid: 8bff12a7e96776448ad717a288337cab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GestorDeRuta
   casillas:
@@ -4575,43 +4576,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4028275146152029892, guid: 948097c46b7b63e439261e925a602106, type: 3}
   m_PrefabInstance: {fileID: 1434698012}
   m_PrefabAsset: {fileID: 0}
---- !u!84 &387716998
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 128
-  m_Height: 128
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 94
-  m_ColorFormat: 48
-  m_MipMap: 1
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 0
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
 --- !u!1 &390882796
 GameObject:
   m_ObjectHideFlags: 0
@@ -6579,10 +6543,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95901fec81481c4b89b073bf0802ffad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FichaInversa
-  ruta: {fileID: 66313766}
   indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
   fichaPrincipal: {fileID: 1062106794}
 --- !u!114 &578562731
 MonoBehaviour:
@@ -6780,43 +6742,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 29b2975f358c02e47a2dad282074719a, type: 3}
   m_PrefabInstance: {fileID: 551830369}
   m_PrefabAsset: {fileID: 0}
---- !u!84 &622302621
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 128
-  m_Height: 128
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 94
-  m_ColorFormat: 48
-  m_MipMap: 1
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 0
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
 --- !u!1 &630704984
 GameObject:
   m_ObjectHideFlags: 0
@@ -10337,6 +10262,7 @@ GameObject:
   - component: {fileID: 947567103}
   - component: {fileID: 947567105}
   - component: {fileID: 947567104}
+  - component: {fileID: 947567106}
   m_Layer: 0
   m_Name: Player1
   m_TagString: Untagged
@@ -10422,6 +10348,28 @@ MonoBehaviour:
   reserve: []
   maxReserveSize: 5
   maxHandSize: 10
+--- !u!114 &947567106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 947567101}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonView
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 4
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &954098596
 GameObject:
   m_ObjectHideFlags: 0
@@ -11930,6 +11878,7 @@ GameObject:
   - component: {fileID: 1062106794}
   - component: {fileID: 1062106796}
   - component: {fileID: 1062106795}
+  - component: {fileID: 1062106797}
   m_Layer: 0
   m_Name: Player3
   m_TagString: Untagged
@@ -12015,6 +11964,28 @@ MonoBehaviour:
   OnEnergiaInsuficiente:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1062106797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1062106792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonView
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 6
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!4 &1063524033 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 29b2975f358c02e47a2dad282074719a, type: 3}
@@ -12226,6 +12197,7 @@ GameObject:
   - component: {fileID: 1108432512}
   - component: {fileID: 1108432514}
   - component: {fileID: 1108432513}
+  - component: {fileID: 1108432515}
   m_Layer: 0
   m_Name: Player4
   m_TagString: Untagged
@@ -12311,6 +12283,28 @@ MonoBehaviour:
   OnEnergiaInsuficiente:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1108432515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1108432510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonView
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 7
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1001 &1108865681
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14803,6 +14797,7 @@ MonoBehaviour:
   - {fileID: 1062106794}
   - {fileID: 1108432512}
   ruta: {fileID: 66313766}
+  sistemaCartas: {fileID: 0}
   panelFin: {fileID: 1170638330}
   textoFin: {fileID: 1302847095}
   textoGanadoresHUD: {fileID: 0}
@@ -14911,6 +14906,43 @@ MonoBehaviour:
   gameManager: {fileID: 0}
   poolCartasVentaja: []
   poolCartasDesventaja: []
+--- !u!84 &1376198011
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 6
+  m_Width: 128
+  m_Height: 128
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 94
+  m_ColorFormat: 48
+  m_MipMap: 1
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_UseDynamicScaleExplicit: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 0
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!4 &1390382094 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 29b2975f358c02e47a2dad282074719a, type: 3}
@@ -17009,6 +17041,43 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2402192298488502469, guid: 7bbe7562c4600eb40aa47bab47b8b9f4, type: 3}
   m_PrefabInstance: {fileID: 712981980}
   m_PrefabAsset: {fileID: 0}
+--- !u!84 &1616945264
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 6
+  m_Width: 128
+  m_Height: 128
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 94
+  m_ColorFormat: 48
+  m_MipMap: 1
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_UseDynamicScaleExplicit: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 0
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1 &1617597156
 GameObject:
   m_ObjectHideFlags: 0
@@ -17194,10 +17263,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95901fec81481c4b89b073bf0802ffad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FichaInversa
-  ruta: {fileID: 66313766}
   indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
   fichaPrincipal: {fileID: 1964455106}
 --- !u!114 &1617734915
 MonoBehaviour:
@@ -19808,10 +19875,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95901fec81481c4b89b073bf0802ffad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FichaInversa
-  ruta: {fileID: 66313766}
   indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
   fichaPrincipal: {fileID: 1108432512}
 --- !u!114 &1906783811
 MonoBehaviour:
@@ -20429,6 +20494,7 @@ GameObject:
   - component: {fileID: 1964455106}
   - component: {fileID: 1964455108}
   - component: {fileID: 1964455107}
+  - component: {fileID: 1964455109}
   m_Layer: 0
   m_Name: Player2
   m_TagString: Untagged
@@ -20514,6 +20580,28 @@ MonoBehaviour:
   OnEnergiaInsuficiente:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1964455109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1964455104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonView
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 5
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1001 &1967818570
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21700,10 +21788,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95901fec81481c4b89b073bf0802ffad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FichaInversa
-  ruta: {fileID: 66313766}
   indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
   fichaPrincipal: {fileID: 947567103}
 --- !u!114 &2083967945
 MonoBehaviour:

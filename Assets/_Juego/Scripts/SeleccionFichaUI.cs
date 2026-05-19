@@ -15,6 +15,7 @@ public class SeleccionFichaUI : MonoBehaviour
     public GameManager gameManager;
 
     private MovimientoFicha jugadorActual;
+    private int pasosActuales;
 
     void Start()
     {
@@ -25,17 +26,20 @@ public class SeleccionFichaUI : MonoBehaviour
 
     public void MostrarSeleccion(MovimientoFicha jugador)
     {
-        if (panel != null) panel.SetActive(true);
+        MostrarSeleccionConPasos(jugador, 0);
+    }
 
-        // Mostrar info de cada ficha
+    public void MostrarSeleccionConPasos(MovimientoFicha jugador, int pasos)
+    {
+        jugadorActual = jugador;
+        pasosActuales = pasos;
+
         if (textoFichaA != null)
             textoFichaA.text = $"Ficha A\nCasilla: {jugador.indiceActual}";
-
         if (textoFichaB != null && jugador.fichaB != null)
             textoFichaB.text = $"Ficha B\nCasilla: {jugador.fichaB.indiceActual}";
 
-        // Guardar referencia para cuando elija
-        jugadorActual = jugador;
+        if (panel != null) panel.SetActive(true);
     }
 
     public void OcultarPanel()
@@ -46,17 +50,9 @@ public class SeleccionFichaUI : MonoBehaviour
     private void OnElegirFicha(bool esB)
     {
         if (jugadorActual == null) return;
-        
-        // Solo guardar cuál ficha se eligió, NO mover aún
-        jugadorActual.moverFichaB = esB;
-        
         if (panel != null) panel.SetActive(false);
-        
-        // Continuar el turno en GestorTurnos (cartas → dado → movimiento)
-        GestorTurnos gestorTurnos = FindAnyObjectByType<GestorTurnos>();
-        if (gestorTurnos != null)
-        {
-            gestorTurnos.ContinuarDespuesDeSeleccion();
-        }
+
+        // Mover con los pasos del dado via RPC a todos los clientes
+        DadoLogico.MoverViaRPC(jugadorActual, pasosActuales, esB);
     }
 }
