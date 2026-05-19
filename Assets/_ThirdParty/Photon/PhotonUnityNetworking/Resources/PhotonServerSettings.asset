@@ -52,6 +52,7 @@ MonoBehaviour:
   - RPC_GuardarCarta
   - RPC_UsarCarta
   - RPC_UsarCartaDeReserva
+  - RPC_SincronizarPosicionFicha
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
