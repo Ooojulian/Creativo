@@ -123,8 +123,8 @@ public class FichaInversa : MonoBehaviour
         if (card == null) yield break;
 
         bool esMia = true;
-        var pv = fichaPrincipal != null ? fichaPrincipal.GetComponent<Photon.Pun.PhotonView>() : GetComponent<Photon.Pun.PhotonView>();
-        if (pv != null) esMia = pv.IsMine;
+        if (Photon.Pun.PhotonNetwork.InRoom)
+            esMia = GameSync.Instance != null && GameSync.Instance.EsMiTurno;
 
         if (esMia && gameManager != null && gameManager.uiCartas != null)
             gameManager.uiCartas.MostrarRevelacion(card);

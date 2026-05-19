@@ -191,11 +191,12 @@ public class MovimientoFicha : MonoBehaviour
         }
 
         // 1) Mostrar revelación SOLO SI ES MI FICHA
+        // Usamos GameSync.EsMiTurno porque las fichas son objetos de escena (no instanciados por red),
+        // por lo que photonView.IsMine siempre apunta al host — no al dueño real del turno.
         bool esMia = true;
         if (Photon.Pun.PhotonNetwork.InRoom)
         {
-            var pv = GetComponent<Photon.Pun.PhotonView>();
-            esMia = pv != null && pv.IsMine;
+            esMia = GameSync.Instance != null && GameSync.Instance.EsMiTurno;
         }
 
         reveloCarta = true;
