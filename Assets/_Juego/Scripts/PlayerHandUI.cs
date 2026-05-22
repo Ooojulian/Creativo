@@ -9,81 +9,104 @@ public class PlayerHandUI : MonoBehaviour
     public Transform containerReserva;
     public GameObject prefabCarta;
 
-    // Referencia al jugador LOCAL de esta máquina (no el del turno activo)
+    // En red: jugador local fijo. En local: jugador del turno activo (cambia cada turno).
     private MovimientoFicha _jugadorLocal;
+    private bool _modoLocal;
 
-    // Huellas digitales del inventario para detectar cambios sin redibujar cada frame
-    private int _prevHandHash    = int.MinValue;
-    private int _prevReserveHash = int.MinValue;
+    private PlayerInventory _inventarioSuscrito;
+    private bool _pendingRefresh;
 
     void Start()
     {
-        // Si no hay red (modo local), asumimos que la mano visible es la del jugador de turno
-        // o por defecto el jugador 0.
         if (!PhotonNetwork.InRoom)
         {
-            if (gameManager.todosLosJugadores.Count > 0)
-                _jugadorLocal = gameManager.todosLosJugadores[0];
-            return;
+            _modoLocal = true;
         }
-
-        // Si hay red, buscamos cuál ficha nos corresponde
-        int myActor = PhotonNetwork.LocalPlayer.ActorNumber;
-        int myIndex = -1;
-        for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
+        else
         {
-            if (PhotonNetwork.PlayerList[i].ActorNumber == myActor)
+            _modoLocal = false;
+            int myActor = PhotonNetwork.LocalPlayer.ActorNumber;
+            foreach (var ficha in gameManager.todosLosJugadores)
             {
-                myIndex = i;
-                break;
+                if (ficha != null && ficha.actorNumber == myActor)
+                {
+                    _jugadorLocal = ficha;
+                    SuscribirInventario(_jugadorLocal);
+                    _pendingRefresh = true;
+                    break;
+                }
             }
         }
 
-        if (myIndex >= 0 && myIndex < gameManager.todosLosJugadores.Count)
-        {
-            _jugadorLocal = gameManager.todosLosJugadores[myIndex];
-        }
+        // Escuchar inicio de turno para re-suscribir en modo local cuando cambia el jugador activo
+        if (gameManager != null)
+            gameManager.OnTurnStarted += OnTurnStarted;
     }
 
-    // Calcula una huella digital rápida del inventario del jugador.
-    // Devuelve true solo cuando la mano o la reserva cambiaron.
-    bool InventarioCambio()
+    void OnDestroy()
     {
-        if (_jugadorLocal == null || _jugadorLocal.inventario == null) return false;
-
-        int handHash = _jugadorLocal.inventario.hand.Count;
-        foreach (var c in _jugadorLocal.inventario.hand)
-            if (c != null) handHash ^= (int)c.type * 397;
-
-        int reserveHash = _jugadorLocal.inventario.reserve.Count;
-        foreach (var c in _jugadorLocal.inventario.reserve)
-            if (c != null) reserveHash ^= (int)c.type * 397;
-
-        if (handHash != _prevHandHash || reserveHash != _prevReserveHash)
-        {
-            _prevHandHash    = handHash;
-            _prevReserveHash = reserveHash;
-            return true;
-        }
-        return false;
+        DesuscribirInventario();
+        if (gameManager != null)
+            gameManager.OnTurnStarted -= OnTurnStarted;
     }
+
+    private void OnTurnStarted(MovimientoFicha jugador)
+    {
+        if (_modoLocal)
+        {
+            // En modo local: mostrar siempre las cartas del jugador cuyo turno es
+            if (jugador != _jugadorLocal)
+            {
+                _jugadorLocal = jugador;
+                SuscribirInventario(_jugadorLocal);
+            }
+        }
+        // En modo red: _jugadorLocal es fijo (el local), pero el color de la reserva
+        // cambia según si es mi turno — forzar redibujado
+        _pendingRefresh = true;
+    }
+
+    private void SuscribirInventario(MovimientoFicha jugador)
+    {
+        DesuscribirInventario();
+        if (jugador != null && jugador.inventario != null)
+        {
+            _inventarioSuscrito = jugador.inventario;
+            _inventarioSuscrito.OnInventoryChanged += MarcarRefresh;
+        }
+    }
+
+    private void DesuscribirInventario()
+    {
+        if (_inventarioSuscrito != null)
+        {
+            _inventarioSuscrito.OnInventoryChanged -= MarcarRefresh;
+            _inventarioSuscrito = null;
+        }
+    }
+
+    private void MarcarRefresh() => _pendingRefresh = true;
+
+    private const float CARD_W = 80f;
+    private const float CARD_H = 110f;
 
     void Update()
     {
-        // Solo redibuja la mano si el inventario realmente cambió.
-        // Si se actualizara cada frame, los botones se destruirían antes
-        // de que Unity registre el clic del jugador.
-        if (_jugadorLocal != null && InventarioCambio())
+        if (_pendingRefresh && _jugadorLocal != null)
+        {
+            _pendingRefresh = false;
             ActualizarUI();
+        }
     }
 
     public void ActualizarUI()
     {
-        // Limpiar contenedores
         foreach (Transform child in containerMano)   Destroy(child.gameObject);
         foreach (Transform child in containerReserva) Destroy(child.gameObject);
 
         if (_jugadorLocal == null || _jugadorLocal.inventario == null) return;
+
+        Debug.Log($"[PlayerHandUI] ActualizarUI: mano={_jugadorLocal.inventario.hand.Count} reserva={_jugadorLocal.inventario.reserve.Count} jugador={_jugadorLocal.name} containerMano={containerMano != null} containerReserva={containerReserva != null} prefab={prefabCarta != null}");
 
         // Mostrar solo las cartas del jugador LOCAL de esta máquina
         foreach (var card in _jugadorLocal.inventario.hand)
@@ -91,6 +114,8 @@ public class PlayerHandUI : MonoBehaviour
             var capturedCard   = card;
             var capturedPlayer = _jugadorLocal;
             GameObject obj = Instantiate(prefabCarta, containerMano);
+            var rt = obj.GetComponent<RectTransform>();
+            if (rt != null) rt.sizeDelta = new Vector2(CARD_W, CARD_H);
             obj.GetComponent<Image>().sprite = capturedCard.artwork;
 
             var btn = obj.GetComponent<Button>();
@@ -103,32 +128,42 @@ public class PlayerHandUI : MonoBehaviour
 
             btn.onClick.AddListener(() =>
             {
-                Debug.Log($"[PlayerHandUI] ¡Click registrado físicamente en el botón de la carta: {capturedCard.cardName}!");
-                if (CardPlayUI.Instance == null)
-                {
-                    Debug.LogError("[PlayerHandUI] CardPlayUI.Instance es null. " +
-                                   "Asegúrate de que el GameObject con el script CardPlayUI " +
-                                   "exista en la escena y esté activo.");
-                    return;
-                }
+                // En red: solo el jugador local puede jugar sus propias cartas en su turno
+                if (Photon.Pun.PhotonNetwork.InRoom &&
+                    GameSync.Instance != null && !GameSync.Instance.EsMiTurno) return;
+
+                if (CardPlayUI.Instance == null) return;
                 CardPlayUI.Instance.Mostrar(capturedCard, capturedPlayer);
             });
         }
+
+        bool esMiTurno = !PhotonNetwork.InRoom ||
+                         (GameSync.Instance != null && GameSync.Instance.EsMiTurno);
 
         foreach (var card in _jugadorLocal.inventario.reserve)
         {
             var capturedCard   = card;
             var capturedPlayer = _jugadorLocal;
             GameObject obj = Instantiate(prefabCarta, containerReserva);
-            obj.GetComponent<Image>().sprite = capturedCard.artwork;
+            var rt2 = obj.GetComponent<RectTransform>();
+            if (rt2 != null) rt2.sizeDelta = new Vector2(CARD_W, CARD_H);
+            var img = obj.GetComponent<Image>();
+            if (img != null)
+            {
+                img.sprite = capturedCard.artwork;
+                img.color = esMiTurno ? Color.white : new Color(1f, 1f, 1f, 0.45f);
+            }
 
             var btn = obj.GetComponent<Button>();
             if (btn != null)
             {
+                btn.interactable = esMiTurno;
                 btn.onClick.AddListener(() =>
                 {
-                    Debug.Log($"[PlayerHandUI] Click en carta de RESERVA: {capturedCard.cardName}");
-                    if (CardPlayUI.Instance == null) { Debug.LogError("[PlayerHandUI] CardPlayUI.Instance es null"); return; }
+                    if (PhotonNetwork.InRoom &&
+                        GameSync.Instance != null && !GameSync.Instance.EsMiTurno) return;
+
+                    if (CardPlayUI.Instance == null) return;
                     CardPlayUI.Instance.MostrarDesdeReserva(capturedCard, capturedPlayer);
                 });
             }

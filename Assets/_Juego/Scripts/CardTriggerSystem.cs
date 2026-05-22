@@ -43,6 +43,7 @@ public class CardTriggerSystem : MonoBehaviour
     public void CheckTurnEnd(MovimientoFicha jugador, int cartasAlEmpezar)
     {
         var inv = jugador.GetComponent<PlayerInventory>();
+        if (inv == null) return;
         if (inv.hand.Count < cartasAlEmpezar)
         {
             TryTrigger(jugador, CardType.RoboArcano);
@@ -52,12 +53,13 @@ public class CardTriggerSystem : MonoBehaviour
     // Llamado cuando alguien roba carta
     public void CheckCardDrawn(MovimientoFicha jugador, CardSO card)
     {
+        var invJugador = jugador.GetComponent<PlayerInventory>();
+        if (invJugador == null) return;
         foreach (var j in gameManager.todosLosJugadores)
         {
             if (j != jugador)
             {
-                var inv = jugador.GetComponent<PlayerInventory>();
-                if (inv.hand.Count >= 5) // O si la carta es especial
+                if (invJugador.hand.Count >= 5)
                     TryTrigger(j, CardType.Fatiga, jugador);
             }
         }
@@ -78,13 +80,44 @@ public class CardTriggerSystem : MonoBehaviour
     private void TryTrigger(MovimientoFicha usuario, CardType type, MovimientoFicha rival = null)
     {
         var inv = usuario.GetComponent<PlayerInventory>();
+        if (inv == null) return;
         CardSO cardToTrigger = inv.reserve.Find(c => c.type == type);
-        
+
         if (cardToTrigger != null)
         {
             Debug.Log($"¡Trigger de reserva! {cardToTrigger.cardName} de {usuario.name}");
-            inv.RemoveFromReserve(cardToTrigger);
-            CardManager.Instance.EjecutarEfectoReserva(cardToTrigger, usuario, rival);
+
+            // En red: sincronizar via RPC para que todos ejecuten el mismo efecto
+            if (Photon.Pun.PhotonNetwork.InRoom && GameSync.Instance != null && gameManager != null)
+            {
+                int idxUsuario = gameManager.todosLosJugadores.IndexOf(usuario);
+                int idxRival   = rival != null ? gameManager.todosLosJugadores.IndexOf(rival) : -1;
+                int randVal1 = -1, randVal2 = -1;
+
+                if (type == CardType.Ruptura && rival != null)
+                {
+                    var invRival = rival.GetComponent<PlayerInventory>();
+                    if (invRival != null && invRival.hand.Count > 0)
+                    {
+                        randVal1 = UnityEngine.Random.Range(0, invRival.hand.Count);
+                        if (invRival.hand.Count > 1)
+                            do { randVal2 = UnityEngine.Random.Range(0, invRival.hand.Count); }
+                            while (randVal2 == randVal1);
+                    }
+                }
+                else if (type == CardType.Intercambio)
+                {
+                    randVal1 = idxRival;
+                }
+
+                GameSync.Instance.SincronizarUsarCartaDeReserva(idxUsuario, (int)type, idxRival, false, randVal1, randVal2);
+            }
+            else
+            {
+                // Sin red: ejecutar localmente
+                inv.RemoveFromReserve(cardToTrigger);
+                CardManager.Instance.EjecutarEfectoReserva(cardToTrigger, usuario, rival);
+            }
         }
     }
 }

@@ -116,16 +116,13 @@ public class DadoLogico : MonoBehaviour
 
     private bool EsMiTurno()
     {
-        if (!Photon.Pun.PhotonNetwork.IsConnected) return true;
-        var gameSync = GameSync.Instance;
-        if (gameSync != null) return gameSync.EsMiTurno;
-        if (jugador == null) return false;
-        var photonView = jugador.GetComponent<Photon.Pun.PhotonView>();
-        return photonView != null && photonView.IsMine;
+        if (!Photon.Pun.PhotonNetwork.InRoom) return true;
+        return GameSync.Instance != null && GameSync.Instance.EsMiTurno;
     }
 
     private void OnBotonTirarDado()
     {
+        if (!EsMiTurno()) return;
         if (!lanzando && !esperandoConfirmacion)
             Lanzar();
         else if (esperandoConfirmacion)
@@ -284,9 +281,10 @@ public class DadoLogico : MonoBehaviour
 
     public static void MoverViaRPC(MovimientoFicha jugador, int pasos, bool esFichaB)
     {
-        if (GameSync.Instance != null && Photon.Pun.PhotonNetwork.IsConnected)
+        if (GameSync.Instance != null && Photon.Pun.PhotonNetwork.InRoom)
         {
             int indiceFicha = GameManager.Instance.todosLosJugadores.IndexOf(jugador);
+            Debug.Log($"[DadoLogico] MoverViaRPC: jugador={jugador.name} indiceFicha={indiceFicha} pasos={pasos} esFichaB={esFichaB}");
             GameSync.Instance.EnviarResultadoDado(pasos, indiceFicha, esFichaB);
         }
         else

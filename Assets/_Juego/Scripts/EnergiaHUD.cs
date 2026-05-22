@@ -42,19 +42,17 @@ public class EnergiaHUD : MonoBehaviour
     void Update()
     {
         var gm = GameManager.Instance;
-        // Ocultar botones si el juego no ha empezado todavía
         bool juegoActivo = gm != null && gm.JugadorActual != null && gm.dado != null;
-        MostrarBotones(juegoActivo);
-        if (!juegoActivo) return;
+        if (!juegoActivo) { MostrarBotones(false); return; }
 
-        bool dadoListo = gm.dado.EsperandoConfirmacion;
-        bool puedeAccionar = !gm.dado.Lanzando; // Se puede usar antes de tirar o esperando confirmación
+        // En red: solo mostrar botones al jugador local cuando es su turno
+        bool esMiTurno = GameSync.Instance == null || !Photon.Pun.PhotonNetwork.InRoom
+                         || (GameSync.Instance != null && GameSync.Instance.EsMiTurno);
+        MostrarBotones(esMiTurno);
+        if (!esMiTurno) return;
 
-        if (!puedeAccionar)
-        {
-            SetBotonesActivos(false);
-            return;
-        }
+        bool puedeAccionar = !gm.dado.Lanzando;
+        if (!puedeAccionar) { SetBotonesActivos(false); return; }
 
         var ctrl = gm.JugadorActual.GetComponent<EnergiaController>();
         if (ctrl == null) { SetBotonesActivos(false); return; }

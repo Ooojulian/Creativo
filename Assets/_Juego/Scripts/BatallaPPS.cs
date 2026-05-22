@@ -50,9 +50,16 @@ public class BatallaPPS : MonoBehaviourPun
     // Llamado por host cuando detecta colisión
     public void IniciarBatalla(int actorAtk, int actorDef, int idxFichaAtk, bool fBAtk, int idxFichaDef, bool fBDef)
     {
-        if (!PhotonNetwork.IsMasterClient) return;
-        photonView.RPC(nameof(RPC_IniciarBatalla), RpcTarget.All,
-            actorAtk, actorDef, idxFichaAtk, fBAtk, idxFichaDef, fBDef);
+        if (PhotonNetwork.InRoom)
+        {
+            if (!PhotonNetwork.IsMasterClient) return;
+            photonView.RPC(nameof(RPC_IniciarBatalla), RpcTarget.All,
+                actorAtk, actorDef, idxFichaAtk, fBAtk, idxFichaDef, fBDef);
+        }
+        else
+        {
+            RPC_IniciarBatalla(actorAtk, actorDef, idxFichaAtk, fBAtk, idxFichaDef, fBDef);
+        }
     }
 
     [PunRPC]
@@ -67,7 +74,8 @@ public class BatallaPPS : MonoBehaviourPun
         eleccionAtacante = EleccionPPS.Ninguna;
         eleccionDefensor = EleccionPPS.Ninguna;
 
-        bool participo = PhotonNetwork.LocalPlayer.ActorNumber == actorAtk
+        bool participo = !PhotonNetwork.InRoom
+                      || PhotonNetwork.LocalPlayer.ActorNumber == actorAtk
                       || PhotonNetwork.LocalPlayer.ActorNumber == actorDef;
 
         if (panelBatalla != null) panelBatalla.SetActive(true);
@@ -91,8 +99,18 @@ public class BatallaPPS : MonoBehaviourPun
     {
         HabilitarBotones(false);
         if (textoEstado != null) textoEstado.text = $"Elegiste: {eleccion}. Esperando rival...";
-        photonView.RPC(nameof(RPC_RecibirEleccion), RpcTarget.All,
-            PhotonNetwork.LocalPlayer.ActorNumber, (int)eleccion);
+        if (PhotonNetwork.InRoom)
+        {
+            photonView.RPC(nameof(RPC_RecibirEleccion), RpcTarget.All,
+                PhotonNetwork.LocalPlayer.ActorNumber, (int)eleccion);
+        }
+        else
+        {
+            // Offline: el jugador elige por el atacante, la CPU elige aleatoriamente por el defensor
+            EleccionPPS eleccionCPU = (EleccionPPS)UnityEngine.Random.Range(1, 4);
+            RPC_RecibirEleccion(actorAtacante, (int)eleccion);
+            RPC_RecibirEleccion(actorDefensor, (int)eleccionCPU);
+        }
     }
 
     [PunRPC]
@@ -124,8 +142,11 @@ public class BatallaPPS : MonoBehaviourPun
             else
                 ganador = 2;
         }
-        photonView.RPC(nameof(RPC_MostrarResultado), RpcTarget.All,
-            ganador, (int)eleccionAtacante, (int)eleccionDefensor);
+        if (PhotonNetwork.InRoom)
+            photonView.RPC(nameof(RPC_MostrarResultado), RpcTarget.All,
+                ganador, (int)eleccionAtacante, (int)eleccionDefensor);
+        else
+            RPC_MostrarResultado(ganador, (int)eleccionAtacante, (int)eleccionDefensor);
     }
 
     [PunRPC]
@@ -139,7 +160,7 @@ public class BatallaPPS : MonoBehaviourPun
         if (OnBattleResult != null)
             OnBattleResult.Invoke(ganador, indiceFichaAtacante, indiceFichaDefensor);
 
-        if (PhotonNetwork.IsMasterClient)
+        if (PhotonNetwork.IsMasterClient || !PhotonNetwork.InRoom)
             StartCoroutine(AplicarResultado(ganador));
     }
 
@@ -153,7 +174,10 @@ public class BatallaPPS : MonoBehaviourPun
         else if (ganador == 2) // defensor gana → atacante pierde
             EnviarFichaAlInicio(indiceFichaAtacante, fichaBAtacante);
 
-        photonView.RPC(nameof(RPC_CerrarBatalla), RpcTarget.All);
+        if (PhotonNetwork.InRoom)
+            photonView.RPC(nameof(RPC_CerrarBatalla), RpcTarget.All);
+        else
+            RPC_CerrarBatalla();
 
         // Avanzar turno
         gameManager.SiguienteTurno();
@@ -161,7 +185,10 @@ public class BatallaPPS : MonoBehaviourPun
 
     private void EnviarFichaAlInicio(int indiceFicha, bool esB)
     {
-        photonView.RPC(nameof(RPC_FichaAlInicio), RpcTarget.All, indiceFicha, esB);
+        if (PhotonNetwork.InRoom)
+            photonView.RPC(nameof(RPC_FichaAlInicio), RpcTarget.All, indiceFicha, esB);
+        else
+            RPC_FichaAlInicio(indiceFicha, esB);
     }
 
     [PunRPC]

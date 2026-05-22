@@ -98,7 +98,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void IniciarPartida(int cantidad)
+    // actorNumbers: host-provided mapping (index i → actorNumber). Null = local mode.
+    public void IniciarPartida(int cantidad, int[] actorNumbers = null)
     {
         if (panelMenu != null) panelMenu.SetActive(false);
         jugadoresActivos.Clear();
@@ -131,6 +132,16 @@ public class GameManager : MonoBehaviour
             jugador.gameObject.SetActive(true);
             jugadoresActivos.Add(jugador);
 
+            // actorNumbers viene del host (fuente de verdad). Fallback: PlayerList o local.
+            if (actorNumbers != null && i < actorNumbers.Length)
+                jugador.actorNumber = actorNumbers[i];
+            else if (PhotonNetwork.InRoom && i < PhotonNetwork.PlayerList.Length)
+                jugador.actorNumber = PhotonNetwork.PlayerList[i].ActorNumber;
+            else
+                jugador.actorNumber = i + 1;
+
+            Debug.Log($"[GameManager] IniciarPartida: ficha[{i}] '{jugador.name}' actorNumber={jugador.actorNumber}");
+
             // Activar e inicializar ficha B (va de meta a inicio)
             if (jugador.fichaB != null)
             {
@@ -153,14 +164,10 @@ public class GameManager : MonoBehaviour
         if (turnoActual < jugadoresActivos.Count)
         {
             MovimientoFicha j = jugadoresActivos[turnoActual];
-            // Decrementar estados del jugador que acaba de jugar
             j.GetComponent<EstadosJugador>()?.DecrementarTodosLosEstados();
-            // Trigger "Inspiración" al final del turno
             CardTriggerSystem.Instance?.CheckTurnEnd(j, j.cartasAlEmpezarTurno);
+            OnTurnEnded?.Invoke(j);
         }
-
-        if (OnTurnEnded != null)
-            OnTurnEnded.Invoke(jugadoresActivos[turnoActual]);
 
         turnoActual++;
         if (turnoActual >= jugadoresActivos.Count)

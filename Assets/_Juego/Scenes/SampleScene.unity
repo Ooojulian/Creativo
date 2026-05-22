@@ -185,6 +185,7 @@ MonoBehaviour:
   jugador: {fileID: 0}
   textoResultado: {fileID: 0}
   textoInstruccion: {fileID: 0}
+  _btnTirarDado: {fileID: 0}
   posicionFija: {x: 500, y: 60, z: 500}
   escalaDado: 5
   duracionLanzamiento: 1
@@ -1135,7 +1136,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 66313764}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbc54570e3f27ac3fb87bcb4e9d4d575, type: 3}
+  m_Script: {fileID: 11500000, guid: 8bff12a7e96776448ad717a288337cab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GestorDeRuta
   casillas:
@@ -4370,7 +4371,7 @@ MonoBehaviour:
   textoCarta: {fileID: 1115949614}
   botonUsar: {fileID: 2106486440}
   botonGuardar: {fileID: 1969464570}
-  botonCerrar: {fileID: 1849659381}
+  botonCerrar: {fileID: 0}
 --- !u!4 &370384256
 Transform:
   m_ObjectHideFlags: 0
@@ -4971,43 +4972,6 @@ Transform:
   - {fileID: 1548729483}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!84 &412319534
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 128
-  m_Height: 128
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 94
-  m_ColorFormat: 48
-  m_MipMap: 1
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 0
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
 --- !u!1001 &422370092
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6629,10 +6593,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95901fec81481c4b89b073bf0802ffad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FichaInversa
-  ruta: {fileID: 66313766}
   indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
   fichaPrincipal: {fileID: 1062106794}
 --- !u!114 &578562731
 MonoBehaviour:
@@ -9877,6 +9839,43 @@ Transform:
   - {fileID: 1717381361}
   m_Father: {fileID: 410097612}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!84 &900779154
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 6
+  m_Width: 128
+  m_Height: 128
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 94
+  m_ColorFormat: 48
+  m_MipMap: 1
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_UseDynamicScaleExplicit: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 0
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1 &902674445
 GameObject:
   m_ObjectHideFlags: 0
@@ -13202,9 +13201,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 264}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 130}
+  m_SizeDelta: {x: 600, y: 110}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1194239374
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13215,17 +13214,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.HorizontalLayoutGroup
   m_Padding:
-    m_Left: 0
-    m_Right: 0
+    m_Left: 5
+    m_Right: 5
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 0
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildAlignment: 4
+  m_Spacing: 5
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
@@ -16783,43 +16782,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 29b2975f358c02e47a2dad282074719a, type: 3}
---- !u!84 &1519555262
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 128
-  m_Height: 128
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 94
-  m_ColorFormat: 48
-  m_MipMap: 1
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 0
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
 --- !u!1 &1548729482
 GameObject:
   m_ObjectHideFlags: 0
@@ -17589,10 +17551,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95901fec81481c4b89b073bf0802ffad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FichaInversa
-  ruta: {fileID: 66313766}
   indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
   fichaPrincipal: {fileID: 1964455106}
 --- !u!114 &1617734915
 MonoBehaviour:
@@ -20294,10 +20254,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95901fec81481c4b89b073bf0802ffad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FichaInversa
-  ruta: {fileID: 66313766}
   indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
   fichaPrincipal: {fileID: 1108432512}
 --- !u!114 &1906783811
 MonoBehaviour:
@@ -21338,11 +21296,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 131284073}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -250, y: -150}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 10}
+  m_SizeDelta: {x: 600, y: 110}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1978736307
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21353,17 +21311,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.HorizontalLayoutGroup
   m_Padding:
-    m_Left: 0
-    m_Right: 0
+    m_Left: 5
+    m_Right: 5
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 0
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildAlignment: 4
+  m_Spacing: 5
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
@@ -21567,6 +21525,43 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CartaEnCasilla
   modo: 2
   cartaEspecifica: {fileID: 0}
+--- !u!84 &2000407163
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 6
+  m_Width: 128
+  m_Height: 128
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 94
+  m_ColorFormat: 48
+  m_MipMap: 1
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_UseDynamicScaleExplicit: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 0
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1 &2004548735
 GameObject:
   m_ObjectHideFlags: 0
@@ -22171,10 +22166,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95901fec81481c4b89b073bf0802ffad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FichaInversa
-  ruta: {fileID: 66313766}
   indiceActual: 0
   velocidad: 150
-  gm: {fileID: 1366047254}
   fichaPrincipal: {fileID: 947567103}
 --- !u!114 &2083967945
 MonoBehaviour:

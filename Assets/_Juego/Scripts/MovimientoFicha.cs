@@ -31,6 +31,9 @@ public class MovimientoFicha : MonoBehaviour
     public FichaInversa fichaB;
     public bool moverFichaB = false; // true = mover FichaB, false = mover FichaA (esta)
 
+    [Header("Red")]
+    public int actorNumber = -1; // ActorNumber de Photon del jugador que controla esta ficha
+
     void Awake()
     {
         camaraDirectora = FindAnyObjectByType<CamaraDirectora>();
@@ -224,52 +227,49 @@ public class MovimientoFicha : MonoBehaviour
                     CardTriggerSystem.Instance.CheckCardDrawn(this, card);
             }
 
-            if (gm != null && gm.uiCartas != null)
-                yield return StartCoroutine(gm.uiCartas.FadeOutYLimpiar(tiempoResultado));
-
             if (CardPlayUI.Instance != null)
                 CardPlayUI.Instance.Mostrar(card, this);
+
+            if (gm != null && gm.uiCartas != null)
+                yield return StartCoroutine(gm.uiCartas.FadeOutYLimpiar(tiempoResultado));
 
             yield break;
         }
 
-        // ─── Con red: solo el dueño decide la carta y la sincroniza ──────────
-        CardSO cartaElegida = null;
+        // ─── Con red: solo el dueño del turno decide y muestra la carta ──────
+        // Los demás clientes no hacen nada — el RPC_CartaRobada se encarga del AddToHand.
+        if (!esMia) yield break;
 
-        if (esMia)
+        CardSO cartaElegida = comp.ObtenerCarta();
+
+        if (cartaElegida == null)
         {
-            cartaElegida = comp.ObtenerCarta();
-
-            if (cartaElegida == null)
-            {
-                if (gm != null && gm.uiCartas != null) gm.uiCartas.Limpiar();
-                yield break;
-            }
-
-            // Mostrar revelación solo en mi pantalla
-            if (gm != null && gm.uiCartas != null)
-                gm.uiCartas.MostrarRevelacion(cartaElegida);
-
-            yield return new WaitForSeconds(tiempoRevelacion);
-
-            // Sincronizar con todos los clientes (el RPC hace el AddToHand en todos)
-            int fichaIndex = gm.todosLosJugadores.IndexOf(this);
-            if (GameSync.Instance != null && fichaIndex >= 0)
-                GameSync.Instance.SincronizarCartaRobada(fichaIndex, (int)cartaElegida.type);
-
-            // Trigger de CheckCardDrawn solo local (efecto de reserva si aplica)
-            if (CardTriggerSystem.Instance != null)
-                CardTriggerSystem.Instance.CheckCardDrawn(this, cartaElegida);
-
-            // Fade out solo en mi pantalla
-            if (gm != null && gm.uiCartas != null)
-                yield return StartCoroutine(gm.uiCartas.FadeOutYLimpiar(tiempoResultado));
-
-            // Abrir panel Usar/Guardar solo en mi pantalla
-            if (CardPlayUI.Instance != null)
-                CardPlayUI.Instance.Mostrar(cartaElegida, this);
+            if (gm != null && gm.uiCartas != null) gm.uiCartas.Limpiar();
+            yield break;
         }
-        // Los demás clientes no hacen nada aquí; el RPC se encarga de su AddToHand.
+
+        // Mostrar revelación solo en mi pantalla
+        if (gm != null && gm.uiCartas != null)
+            gm.uiCartas.MostrarRevelacion(cartaElegida);
+
+        yield return new WaitForSeconds(tiempoRevelacion);
+
+        // Sincronizar con todos los clientes (el RPC hace el AddToHand en todos)
+        int fichaIndex = gm.todosLosJugadores.IndexOf(this);
+        if (GameSync.Instance != null && fichaIndex >= 0)
+            GameSync.Instance.SincronizarCartaRobada(fichaIndex, (int)cartaElegida.type);
+
+        // Trigger de CheckCardDrawn solo local
+        if (CardTriggerSystem.Instance != null)
+            CardTriggerSystem.Instance.CheckCardDrawn(this, cartaElegida);
+
+        // Fade out solo en mi pantalla
+        if (gm != null && gm.uiCartas != null)
+            yield return StartCoroutine(gm.uiCartas.FadeOutYLimpiar(tiempoResultado));
+
+        // Abrir panel Usar/Guardar solo en mi pantalla
+        if (CardPlayUI.Instance != null)
+            CardPlayUI.Instance.Mostrar(cartaElegida, this);
     }
 
     public System.Collections.Generic.List<Transform> ObtenerCasillas()

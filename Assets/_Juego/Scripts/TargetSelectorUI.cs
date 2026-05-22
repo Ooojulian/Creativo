@@ -148,11 +148,14 @@ public class TargetSelectorUI : MonoBehaviour
         LimpiarBotones();
         if (textoTitulo != null) textoTitulo.text = "¿A quién deseas atacar?";
 
+        MovimientoFicha usuarioActual = gm.JugadorActual;
+
+        bool hayRivales = false;
         for (int i = 0; i < gm.todosLosJugadores.Count; i++)
         {
             var jugador = gm.todosLosJugadores[i];
-            // Excluir a todos menos a rivales activos (el usuario ya no lo tenemos,
-            // pero el selector solo muestra jugadores distintos al que tiene el turno actual)
+            if (jugador == usuarioActual || !jugador.gameObject.activeSelf) continue;
+
             int capturedIndex = i;
             var btnObj = CrearBoton($"Jugador {i + 1}");
             btnObj.GetComponent<Button>().onClick.AddListener(() =>
@@ -160,6 +163,13 @@ public class TargetSelectorUI : MonoBehaviour
                 _rivalSeleccionado = capturedIndex;
                 MostrarPaso2Fichas(gm.todosLosJugadores[capturedIndex]);
             });
+            hayRivales = true;
+        }
+
+        if (!hayRivales)
+        {
+            _callback?.Invoke(-1, false);
+            Ocultar();
         }
     }
 

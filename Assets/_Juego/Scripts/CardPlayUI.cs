@@ -9,6 +9,7 @@ public class CardPlayUI : MonoBehaviour
 
     public GameObject panel;
     public TextMeshProUGUI textoCarta;
+    public Image imagenCarta;
     public Button botonUsar;
     public Button botonGuardar;
     public Button botonCerrar;   // Siempre visible, permite cancelar sin gastar la carta
@@ -21,6 +22,29 @@ public class CardPlayUI : MonoBehaviour
     {
         Instance = this;
         panel.SetActive(false);
+
+        // Auto-buscar o crear imagen de carta si no fue asignada en el Inspector
+        if (imagenCarta == null && panel != null)
+        {
+            // Buscar un hijo llamado "ImagenCarta" primero
+            var t = panel.transform.Find("ImagenCarta");
+            if (t != null)
+                imagenCarta = t.GetComponent<Image>();
+        }
+        if (imagenCarta == null && panel != null)
+        {
+            // Crear un Image hijo dedicado a mostrar el artwork
+            var go = new GameObject("ImagenCarta", typeof(RectTransform), typeof(Image));
+            go.transform.SetParent(panel.transform, worldPositionStays: false);
+            var rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.5f, 0.5f);
+            rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = new Vector2(220f, 220f);
+            rt.anchoredPosition = new Vector2(0f, 80f);
+            imagenCarta = go.GetComponent<Image>();
+            imagenCarta.preserveAspect = true;
+            go.SetActive(false);
+        }
 
         // Enlazar botones programáticamente para que siempre funcionen sin tener que configurarlos en el Inspector de Unity
         if (botonUsar != null)
@@ -60,8 +84,22 @@ public class CardPlayUI : MonoBehaviour
 
     private void MostrarPanel(CardSO card, MovimientoFicha jugador)
     {
+        // En red: nunca abrir el panel si no es el turno del cliente local
+        if (Photon.Pun.PhotonNetwork.InRoom &&
+            GameSync.Instance != null && !GameSync.Instance.EsMiTurno)
+        {
+            Debug.LogWarning("[CardPlayUI] Intento de abrir panel fuera de turno — ignorado.");
+            return;
+        }
+
         cartaSeleccionada = card;
         jugadorActual = jugador;
+
+        if (imagenCarta != null)
+        {
+            imagenCarta.sprite = card.artwork;
+            imagenCarta.gameObject.SetActive(card.artwork != null);
+        }
 
         var energia = jugador.GetComponent<EnergiaController>();
         int energiaActual = energia != null ? energia.EnergiaActual : 0;
@@ -177,19 +215,9 @@ public class CardPlayUI : MonoBehaviour
         }
         else if (cartaSeleccionada.type == CardType.Intercambio)
         {
-            if (GameManager.Instance != null)
-            {
-                var candidatos = new List<int>();
-                for (int i = 0; i < GameManager.Instance.todosLosJugadores.Count; i++)
-                {
-                    var j = GameManager.Instance.todosLosJugadores[i];
-                    if (j != jugadorActual && j.gameObject.activeSelf) candidatos.Add(i);
-                }
-                if (candidatos.Count > 0)
-                {
-                    randVal1 = candidatos[UnityEngine.Random.Range(0, candidatos.Count)];
-                }
-            }
+            // Si el usuario ya eligió rival via TargetSelectorUI, usar ese índice directamente.
+            // randVal1 solo se usa cuando no hay selector (auto-detect en CardManager).
+            randVal1 = indexRival >= 0 ? indexRival : -1;
         }
 
         // ─── Con red: RPC con índice de rival, token y valores deterministas incluidos

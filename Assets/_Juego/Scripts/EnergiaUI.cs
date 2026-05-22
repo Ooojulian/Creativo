@@ -14,27 +14,29 @@ public class EnergiaUI : MonoBehaviour
     void Awake()
     {
         if (textoEnergia != null)
-        {
             textoEnergia.gameObject.SetActive(false);
-            Debug.Log("[EnergíaUI] Texto inicializado y oculto.");
-        }
-
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.OnTurnStarted += ActualizarSuscripcion;
-
-            if (GameManager.Instance.JugadorActual != null)
-            {
-                Debug.Log($"[EnergíaUI] Detectado jugador actual {GameManager.Instance.JugadorActual.name} al inicio.");
-                ActualizarSuscripcion(GameManager.Instance.JugadorActual);
-            }
-        }
     }
 
     void Start()
     {
-        // Ya no conectamos manualmente aquí. Al suscribirnos en Awake,
-        // capturaremos automáticamente el OnTurnStarted inicial de GameManager.Start().
+        SuscribirSiPosible();
+    }
+
+    void Update()
+    {
+        // Reintento por si GameManager llegó tarde
+        if (currentController == null)
+            SuscribirSiPosible();
+    }
+
+    private bool _suscrito = false;
+    private void SuscribirSiPosible()
+    {
+        if (_suscrito || GameManager.Instance == null) return;
+        _suscrito = true;
+        GameManager.Instance.OnTurnStarted += ActualizarSuscripcion;
+        if (GameManager.Instance.JugadorActual != null)
+            ActualizarSuscripcion(GameManager.Instance.JugadorActual);
     }
 
     void OnDestroy()

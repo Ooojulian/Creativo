@@ -25,9 +25,16 @@ public class GameSync : MonoBehaviourPunCallbacks
     public void AnunciarTurnoConPanel(int indiceTurno)
     {
         if (!PhotonNetwork.IsMasterClient) return;
-        // Mapear índice de turno a actor number: el jugador en posición indiceTurno
-        var jugadores = PhotonNetwork.PlayerList;
-        int actorNumber = indiceTurno < jugadores.Length ? jugadores[indiceTurno].ActorNumber : 1;
+        // Leer actorNumber desde la ficha en escena (asignado en IniciarPartida)
+        // Evita depender del orden no garantizado de PhotonNetwork.PlayerList
+        int actorNumber = -1;
+        if (gameManager != null && indiceTurno < gameManager.todosLosJugadores.Count)
+            actorNumber = gameManager.todosLosJugadores[indiceTurno].actorNumber;
+        if (actorNumber < 0)
+        {
+            var jugadores = PhotonNetwork.PlayerList;
+            actorNumber = indiceTurno < jugadores.Length ? jugadores[indiceTurno].ActorNumber : 1;
+        }
         photonView.RPC(nameof(RPC_RecibirTurnoConPanel), RpcTarget.All, actorNumber, indiceTurno);
     }
 
@@ -44,6 +51,12 @@ public class GameSync : MonoBehaviourPunCallbacks
             ? gameManager.todosLosJugadores[indiceTurno] : null;
         if (jugador == null) return;
 
+        // Asignar dado.jugador en TODOS los clientes para que MoverViaRPC use el índice correcto
+        if (gameManager.dado != null)
+            gameManager.dado.jugador = jugador;
+
+        Debug.Log($"[GameSync] RPC_RecibirTurnoConPanel: actorNumber={actorNumber} indiceTurno={indiceTurno} jugador={jugador.name} esMiTurno={esMiTurno} localActor={PhotonNetwork.LocalPlayer.ActorNumber}");
+
         // Lanzar evento de turno en todos los clientes (energía, UI, etc.)
         gameManager.DispararOnTurnStarted(jugador);
 
@@ -57,8 +70,14 @@ public class GameSync : MonoBehaviourPunCallbacks
     public void AnunciarTurno(int indiceTurno)
     {
         if (!PhotonNetwork.IsMasterClient) return;
-        var jugadores = PhotonNetwork.PlayerList;
-        int actorNumber = indiceTurno < jugadores.Length ? jugadores[indiceTurno].ActorNumber : 1;
+        int actorNumber = -1;
+        if (gameManager != null && indiceTurno < gameManager.todosLosJugadores.Count)
+            actorNumber = gameManager.todosLosJugadores[indiceTurno].actorNumber;
+        if (actorNumber < 0)
+        {
+            var jugadores = PhotonNetwork.PlayerList;
+            actorNumber = indiceTurno < jugadores.Length ? jugadores[indiceTurno].ActorNumber : 1;
+        }
         photonView.RPC(nameof(RPC_RecibirTurno), RpcTarget.All, actorNumber, indiceTurno);
     }
 
@@ -170,11 +189,16 @@ public class GameSync : MonoBehaviourPunCallbacks
     public void IniciarPartida(int cantidad)
     {
         if (!PhotonNetwork.IsMasterClient) return;
-        photonView.RPC(nameof(RPC_IniciarPartida), RpcTarget.All, cantidad);
+        // Host builds the authoritative actor→ficha mapping and sends it to all clients.
+        int[] actorNumbers = new int[cantidad];
+        var lista = PhotonNetwork.PlayerList; // sorted by ActorNumber on host
+        for (int i = 0; i < cantidad && i < lista.Length; i++)
+            actorNumbers[i] = lista[i].ActorNumber;
+        photonView.RPC(nameof(RPC_IniciarPartida), RpcTarget.All, cantidad, actorNumbers);
     }
 
     [PunRPC]
-    private void RPC_IniciarPartida(int cantidad)
+    private void RPC_IniciarPartida(int cantidad, int[] actorNumbers)
     {
         if (gameManager == null) gameManager = FindAnyObjectByType<GameManager>();
         var menu = MenuController.Instance;
@@ -186,7 +210,7 @@ public class GameSync : MonoBehaviourPunCallbacks
             if (menu.panelUnirse != null)        menu.panelUnirse.SetActive(false);
             if (menu.botonIniciarPartida != null) menu.botonIniciarPartida.gameObject.SetActive(false);
         }
-        gameManager.IniciarPartida(cantidad);
+        gameManager.IniciarPartida(cantidad, actorNumbers);
     }
 
     // ─── SALA ────────────────────────────────────────────────────────────────

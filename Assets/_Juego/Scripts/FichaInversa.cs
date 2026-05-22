@@ -171,12 +171,32 @@ public class FichaInversa : MonoBehaviour
 
         yield return new WaitForSeconds(fichaPrincipal != null ? fichaPrincipal.tiempoRevelacion : 2f);
 
-        if (fichaPrincipal != null && fichaPrincipal.inventario != null)
+        if (Photon.Pun.PhotonNetwork.InRoom)
         {
-            fichaPrincipal.inventario.AddToHand(card);
-            if (CardTriggerSystem.Instance != null)
-                CardTriggerSystem.Instance.CheckCardDrawn(fichaPrincipal, card);
+            // En red: solo el dueño del turno decide la carta y la sincroniza via RPC
+            if (esMia && fichaPrincipal != null && gameManager != null)
+            {
+                int fichaIndex = gameManager.todosLosJugadores.IndexOf(fichaPrincipal);
+                if (GameSync.Instance != null && fichaIndex >= 0)
+                    GameSync.Instance.SincronizarCartaRobada(fichaIndex, (int)card.type);
+
+                if (CardTriggerSystem.Instance != null)
+                    CardTriggerSystem.Instance.CheckCardDrawn(fichaPrincipal, card);
+            }
         }
+        else
+        {
+            // Sin red: añadir localmente
+            if (fichaPrincipal != null && fichaPrincipal.inventario != null)
+            {
+                fichaPrincipal.inventario.AddToHand(card);
+                if (CardTriggerSystem.Instance != null)
+                    CardTriggerSystem.Instance.CheckCardDrawn(fichaPrincipal, card);
+            }
+        }
+
+        if (esMia && gameManager != null && gameManager.uiCartas != null)
+            yield return StartCoroutine(gameManager.uiCartas.FadeOutYLimpiar(fichaPrincipal != null ? fichaPrincipal.tiempoResultado : 1f));
 
         if (esMia && CardPlayUI.Instance != null)
         {
@@ -184,8 +204,5 @@ public class FichaInversa : MonoBehaviour
             while (CardPlayUI.Instance.panel.activeSelf)
                 yield return null;
         }
-
-        if (esMia && gameManager != null && gameManager.uiCartas != null)
-            yield return StartCoroutine(gameManager.uiCartas.FadeOutYLimpiar(fichaPrincipal != null ? fichaPrincipal.tiempoResultado : 1f));
     }
 }

@@ -17,7 +17,6 @@ public class EnergiaHooks : MonoBehaviour
     public int energiaPorMetaIntermedia = 3;
 
     private Dictionary<MovimientoFicha, EnergiaController> controllers = new Dictionary<MovimientoFicha, EnergiaController>();
-    private MovimientoFicha ultimoGanadorBatalla = null;
 
     void Awake()
     {
@@ -93,14 +92,7 @@ public class EnergiaHooks : MonoBehaviour
         var ctrl = controllers[jugador];
         ctrl.GanarEnergia(energiaPorTurno);
 
-        // 2. Ganar +2 si ganó batalla previa
-        if (ultimoGanadorBatalla == jugador)
-        {
-            ctrl.GanarEnergia(energiaPorBatallaGanada);
-            ultimoGanadorBatalla = null; // Resetear
-        }
-
-        // 3. Ganar +3 si está en meta intermedia
+        // Ganar +3 si está en meta intermedia
         // Definimos "meta intermedia" como cualquier casilla tipo NodeType.Finish que NO sea la última de la ruta
         var casillas = jugador.ObtenerCasillas();
         if (casillas != null && casillas.Count > 0 && jugador.indiceActual > 0 && jugador.indiceActual < casillas.Count - 1)
@@ -123,13 +115,8 @@ public class EnergiaHooks : MonoBehaviour
 
         if (fichaGanadora != null)
         {
-            // Si queremos que la energía se gane INSTANTÁNEAMENTE:
             if (controllers.TryGetValue(fichaGanadora, out var ctrl))
-            {
                 ctrl.GanarEnergia(energiaPorBatallaGanada);
-            }
-            // O si queremos que se gane al INICIO del siguiente turno del jugador:
-            // ultimoGanadorBatalla = fichaGanadora; 
         }
     }
 
