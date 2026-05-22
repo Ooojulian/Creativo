@@ -44,6 +44,12 @@ public class GameSync : MonoBehaviourPunCallbacks
             ? gameManager.todosLosJugadores[indiceTurno] : null;
         if (jugador == null) return;
 
+        // CRÍTICO: asignar la ficha correcta al dado en TODOS los clientes,
+        // no solo en el host (PrepararTurno lo hace localmente para el host,
+        // pero el cliente necesita recibirlo aquí para saber qué ficha mover).
+        if (gameManager.dado != null)
+            gameManager.dado.jugador = jugador;
+
         // Lanzar evento de turno en todos los clientes (energía, UI, etc.)
         gameManager.DispararOnTurnStarted(jugador);
 

@@ -67,6 +67,6 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "Creativo.slnx",
+    "dotnet.defaultSolution": "Creativo-2026-05-22-10-46-17.slnx",
     "dotnet.enableWorkspaceBasedDevelopment": false
 }
